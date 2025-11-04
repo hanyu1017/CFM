@@ -230,8 +230,17 @@ export default function DashboardPage() {
 }
 
 // 指標卡片組件
-function MetricCard({ title, value, unit, trend, icon, color }: any) {
-  const colorClasses = {
+interface MetricCardProps {
+  title: string;
+  value: number | string;
+  unit: string;
+  trend: number;
+  icon: React.ReactNode;
+  color: 'blue' | 'green' | 'yellow' | 'purple';
+}
+
+function MetricCard({ title, value, unit, trend, icon, color }: MetricCardProps) {
+  const colorClasses: Record<'blue' | 'green' | 'yellow' | 'purple', string> = {
     blue: 'bg-blue-500',
     green: 'bg-green-500',
     yellow: 'bg-yellow-500',
