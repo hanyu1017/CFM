@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    const totalEmissions = carbonData.reduce((sum, item) => sum + item.totalCarbon, 0);
+    const totalEmissions = carbonData.reduce((sum: number, item: { totalCarbon: number }) => sum + item.totalCarbon, 0);
 
     const report = await prisma.sustainabilityReport.create({
       data: {

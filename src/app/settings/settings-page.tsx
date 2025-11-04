@@ -130,7 +130,7 @@ export default function SettingsPage() {
               {activeTab === 'targets' && (
                 <TargetsPanel
                   targets={targets}
-                  onAdd={async (target) => {
+                  onAdd={async (target: EmissionTarget) => {
                     const response = await fetch('/api/settings/targets', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
@@ -139,7 +139,7 @@ export default function SettingsPage() {
                     const data = await response.json();
                     setTargets([...targets, data]);
                   }}
-                  onUpdate={async (id, target) => {
+                  onUpdate={async (id: string, target: EmissionTarget) => {
                     await fetch(`/api/settings/targets/${id}`, {
                       method: 'PUT',
                       headers: { 'Content-Type': 'application/json' },
@@ -147,7 +147,7 @@ export default function SettingsPage() {
                     });
                     setTargets(targets.map(t => t.id === id ? { ...target, id } : t));
                   }}
-                  onDelete={async (id) => {
+                  onDelete={async (id: string) => {
                     await fetch(`/api/settings/targets/${id}`, { method: 'DELETE' });
                     setTargets(targets.filter(t => t.id !== id));
                   }}
@@ -157,7 +157,7 @@ export default function SettingsPage() {
               {activeTab === 'settings' && (
                 <SettingsPanel
                   settings={settings}
-                  onUpdate={async (id, setting) => {
+                  onUpdate={async (id: string, setting: Setting) => {
                     await fetch(`/api/settings/config/${id}`, {
                       method: 'PUT',
                       headers: { 'Content-Type': 'application/json' },
@@ -193,7 +193,13 @@ function TabButton({ active, onClick, icon, label }: any) {
 }
 
 // 公司資料面板
-function CompanyPanel({ data, onChange, onSave }: any) {
+interface CompanyPanelProps {
+  data: CompanyData;
+  onChange: (data: CompanyData) => void;
+  onSave: () => void;
+}
+
+function CompanyPanel({ data, onChange, onSave }: CompanyPanelProps) {
   const handleChange = (key: keyof CompanyData, value: string) => {
     onChange({ ...data, [key]: value });
   };
@@ -204,40 +210,40 @@ function CompanyPanel({ data, onChange, onSave }: any) {
         <FormField
           label="公司名稱"
           value={data.name}
-          onChange={(v) => handleChange('name', v)}
+          onChange={(v: string) => handleChange('name', v)}
           placeholder="輸入公司名稱"
         />
         <FormField
           label="產業類別"
           value={data.industry}
-          onChange={(v) => handleChange('industry', v)}
+          onChange={(v: string) => handleChange('industry', v)}
           placeholder="例如：製造業、科技業"
         />
         <FormField
           label="公司地址"
           value={data.address}
-          onChange={(v) => handleChange('address', v)}
+          onChange={(v: string) => handleChange('address', v)}
           placeholder="輸入完整地址"
           fullWidth
         />
         <FormField
           label="聯絡信箱"
           value={data.contactEmail}
-          onChange={(v) => handleChange('contactEmail', v)}
+          onChange={(v: string) => handleChange('contactEmail', v)}
           type="email"
           placeholder="email@example.com"
         />
         <FormField
           label="聯絡電話"
           value={data.contactPhone}
-          onChange={(v) => handleChange('contactPhone', v)}
+          onChange={(v: string) => handleChange('contactPhone', v)}
           type="tel"
           placeholder="(02) 1234-5678"
         />
         <FormField
           label="統一編號"
           value={data.registrationNum}
-          onChange={(v) => handleChange('registrationNum', v)}
+          onChange={(v: string) => handleChange('registrationNum', v)}
           placeholder="8位數統編"
         />
       </div>
@@ -316,7 +322,7 @@ function TargetsPanel({ targets, onAdd, onUpdate, onDelete }: any) {
               label="目標年度"
               type="number"
               value={formData.targetYear}
-              onChange={(v) => setFormData({ ...formData, targetYear: parseInt(v) })}
+              onChange={(v: string) => setFormData({ ...formData, targetYear: parseInt(v) })}
             />
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -324,7 +330,7 @@ function TargetsPanel({ targets, onAdd, onUpdate, onDelete }: any) {
               </label>
               <select
                 value={formData.targetType}
-                onChange={(e) => setFormData({ ...formData, targetType: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({ ...formData, targetType: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="NET_ZERO">淨零排放</option>
@@ -336,19 +342,19 @@ function TargetsPanel({ targets, onAdd, onUpdate, onDelete }: any) {
               label="基準年度"
               type="number"
               value={formData.baselineYear}
-              onChange={(v) => setFormData({ ...formData, baselineYear: parseInt(v) })}
+              onChange={(v: string) => setFormData({ ...formData, baselineYear: parseInt(v) })}
             />
             <FormField
               label="基準值 (tCO2e)"
               type="number"
               value={formData.baselineValue}
-              onChange={(v) => setFormData({ ...formData, baselineValue: parseFloat(v) })}
+              onChange={(v: string) => setFormData({ ...formData, baselineValue: parseFloat(v) })}
             />
             <FormField
               label="目標值 (tCO2e)"
               type="number"
               value={formData.targetValue}
-              onChange={(v) => setFormData({ ...formData, targetValue: parseFloat(v) })}
+              onChange={(v: string) => setFormData({ ...formData, targetValue: parseFloat(v) })}
             />
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">

@@ -172,8 +172,17 @@ export default function ReportPage() {
 }
 
 // 快速操作卡片
-function QuickActionCard({ title, description, icon, color, onClick, disabled = false }: any) {
-  const colorClasses = {
+interface QuickActionCardProps {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  color: 'blue' | 'green' | 'purple';
+  onClick: () => void;
+  disabled?: boolean;
+}
+
+function QuickActionCard({ title, description, icon, color, onClick, disabled = false }: QuickActionCardProps) {
+  const colorClasses: Record<'blue' | 'green' | 'purple', string> = {
     blue: 'bg-blue-500 hover:bg-blue-600',
     green: 'bg-green-500 hover:bg-green-600',
     purple: 'bg-purple-500 hover:bg-purple-600',
