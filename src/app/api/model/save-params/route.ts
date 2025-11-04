@@ -8,10 +8,9 @@ export async function POST(request: NextRequest) {
   try {
     const params = await request.json();
 
-    // 儲存參數到資料庫
     const savedParams = await prisma.modelParameter.create({
       data: {
-        companyId: 'default', // 實際應用中應從 session 獲取
+        companyId: 'default',
         ...params,
         isActive: true,
       },

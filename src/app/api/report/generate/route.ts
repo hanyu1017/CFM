@@ -8,7 +8,6 @@ export async function POST(request: NextRequest) {
   try {
     const config = await request.json();
 
-    // 創建自定義報告
     const report = await prisma.sustainabilityReport.create({
       data: {
         companyId: 'default',
