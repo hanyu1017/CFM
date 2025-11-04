@@ -1,0 +1,349 @@
+// Prisma Schema for 永續碳排管理系統
+// Database: PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ========================================
+// 1. 公司基本資料
+// ========================================
+model Company {
+  id              String   @id @default(cuid())
+  name            String
+  industry        String?
+  address         String?
+  contactEmail    String?
+  contactPhone    String?
+  registrationNum String?  @unique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // 關聯
+  carbonData      CarbonEmission[]
+  reports         SustainabilityReport[]
+  settings        CompanySetting[]
+  modelParams     ModelParameter[]
+}
+
+// ========================================
+// 2. 碳排放數據 (用於儀表板)
+// ========================================
+model CarbonEmission {
+  id          String   @id @default(cuid())
+  companyId   String
+  date        DateTime
+  
+  // 碳排放類別
+  scope1      Float    @default(0) // 直接排放
+  scope2      Float    @default(0) // 能源間接排放
+  scope3      Float    @default(0) // 其他間接排放
+  totalCarbon Float    // 總碳排放量 (tCO2e)
+  
+  // 細分數據
+  electricity Float    @default(0) // 電力使用 (kWh)
+  naturalGas  Float    @default(0) // 天然氣 (m³)
+  fuel        Float    @default(0) // 燃料 (L)
+  transport   Float    @default(0) // 運輸 (km)
+  waste       Float    @default(0) // 廢棄物 (kg)
+  water       Float    @default(0) // 用水 (m³)
+  
+  // 元數據
+  dataSource  String?  // 數據來源
+  verified    Boolean  @default(false)
+  notes       String?  @db.Text
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // 關聯
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  @@index([companyId, date])
+  @@index([date])
+}
+
+// ========================================
+// 3. 決策模型參數
+// ========================================
+model ModelParameter {
+  id          String   @id @default(cuid())
+  companyId   String
+  
+  // 基本參數
+  a           Float    @default(1000)   // 需求參數
+  b           Float    @default(2.5)    // 價格敏感度
+  M           Float    @default(0.15)   // 市場增長率
+  rho         Float    @default(0.2)    // 折扣率
+  W           Float    @default(180)    // 批發價格
+  V           Float    @default(950)    // 變動成本
+  Dcost       Float    @default(100)    // 處理成本
+  S           Float    @default(15000)  // 固定成本
+  Ii          Float    @default(600000) // 初始投資
+  
+  // 綠色製造參數
+  A           Float    @default(2000)   // 零售訂購成本
+  UR          Float    @default(15)     // 單位零售持有成本
+  Uf          Float    @default(6)      // 單位固定持有成本
+  Ij          Float    @default(5)      // 單位庫存成本
+  H           Float    @default(450)    // 生產時間
+  alpha       Float    @default(12)     // 綠色投資係數
+  beta        Float    @default(0.001)  // 綠色技術效果
+  
+  // 不確定性參數
+  SHat        Float    @default(15000)
+  VHat        Float    @default(1400)
+  DcostHat    Float    @default(50)
+  UFHat       Float    @default(25)
+  IiHat       Float    @default(1000)
+  IjHat       Float    @default(120)
+  AHat        Float    @default(30)
+  WHat        Float    @default(5)
+  URHat       Float    @default(30)
+  MHat        Float    @default(5)
+  
+  // 其他參數
+  CapitalDelta Float   @default(0.2)    // 資本折舊率
+  TP          Float    @default(1.0)    // 時間參數
+  
+  // 元數據
+  isActive    Boolean  @default(true)
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // 關聯
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  results     OptimizationResult[]
+  
+  @@index([companyId])
+}
+
+// ========================================
+// 4. 優化結果 (決策模型輸出)
+// ========================================
+model OptimizationResult {
+  id              String   @id @default(cuid())
+  parameterId     String
+  
+  // 輸入變數
+  inputP          Float?   // 價格輸入
+  inputTf         Float?   // 固定週期輸入
+  inputTR         Float?   // 零售週期輸入
+  inputG          Float?   // 綠色投資輸入
+  
+  // 優化結果
+  optimalProfit   Float    // 最大利潤
+  optimalP        Float    // 最優價格 p*
+  optimalTf       Float    // 最優固定週期 Tf*
+  optimalTR       Float    // 最優零售週期 TR*
+  optimalG        Float    // 最優綠色投資 G*
+  totalCycle      Float    // 總週期 (TR + Tf)
+  
+  // 額外指標
+  totalRevenue    Float?   // 總收入
+  totalCost       Float?   // 總成本
+  demand          Float?   // 需求量
+  carbonReduction Float?   // 碳減排量
+  
+  // 元數據
+  calculatedAt    DateTime @default(now())
+  
+  // 關聯
+  parameter       ModelParameter @relation(fields: [parameterId], references: [id], onDelete: Cascade)
+  
+  @@index([parameterId])
+  @@index([calculatedAt])
+}
+
+// ========================================
+// 5. 敏感性分析結果
+// ========================================
+model SensitivityAnalysis {
+  id                String   @id @default(cuid())
+  
+  // 分析參數
+  parameterName     String   // 參數名稱 (a, b, M, etc.)
+  baseValue         Float    // 基準值
+  variationPercent  Float    // 變動百分比
+  newValue          Float    // 新參數值
+  
+  // 結果
+  resultProfit      Float?   // 利潤結果
+  resultProfitChange Float?  // 利潤變化量
+  resultProfitChangePct Float? // 利潤變化百分比
+  resultP           Float?   // p*
+  resultTf          Float?   // Tf*
+  resultTR          Float?   // TR*
+  resultG           Float?   // G*
+  
+  // 元數據
+  createdAt         DateTime @default(now())
+  
+  @@index([parameterName])
+  @@index([variationPercent])
+}
+
+// ========================================
+// 6. 永續報告書
+// ========================================
+model SustainabilityReport {
+  id              String   @id @default(cuid())
+  companyId       String
+  
+  // 報告基本資訊
+  title           String
+  reportPeriod    String   // 例如: "2024年第1季"
+  startDate       DateTime
+  endDate         DateTime
+  status          ReportStatus @default(DRAFT)
+  
+  // 報告內容 (JSON結構)
+  executiveSummary String? @db.Text  // 執行摘要
+  carbonFootprint  Json?             // 碳足跡數據
+  emissionsSummary Json?             // 排放總結
+  reductionTargets Json?             // 減排目標
+  initiatives      Json?             // 永續措施
+  compliance       Json?             // 法規遵循
+  financialImpact  Json?             // 財務影響
+  stakeholders     Json?             // 利害關係人
+  
+  // 檔案
+  pdfUrl          String?
+  docxUrl         String?
+  
+  // 元數據
+  generatedBy     String?  // 生成方式: AUTO, MANUAL
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  publishedAt     DateTime?
+  
+  // 關聯
+  company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  @@index([companyId])
+  @@index([status])
+  @@index([startDate, endDate])
+}
+
+enum ReportStatus {
+  DRAFT       // 草稿
+  REVIEW      // 審核中
+  APPROVED    // 已核准
+  PUBLISHED   // 已發布
+  ARCHIVED    // 已歸檔
+}
+
+// ========================================
+// 7. 公司設定 (用於設定頁面)
+// ========================================
+model CompanySetting {
+  id          String   @id @default(cuid())
+  companyId   String
+  
+  // 設定類別
+  category    String   // 例如: "carbon_target", "report_config", "notification"
+  key         String   // 設定鍵
+  value       String   @db.Text // 設定值 (可存JSON)
+  dataType    String   @default("string") // string, number, boolean, json
+  
+  // 描述
+  label       String?  // 顯示標籤
+  description String?  @db.Text
+  
+  // 元數據
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // 關聯
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  @@unique([companyId, category, key])
+  @@index([companyId])
+  @@index([category])
+}
+
+// ========================================
+// 8. 減排目標
+// ========================================
+model EmissionTarget {
+  id          String   @id @default(cuid())
+  companyId   String?
+  
+  // 目標資訊
+  targetYear  Int
+  targetType  String   // NET_ZERO, REDUCTION, INTENSITY
+  baselineYear Int
+  baselineValue Float
+  targetValue Float
+  unit        String   @default("tCO2e")
+  
+  // 進度
+  currentValue Float?
+  progress    Float?   // 完成百分比
+  
+  // 描述
+  description String?  @db.Text
+  status      String   @default("ACTIVE") // ACTIVE, ACHIEVED, DELAYED, CANCELLED
+  
+  // 元數據
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([companyId])
+  @@index([targetYear])
+}
+
+// ========================================
+// 9. AI對話記錄 (可選)
+// ========================================
+model ChatMessage {
+  id          String   @id @default(cuid())
+  sessionId   String
+  
+  // 訊息內容
+  role        String   // user, assistant
+  content     String   @db.Text
+  
+  // 元數據
+  tokens      Int?
+  model       String?  @default("claude-3-sonnet")
+  createdAt   DateTime @default(now())
+  
+  @@index([sessionId])
+  @@index([createdAt])
+}
+
+// ========================================
+// 10. 系統日誌 (可選)
+// ========================================
+model AuditLog {
+  id          String   @id @default(cuid())
+  
+  // 操作資訊
+  action      String   // CREATE, UPDATE, DELETE, LOGIN, etc.
+  entity      String   // 實體類型
+  entityId    String?  // 實體ID
+  
+  // 用戶資訊
+  userId      String?
+  userEmail   String?
+  ipAddress   String?
+  
+  // 變更詳情
+  oldValue    Json?
+  newValue    Json?
+  
+  // 元數據
+  createdAt   DateTime @default(now())
+  
+  @@index([action])
+  @@index([entity])
+  @@index([createdAt])
+}
