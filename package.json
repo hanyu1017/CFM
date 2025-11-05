@@ -14,9 +14,12 @@
     "prisma:studio": "prisma studio",
     "prisma:seed": "ts-node prisma/seed.ts",
     "seed:generate": "node scripts/generate-seed-data.js",
+    "seed:generate-clean": "node scripts/generate-seed-data-clean.js",
     "seed:import": "node scripts/import-seed-data.js",
     "seed:import-pg": "node scripts/import-with-pg.js",
     "seed:generate-sql": "node scripts/generate-sql.js",
+    "seed:validate": "node scripts/validate-json.js",
+    "seed:fix": "node scripts/validate-json.js",
     "prisma:fix": "node scripts/fix-prisma.js"
   },
   "dependencies": {
