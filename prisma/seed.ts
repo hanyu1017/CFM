@@ -88,9 +88,9 @@ async function main() {
 
   console.log(`✅ 已建立公司: ${company.name} (ID: ${company.id})`);
 
-  // 2. 建立碳排放數據（過去90天，每日一筆）
-  console.log('📊 建立碳排放數據（過去90天）...');
-  const carbonData = generateCarbonEmissionData(company.id, 90);
+  // 2. 建立碳排放數據（過去180天，每日一筆）
+  console.log('📊 建立碳排放數據（過去180天 / 6個月）...');
+  const carbonData = generateCarbonEmissionData(company.id, 180);
 
   for (const data of carbonData) {
     await prisma.carbonEmission.create({ data });
@@ -276,7 +276,7 @@ async function main() {
   console.log('\n🎉 資料庫種子數據執行完成！\n');
   console.log('📝 種子數據摘要:');
   console.log(`   - 公司數量: 1`);
-  console.log(`   - 碳排放數據: ${carbonData.length} 筆（過去90天）`);
+  console.log(`   - 碳排放數據: ${carbonData.length} 筆（過去180天 / 6個月）`);
   console.log(`   - 減排目標: ${targets.count} 個`);
   console.log(`   - 系統設定: 8 項`);
   console.log(`   - 決策模型參數: 1 組`);
