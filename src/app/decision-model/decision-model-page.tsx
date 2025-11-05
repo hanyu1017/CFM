@@ -423,8 +423,16 @@ function ResultPanel({ result }: { result: OptimizationResult }) {
 }
 
 // 結果卡片組件
-function ResultCard({ title, value, unit, color, icon }: any) {
-  const colorClasses = {
+interface ResultCardProps {
+  title: string;
+  value: number | string;
+  unit: string;
+  color: 'blue' | 'green' | 'purple' | 'yellow' | 'gray';
+  icon: React.ReactNode;
+}
+
+function ResultCard({ title, value, unit, color, icon }: ResultCardProps) {
+  const colorClasses: Record<'blue' | 'green' | 'purple' | 'yellow' | 'gray', string> = {
     blue: 'border-blue-500 bg-blue-50',
     green: 'border-green-500 bg-green-50',
     purple: 'border-purple-500 bg-purple-50',

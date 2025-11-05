@@ -22,7 +22,13 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    const formattedData = carbonData.map(item => ({
+    const formattedData = carbonData.map((item: {
+      date: Date;
+      scope1: number;
+      scope2: number;
+      scope3: number;
+      totalCarbon: number;
+    }) => ({
       date: item.date.toISOString().slice(0, 7),
       scope1: item.scope1,
       scope2: item.scope2,
