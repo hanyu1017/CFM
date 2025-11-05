@@ -32,28 +32,28 @@ export async function POST(request: NextRequest) {
         status: 'DRAFT',
         executiveSummary: config.includeExecutiveSummary
           ? `本報告書涵蓋 ${config.period} 期間之永續發展成果。`
-          : null,
+          : undefined,
         carbonFootprint: config.includeCarbonFootprint
           ? { summary: '碳足跡分析' }
-          : null,
+          : undefined,
         emissionsSummary: config.includeEmissionsSummary
           ? { scope1: 0, scope2: 0, scope3: 0 }
-          : null,
+          : undefined,
         reductionTargets: config.includeReductionTargets
           ? { targets: [] }
-          : null,
+          : undefined,
         initiatives: config.includeInitiatives
           ? { list: [] }
-          : null,
+          : undefined,
         compliance: config.includeCompliance
           ? { standards: [] }
-          : null,
+          : undefined,
         financialImpact: config.includeFinancialImpact
           ? { investment: 0 }
-          : null,
+          : undefined,
         stakeholders: config.includeStakeholders
           ? { groups: [] }
-          : null,
+          : undefined,
         pdfUrl,
         generatedBy: 'MANUAL',
       },
