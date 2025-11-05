@@ -43,14 +43,14 @@ export async function POST(request: NextRequest) {
     }
 
     // 計算碳排放統計數據
-    const totalEmissions = carbonData.reduce((sum, item) => sum + Number(item.totalCarbon), 0);
+    const totalEmissions = carbonData.reduce((sum: number, item: typeof carbonData[number]) => sum + Number(item.totalCarbon), 0);
     const avgEmissions = totalEmissions / carbonData.length;
-    const scope1Total = carbonData.reduce((sum, item) => sum + Number(item.scope1), 0);
-    const scope2Total = carbonData.reduce((sum, item) => sum + Number(item.scope2), 0);
-    const scope3Total = carbonData.reduce((sum, item) => sum + Number(item.scope3), 0);
-    const electricityTotal = carbonData.reduce((sum, item) => sum + Number(item.electricity), 0);
-    const naturalGasTotal = carbonData.reduce((sum, item) => sum + Number(item.naturalGas), 0);
-    const fuelTotal = carbonData.reduce((sum, item) => sum + Number(item.fuel), 0);
+    const scope1Total = carbonData.reduce((sum: number, item: typeof carbonData[number]) => sum + Number(item.scope1), 0);
+    const scope2Total = carbonData.reduce((sum: number, item: typeof carbonData[number]) => sum + Number(item.scope2), 0);
+    const scope3Total = carbonData.reduce((sum: number, item: typeof carbonData[number]) => sum + Number(item.scope3), 0);
+    const electricityTotal = carbonData.reduce((sum: number, item: typeof carbonData[number]) => sum + Number(item.electricity), 0);
+    const naturalGasTotal = carbonData.reduce((sum: number, item: typeof carbonData[number]) => sum + Number(item.naturalGas), 0);
+    const fuelTotal = carbonData.reduce((sum: number, item: typeof carbonData[number]) => sum + Number(item.fuel), 0);
 
     // 使用 OpenAI 生成報告內容（8個章節，每個約200字）
     const carbonSummary = `
