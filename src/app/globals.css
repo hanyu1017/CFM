@@ -24,10 +24,11 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
   body {
-    @apply bg-gradient-to-br from-slate-50 via-blue-50 to-green-50 text-foreground;
+    @apply bg-gradient-to-br from-slate-50 via-blue-50 to-green-50;
+    color: hsl(var(--foreground));
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
