@@ -8,7 +8,7 @@ import { LayoutDashboard, Calculator, FileText, Settings, Leaf } from 'lucide-re
 const navigation = [
   { name: '儀表板', href: '/dashboard', icon: LayoutDashboard },
   { name: '決策模型', href: '/decision-model', icon: Calculator },
-  { name: '報告', href: '/report', icon: FileText },
+  { name: '永續報告書生成', href: '/report', icon: FileText },
   { name: '設定', href: '/settings', icon: Settings },
 ];
 

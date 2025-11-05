@@ -8,17 +8,55 @@ export async function POST(request: NextRequest) {
   try {
     const config = await request.json();
 
+    // 獲取公司資料
+    const company = await prisma.company.findFirst();
+    if (!company) {
+      return NextResponse.json(
+        { error: '請先建立公司資料', success: false },
+        { status: 400 }
+      );
+    }
+
+    // 生成示範 PDF URL（實際應該生成真實的 PDF 檔案）
+    const pdfFileName = `report_${Date.now()}.pdf`;
+    const pdfUrl = `/api/report/download/${pdfFileName}`;
+
+    // 建立報告
     const report = await prisma.sustainabilityReport.create({
       data: {
-        companyId: 'default',
+        companyId: company.id,
         title: config.title,
         reportPeriod: config.period,
         startDate: new Date(config.startDate),
         endDate: new Date(config.endDate),
         status: 'DRAFT',
-        executiveSummary: config.includeExecutiveSummary ? '報告摘要...' : null,
+        executiveSummary: config.includeExecutiveSummary
+          ? `本報告書涵蓋 ${config.period} 期間之永續發展成果。`
+          : null,
+        carbonFootprint: config.includeCarbonFootprint
+          ? { summary: '碳足跡分析' }
+          : null,
+        emissionsSummary: config.includeEmissionsSummary
+          ? { scope1: 0, scope2: 0, scope3: 0 }
+          : null,
+        reductionTargets: config.includeReductionTargets
+          ? { targets: [] }
+          : null,
+        initiatives: config.includeInitiatives
+          ? { list: [] }
+          : null,
+        compliance: config.includeCompliance
+          ? { standards: [] }
+          : null,
+        financialImpact: config.includeFinancialImpact
+          ? { investment: 0 }
+          : null,
+        stakeholders: config.includeStakeholders
+          ? { groups: [] }
+          : null,
+        pdfUrl,
         generatedBy: 'MANUAL',
-      }
+      },
     });
 
     return NextResponse.json({
@@ -27,15 +65,19 @@ export async function POST(request: NextRequest) {
         title: report.title,
         period: report.reportPeriod,
         status: report.status,
-        createdAt: report.createdAt,
+        createdAt: report.createdAt.toISOString(),
+        pdfUrl: report.pdfUrl,
       },
       success: true,
+      message: '報告已成功生成！您可以在報告歷史中查看和下載。',
     });
   } catch (error) {
     console.error('Generate report API error:', error);
     return NextResponse.json(
-      { error: 'Failed to generate report', success: false },
+      { error: '生成報告失敗', success: false },
       { status: 500 }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 }
