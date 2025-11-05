@@ -1,4 +1,4 @@
-// scripts/import-seed-data.ts
+// scripts/import-seed-data.js
 // 將生成的 JSON 數據導入到資料庫
 
 const { PrismaClient } = require('@prisma/client');
@@ -16,7 +16,7 @@ async function importCarbonData() {
 
     if (!fs.existsSync(jsonPath)) {
       console.error('❌ 找不到數據文件:', jsonPath);
-      console.error('請先執行: npx ts-node scripts/generate-seed-data.ts > data/carbon-emissions-seed.json');
+      console.error('請先執行: node scripts/generate-seed-data.js > data/carbon-emissions-seed.json');
       process.exit(1);
     }
 
@@ -65,7 +65,7 @@ async function importCarbonData() {
       const batch = seedData.data.slice(i, i + batchSize);
 
       await prisma.carbonEmission.createMany({
-        data: batch.map((item: any) => ({
+        data: batch.map((item) => ({
           companyId: company.id,
           date: new Date(item.date),
           scope1: item.scope1,
