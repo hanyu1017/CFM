@@ -6,7 +6,7 @@ import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
-import { TrendingUp, TrendingDown, Activity, Zap, Droplets, Wind } from 'lucide-react';
+import { TrendingUp, TrendingDown, Activity, Zap, Droplets, Wind, Calendar } from 'lucide-react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 
 interface CarbonData {
@@ -34,19 +34,72 @@ export default function DashboardPage() {
   });
   const [loading, setLoading] = useState(true);
 
+  // 日期範圍狀態
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
+  // 日期格式化函數
+  const formatDate = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  // 獲取預設日期範圍（過去30天）
+  const getDefaultDateRange = () => {
+    const end = new Date();
+    const start = new Date();
+    start.setDate(start.getDate() - 30);
+    return {
+      startDate: formatDate(start),
+      endDate: formatDate(end)
+    };
+  };
+
+  // 快速選擇日期範圍
+  const setQuickDateRange = (days: number | 'year') => {
+    const end = new Date();
+    const start = new Date();
+
+    if (days === 'year') {
+      start.setMonth(0, 1); // 今年1月1日
+    } else {
+      start.setDate(start.getDate() - days);
+    }
+
+    const startStr = formatDate(start);
+    const endStr = formatDate(end);
+    setStartDate(startStr);
+    setEndDate(endStr);
+    fetchDashboardData(startStr, endStr);
+  };
+
+  // 初始化預設日期
+  useEffect(() => {
+    const { startDate: defaultStart, endDate: defaultEnd } = getDefaultDateRange();
+    setStartDate(defaultStart);
+    setEndDate(defaultEnd);
+  }, []);
+
   // 模擬實時數據更新
   useEffect(() => {
-    fetchDashboardData();
+    if (startDate && endDate) {
+      fetchDashboardData(startDate, endDate);
+    }
     const interval = setInterval(() => {
       updateRealtimeData();
     }, 5000); // 每5秒更新一次
 
     return () => clearInterval(interval);
-  }, []);
+  }, [startDate, endDate]);
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = async (start?: string, end?: string) => {
     try {
-      const response = await fetch('/api/carbon/dashboard');
+      const startParam = start || startDate;
+      const endParam = end || endDate;
+      const url = `/api/carbon/dashboard?startDate=${startParam}&endDate=${endParam}`;
+      const response = await fetch(url);
       const data = await response.json();
       setCarbonData(data.carbonData);
       setMetrics(data.metrics);
@@ -125,6 +178,74 @@ export default function DashboardPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">碳排放監控儀表板</h1>
         <p className="text-gray-600 mt-2">即時監控企業碳排放數據與趨勢分析</p>
+      </div>
+
+      {/* 日期範圍選擇器 */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div className="flex flex-col space-y-4">
+          {/* 日期輸入區域 */}
+          <div className="flex flex-col md:flex-row items-start md:items-end gap-4">
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Calendar className="w-4 h-4 inline mr-1" />
+                開始日期
+              </label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div className="flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Calendar className="w-4 h-4 inline mr-1" />
+                結束日期
+              </label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <button
+              onClick={() => fetchDashboardData(startDate, endDate)}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            >
+              查詢
+            </button>
+          </div>
+
+          {/* 快速選擇按鈕 */}
+          <div className="flex flex-wrap gap-2">
+            <span className="text-sm font-medium text-gray-700 self-center mr-2">快速選擇：</span>
+            <button
+              onClick={() => setQuickDateRange(7)}
+              className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              過去7天
+            </button>
+            <button
+              onClick={() => setQuickDateRange(30)}
+              className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              過去30天
+            </button>
+            <button
+              onClick={() => setQuickDateRange(90)}
+              className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              過去90天
+            </button>
+            <button
+              onClick={() => setQuickDateRange('year')}
+              className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              今年
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* 關鍵指標卡片 */}

@@ -59,19 +59,35 @@ export default function SettingsPage() {
     try {
       if (activeTab === 'company') {
         const response = await fetch('/api/settings/company');
+        if (!response.ok) {
+          throw new Error('無法取得公司資料');
+        }
         const data = await response.json();
-        setCompanyData(data);
+        if (data) {
+          setCompanyData(data);
+        }
       } else if (activeTab === 'targets') {
         const response = await fetch('/api/settings/targets');
+        if (!response.ok) {
+          throw new Error('無法取得減排目標資料');
+        }
         const data = await response.json();
-        setTargets(data);
+        if (Array.isArray(data)) {
+          setTargets(data);
+        }
       } else {
         const response = await fetch('/api/settings/config');
+        if (!response.ok) {
+          throw new Error('無法取得系統配置資料');
+        }
         const data = await response.json();
-        setSettings(data);
+        if (Array.isArray(data)) {
+          setSettings(data);
+        }
       }
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      console.error('載入資料失敗:', error);
+      alert(`載入資料時發生錯誤：${error instanceof Error ? error.message : '未知錯誤'}`);
     } finally {
       setLoading(false);
     }
@@ -119,12 +135,28 @@ export default function SettingsPage() {
                   data={companyData}
                   onChange={setCompanyData}
                   onSave={async () => {
-                    await fetch('/api/settings/company', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify(companyData),
-                    });
-                    alert('公司資料已保存！');
+                    setLoading(true);
+                    try {
+                      const response = await fetch('/api/settings/company', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(companyData),
+                      });
+
+                      if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.error || '儲存失敗');
+                      }
+
+                      const savedData = await response.json();
+                      setCompanyData(savedData);
+                      alert('✓ 公司資料已成功儲存！');
+                    } catch (error) {
+                      console.error('儲存公司資料失敗:', error);
+                      alert(`儲存失敗：${error instanceof Error ? error.message : '未知錯誤'}`);
+                    } finally {
+                      setLoading(false);
+                    }
                   }}
                 />
               )}
@@ -132,26 +164,85 @@ export default function SettingsPage() {
               {activeTab === 'targets' && (
                 <TargetsPanel
                   targets={targets}
+                  loading={loading}
                   onAdd={async (target: EmissionTarget) => {
-                    const response = await fetch('/api/settings/targets', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify(target),
-                    });
-                    const data = await response.json();
-                    setTargets([...targets, data]);
+                    setLoading(true);
+                    try {
+                      const response = await fetch('/api/settings/targets', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(target),
+                      });
+
+                      if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.error || '新增失敗');
+                      }
+
+                      const data = await response.json();
+                      setTargets([...targets, data]);
+                      alert('✓ 減排目標已成功新增！');
+                      return true; // 表示成功
+                    } catch (error) {
+                      console.error('新增減排目標失敗:', error);
+                      alert(`新增失敗：${error instanceof Error ? error.message : '未知錯誤'}`);
+                      return false; // 表示失敗
+                    } finally {
+                      setLoading(false);
+                    }
                   }}
                   onUpdate={async (id: string, target: EmissionTarget) => {
-                    await fetch(`/api/settings/targets/${id}`, {
-                      method: 'PUT',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify(target),
-                    });
-                    setTargets(targets.map(t => t.id === id ? { ...target, id } : t));
+                    setLoading(true);
+                    try {
+                      const response = await fetch(`/api/settings/targets/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(target),
+                      });
+
+                      if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.error || '更新失敗');
+                      }
+
+                      const updatedData = await response.json();
+                      setTargets(targets.map(t => t.id === id ? updatedData : t));
+                      alert('✓ 減排目標已成功更新！');
+                      return true;
+                    } catch (error) {
+                      console.error('更新減排目標失敗:', error);
+                      alert(`更新失敗：${error instanceof Error ? error.message : '未知錯誤'}`);
+                      return false;
+                    } finally {
+                      setLoading(false);
+                    }
                   }}
                   onDelete={async (id: string) => {
-                    await fetch(`/api/settings/targets/${id}`, { method: 'DELETE' });
-                    setTargets(targets.filter(t => t.id !== id));
+                    if (!confirm('確定要刪除此減排目標嗎？此操作無法復原。')) {
+                      return false;
+                    }
+
+                    setLoading(true);
+                    try {
+                      const response = await fetch(`/api/settings/targets/${id}`, {
+                        method: 'DELETE',
+                      });
+
+                      if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.error || '刪除失敗');
+                      }
+
+                      setTargets(targets.filter(t => t.id !== id));
+                      alert('✓ 減排目標已成功刪除！');
+                      return true;
+                    } catch (error) {
+                      console.error('刪除減排目標失敗:', error);
+                      alert(`刪除失敗：${error instanceof Error ? error.message : '未知錯誤'}`);
+                      return false;
+                    } finally {
+                      setLoading(false);
+                    }
                   }}
                 />
               )}
@@ -159,13 +250,32 @@ export default function SettingsPage() {
               {activeTab === 'settings' && (
                 <SettingsPanel
                   settings={settings}
+                  loading={loading}
                   onUpdate={async (id: string, setting: Setting) => {
-                    await fetch(`/api/settings/config/${id}`, {
-                      method: 'PUT',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify(setting),
-                    });
-                    setSettings(settings.map(s => s.id === id ? { ...setting, id } : s));
+                    setLoading(true);
+                    try {
+                      const response = await fetch(`/api/settings/config/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(setting),
+                      });
+
+                      if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.error || '更新失敗');
+                      }
+
+                      const updatedData = await response.json();
+                      setSettings(settings.map(s => s.id === id ? updatedData : s));
+                      alert('✓ 系統配置已成功更新！');
+                      return true;
+                    } catch (error) {
+                      console.error('更新系統配置失敗:', error);
+                      alert(`更新失敗：${error instanceof Error ? error.message : '未知錯誤'}`);
+                      return false;
+                    } finally {
+                      setLoading(false);
+                    }
                   }}
                 />
               )}
@@ -265,7 +375,7 @@ function CompanyPanel({ data, onChange, onSave }: CompanyPanelProps) {
 }
 
 // 減排目標面板
-function TargetsPanel({ targets, onAdd, onUpdate, onDelete }: any) {
+function TargetsPanel({ targets, loading, onAdd, onUpdate, onDelete }: any) {
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<EmissionTarget>({
@@ -278,15 +388,20 @@ function TargetsPanel({ targets, onAdd, onUpdate, onDelete }: any) {
     status: 'ACTIVE',
   });
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (editingId) {
-      onUpdate(editingId, formData);
-      setEditingId(null);
+      const success = await onUpdate(editingId, formData);
+      if (success) {
+        setEditingId(null);
+        resetForm();
+      }
     } else {
-      onAdd(formData);
-      setIsAdding(false);
+      const success = await onAdd(formData);
+      if (success) {
+        setIsAdding(false);
+        resetForm();
+      }
     }
-    resetForm();
   };
 
   const resetForm = () => {
@@ -307,7 +422,8 @@ function TargetsPanel({ targets, onAdd, onUpdate, onDelete }: any) {
       {!isAdding && !editingId && (
         <button
           onClick={() => setIsAdding(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          disabled={loading}
+          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
           <Plus className="w-5 h-5" />
           新增減排目標
@@ -389,10 +505,11 @@ function TargetsPanel({ targets, onAdd, onUpdate, onDelete }: any) {
           <div className="flex gap-2">
             <button
               onClick={handleSubmit}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              disabled={loading}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               <Save className="w-5 h-5" />
-              儲存
+              {loading ? '儲存中...' : '儲存'}
             </button>
             <button
               onClick={() => {
@@ -400,7 +517,8 @@ function TargetsPanel({ targets, onAdd, onUpdate, onDelete }: any) {
                 setEditingId(null);
                 resetForm();
               }}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+              disabled={loading}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               <X className="w-5 h-5" />
               取消
@@ -452,16 +570,14 @@ function TargetsPanel({ targets, onAdd, onUpdate, onDelete }: any) {
                     setFormData(target);
                   }}
                   className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  disabled={loading}
                 >
                   <Edit className="w-5 h-5" />
                 </button>
                 <button
-                  onClick={() => {
-                    if (confirm('確定要刪除此目標嗎？')) {
-                      onDelete(target.id);
-                    }
-                  }}
+                  onClick={() => onDelete(target.id)}
                   className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  disabled={loading}
                 >
                   <Trash2 className="w-5 h-5" />
                 </button>
@@ -475,8 +591,28 @@ function TargetsPanel({ targets, onAdd, onUpdate, onDelete }: any) {
 }
 
 // 系統配置面板
-function SettingsPanel({ settings, onUpdate }: any) {
+function SettingsPanel({ settings, loading, onUpdate }: any) {
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState<string>('');
   const categories = ['報告設定', '通知設定', '數據同步', 'API配置'];
+
+  const handleEdit = (setting: Setting) => {
+    setEditingId(setting.id!);
+    setEditValue(setting.value);
+  };
+
+  const handleSave = async (setting: Setting) => {
+    const success = await onUpdate(setting.id, { ...setting, value: editValue });
+    if (success) {
+      setEditingId(null);
+      setEditValue('');
+    }
+  };
+
+  const handleCancel = () => {
+    setEditingId(null);
+    setEditValue('');
+  };
 
   return (
     <div className="space-y-6">
@@ -493,12 +629,40 @@ function SettingsPanel({ settings, onUpdate }: any) {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     {setting.label}
                   </label>
-                  <input
-                    type="text"
-                    value={setting.value}
-                    onChange={(e) => onUpdate(setting.id, { ...setting, value: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  />
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={editingId === setting.id ? editValue : setting.value}
+                      onChange={(e) => {
+                        if (editingId === setting.id) {
+                          setEditValue(e.target.value);
+                        } else {
+                          handleEdit(setting);
+                          setEditValue(e.target.value);
+                        }
+                      }}
+                      disabled={loading}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                    />
+                    {editingId === setting.id && (
+                      <>
+                        <button
+                          onClick={() => handleSave(setting)}
+                          disabled={loading}
+                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        >
+                          {loading ? '儲存中...' : '儲存'}
+                        </button>
+                        <button
+                          onClick={handleCancel}
+                          disabled={loading}
+                          className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        >
+                          取消
+                        </button>
+                      </>
+                    )}
+                  </div>
                   <p className="text-xs text-gray-500 mt-1">{setting.description}</p>
                 </div>
               ))}
