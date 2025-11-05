@@ -21,6 +21,7 @@
     "seed:generate-sql": "node scripts/generate-sql.js",
     "seed:validate": "node scripts/validate-json.js",
     "seed:fix": "node scripts/validate-json.js",
+    "prisma:diagnose": "node scripts/diagnose-prisma.js",
     "prisma:fix": "node scripts/fix-prisma.js"
   },
   "dependencies": {
