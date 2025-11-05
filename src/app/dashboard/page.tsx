@@ -46,7 +46,7 @@ export default function DashboardPage() {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    return \`\${year}-\${month}-\${day}\`;
+    return `${year}-${month}-${day}`;
   };
 
   // 獲取預設日期範圍（過去30天）
@@ -94,7 +94,7 @@ export default function DashboardPage() {
 
       const startParam = start || startDate;
       const endParam = end || endDate;
-      const url = \`/api/carbon/dashboard?startDate=\${startParam}&endDate=\${endParam}\`;
+      const url = `/api/carbon/dashboard?startDate=${startParam}&endDate=${endParam}`;
       const response = await fetch(url);
       const data = await response.json();
 
@@ -117,7 +117,7 @@ export default function DashboardPage() {
         });
 
         if (data.carbonData && data.carbonData.length > 0) {
-          setMessage(\`成功載入 \${data.carbonData.length} 筆碳排放數據\`);
+          setMessage(`成功載入 ${data.carbonData.length} 筆碳排放數據`);
         }
       }
 
@@ -381,13 +381,13 @@ export default function DashboardPage() {
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ name, percent }) => \`\${name} \${(percent * 100).toFixed(0)}%\`}
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                       outerRadius={100}
                       fill="#8884d8"
                       dataKey="value"
                     >
                       {scopeData.map((entry, index) => (
-                        <Cell key={\`cell-\${index}\`} fill={entry.color} />
+                        <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
                     <Tooltip />
@@ -454,10 +454,10 @@ function MetricCard({ title, value, unit, trend, icon, color }: MetricCardProps)
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <div className="flex items-center justify-between mb-4">
-        <div className={\`\${colorClasses[color]} text-white p-3 rounded-lg\`}>
+        <div className={`${colorClasses[color]} text-white p-3 rounded-lg`}>
           {icon}
         </div>
-        <div className={\`flex items-center text-sm \${trend >= 0 ? 'text-green-600' : 'text-red-600'}\`}>
+        <div className={`flex items-center text-sm ${trend >= 0 ? 'text-green-600' : 'text-red-600'}`}>
           {trend >= 0 ? <TrendingUp className="w-4 h-4 mr-1" /> : <TrendingDown className="w-4 h-4 mr-1" />}
           {Math.abs(trend)}%
         </div>
