@@ -14,7 +14,10 @@
     "prisma:studio": "prisma studio",
     "prisma:seed": "ts-node prisma/seed.ts",
     "seed:generate": "node scripts/generate-seed-data.js",
-    "seed:import": "node scripts/import-seed-data.js"
+    "seed:import": "node scripts/import-seed-data.js",
+    "seed:import-pg": "node scripts/import-with-pg.js",
+    "seed:generate-sql": "node scripts/generate-sql.js",
+    "prisma:fix": "node scripts/fix-prisma.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.20.0",
