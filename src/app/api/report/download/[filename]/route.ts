@@ -11,8 +11,10 @@ export async function GET(
     // 實際應該從儲存系統讀取真實的 PDF 檔案
     const pdfContent = generateDemoPDF(params.filename);
 
-    // 使用標準 Response 而不是 NextResponse 來處理 Buffer
-    return new Response(pdfContent, {
+    // 將 Buffer 轉換為 Uint8Array，這是 Response 可接受的類型
+    const uint8Array = new Uint8Array(pdfContent);
+
+    return new Response(uint8Array, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
