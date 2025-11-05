@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 格式化數據
-    const formattedData = carbonData.map((item) => ({
+    const formattedData = carbonData.map((item: typeof carbonData[number]) => ({
       date: item.date.toISOString().split('T')[0],
       scope1: Number(item.scope1.toFixed(2)),
       scope2: Number(item.scope2.toFixed(2)),
