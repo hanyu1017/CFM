@@ -62,10 +62,6 @@ async function main() {
 
   // 清除現有數據（可選）
   console.log('🗑️  清除現有數據...');
-  await prisma.chatMessage.deleteMany({});
-  await prisma.auditLog.deleteMany({});
-  await prisma.sensitivityAnalysis.deleteMany({});
-  await prisma.optimizationResult.deleteMany({});
   await prisma.modelParameter.deleteMany({});
   await prisma.sustainabilityReport.deleteMany({});
   await prisma.emissionTarget.deleteMany({});
