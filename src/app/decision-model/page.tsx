@@ -194,7 +194,7 @@ export default function DecisionModelPage() {
       {loading && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
           <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
-            <h3 className="text-xl font-semibold mb-4 text-center">Calculating Optimization</h3>
+            <h3 className="text-xl font-semibold mb-4 text-center">計算最佳化中</h3>
             <div className="mb-4">
               <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
                 <div
@@ -208,7 +208,7 @@ export default function DecisionModelPage() {
               onClick={cancelCalculation}
               className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
             >
-              Cancel Calculation
+              取消計算
             </button>
           </div>
         </div>
@@ -292,29 +292,29 @@ function TabButton({ active, onClick, icon, label, disabled = false }: any) {
 function InputPanel({ params, onParamChange, onCalculate, onSave, loading }: any) {
   const paramGroups = [
     {
-      title: 'Basic Economic Parameters',
+      title: '基本經濟參數',
       params: [
-        { key: 'a', label: 'Demand Parameter (a)', unit: '', description: 'Market base demand' },
-        { key: 'b', label: 'Price Sensitivity (b)', unit: '', description: 'Demand price sensitivity' },
-        { key: 'M', label: 'Market Growth Rate (M)', unit: '%', description: 'Expected market growth' },
-        { key: 'rho', label: 'Discount Rate (rho)', unit: '', description: 'Delay delivery discount' },
-        { key: 'W', label: 'Wholesale Price (W)', unit: '$', description: 'Wholesale purchase price' },
-        { key: 'V', label: 'Variable Cost (V)', unit: '$', description: 'Unit variable cost' },
-        { key: 'Dcost', label: 'Handling Cost (Dcost)', unit: '$', description: 'Logistics handling cost' },
-        { key: 'S', label: 'Fixed Cost (S)', unit: '$', description: 'Fixed production cost' },
-        { key: 'Ii', label: 'Initial Investment (Ii)', unit: '$', description: 'Initial capital investment' },
+        { key: 'a', label: '需求參數 (a)', unit: '', description: '市場基礎需求' },
+        { key: 'b', label: '價格敏感度 (b)', unit: '', description: '需求價格敏感度' },
+        { key: 'M', label: '市場成長率 (M)', unit: '%', description: '預期市場成長' },
+        { key: 'rho', label: '折扣率 (rho)', unit: '', description: '延遲交付折扣' },
+        { key: 'W', label: '批發價格 (W)', unit: '$', description: '批發採購價格' },
+        { key: 'V', label: '變動成本 (V)', unit: '$', description: '單位變動成本' },
+        { key: 'Dcost', label: '處理成本 (Dcost)', unit: '$', description: '物流處理成本' },
+        { key: 'S', label: '固定成本 (S)', unit: '$', description: '固定生產成本' },
+        { key: 'Ii', label: '初始投資 (Ii)', unit: '$', description: '初始資本投資' },
       ]
     },
     {
-      title: 'Green Manufacturing Parameters',
+      title: '綠色製造參數',
       params: [
-        { key: 'A', label: 'Retail Order Cost (A)', unit: '$', description: 'Fixed retail order cost' },
-        { key: 'UR', label: 'Retail Holding Cost (UR)', unit: '$', description: 'Unit retail inventory cost' },
-        { key: 'Uf', label: 'Fixed Holding Cost (Uf)', unit: '$', description: 'Fixed facility maintenance' },
-        { key: 'Ij', label: 'Unit Inventory Cost (Ij)', unit: '$', description: 'Per unit inventory cost' },
-        { key: 'H', label: 'Production Time (H)', unit: 'hours', description: 'Production cycle time' },
-        { key: 'alpha', label: 'Green Investment Coefficient (alpha)', unit: '', description: 'Green tech efficiency' },
-        { key: 'beta', label: 'Green Tech Effect (beta)', unit: '', description: 'Carbon reduction effect' },
+        { key: 'A', label: '零售訂單成本 (A)', unit: '$', description: '固定零售訂單成本' },
+        { key: 'UR', label: '零售持有成本 (UR)', unit: '$', description: '單位零售庫存成本' },
+        { key: 'Uf', label: '固定持有成本 (Uf)', unit: '$', description: '固定設施維護' },
+        { key: 'Ij', label: '單位庫存成本 (Ij)', unit: '$', description: '每單位庫存成本' },
+        { key: 'H', label: '生產時間 (H)', unit: '小時', description: '生產週期時間' },
+        { key: 'alpha', label: '綠色投資係數 (alpha)', unit: '', description: '綠色技術效率' },
+        { key: 'beta', label: '綠色技術效果 (beta)', unit: '', description: '碳減排效果' },
       ]
     }
   ];
@@ -491,41 +491,41 @@ function ResultCard({ title, value, unit, color, icon }: ResultCardProps) {
 // 敏感性分析面板
 function SensitivityPanel({ data }: any) {
   const extendedData = [
-    { param: 'Demand (a)', sensitivity: 'High', impact: '+8.1%', description: 'Strong positive correlation with profit' },
-    { param: 'Price Sensitivity (b)', sensitivity: 'Medium', impact: '-4.2%', description: 'Moderate negative impact' },
-    { param: 'Market Growth (M)', sensitivity: 'Medium', impact: '+5.5%', description: 'Positive growth driver' },
-    { param: 'Green Investment (alpha)', sensitivity: 'Low', impact: '+2.1%', description: 'Long-term benefits' },
+    { param: '需求 (a)', sensitivity: '高', impact: '+8.1%', description: '與利潤有強正相關' },
+    { param: '價格敏感度 (b)', sensitivity: '中', impact: '-4.2%', description: '中度負面影響' },
+    { param: '市場成長 (M)', sensitivity: '中', impact: '+5.5%', description: '正向成長驅動' },
+    { param: '綠色投資 (alpha)', sensitivity: '低', impact: '+2.1%', description: '長期效益' },
   ];
 
   return (
     <div className="space-y-6">
       <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold mb-4">Parameter Sensitivity Analysis</h3>
+        <h3 className="text-lg font-semibold mb-4">參數敏感度分析</h3>
         <p className="text-sm text-gray-600 mb-6">
-          Analyze how changes in input parameters affect the optimization results
+          分析輸入參數變化如何影響優化結果
         </p>
         <ResponsiveContainer width="100%" height={400}>
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="variation" label={{ value: 'Variation (%)', position: 'insideBottom', offset: -5 }} />
-            <YAxis label={{ value: 'Profit Change', angle: -90, position: 'insideLeft' }} />
+            <XAxis dataKey="variation" label={{ value: '變化率 (%)', position: 'insideBottom', offset: -5 }} />
+            <YAxis label={{ value: '利潤變化', angle: -90, position: 'insideLeft' }} />
             <Tooltip />
             <Legend />
-            <Line type="monotone" dataKey="profitChange" stroke="#3b82f6" name="Profit Change" strokeWidth={2} />
+            <Line type="monotone" dataKey="profitChange" stroke="#3b82f6" name="利潤變化" strokeWidth={2} />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold mb-4">Parameter Impact Summary</h3>
+        <h3 className="text-lg font-semibold mb-4">參數影響摘要</h3>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">Parameter</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">Sensitivity</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">Impact</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">Description</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-700">參數</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-700">敏感度</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-700">影響</th>
+                <th className="text-left py-3 px-4 font-semibold text-gray-700">說明</th>
               </tr>
             </thead>
             <tbody>
@@ -534,8 +534,8 @@ function SensitivityPanel({ data }: any) {
                   <td className="py-3 px-4 font-medium">{row.param}</td>
                   <td className="py-3 px-4">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      row.sensitivity === 'High' ? 'bg-red-100 text-red-700' :
-                      row.sensitivity === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+                      row.sensitivity === '高' ? 'bg-red-100 text-red-700' :
+                      row.sensitivity === '中' ? 'bg-yellow-100 text-yellow-700' :
                       'bg-green-100 text-green-700'
                     }`}>
                       {row.sensitivity}
@@ -552,19 +552,19 @@ function SensitivityPanel({ data }: any) {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-6">
-          <h4 className="font-semibold text-blue-900 mb-2">Most Sensitive</h4>
-          <p className="text-2xl font-bold text-blue-600 mb-2">Demand (a)</p>
-          <p className="text-sm text-blue-700">10% increase leads to 8.1% profit increase</p>
+          <h4 className="font-semibold text-blue-900 mb-2">最敏感</h4>
+          <p className="text-2xl font-bold text-blue-600 mb-2">需求 (a)</p>
+          <p className="text-sm text-blue-700">增加10%將帶來8.1%的利潤增長</p>
         </div>
         <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-lg p-6">
-          <h4 className="font-semibold text-green-900 mb-2">Opportunity</h4>
-          <p className="text-2xl font-bold text-green-600 mb-2">Market Growth</p>
-          <p className="text-sm text-green-700">Focus on market expansion strategies</p>
+          <h4 className="font-semibold text-green-900 mb-2">機會點</h4>
+          <p className="text-2xl font-bold text-green-600 mb-2">市場成長</p>
+          <p className="text-sm text-green-700">專注於市場擴張策略</p>
         </div>
         <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-lg p-6">
-          <h4 className="font-semibold text-purple-900 mb-2">Risk Factor</h4>
-          <p className="text-2xl font-bold text-purple-600 mb-2">Price Sensitivity</p>
-          <p className="text-sm text-purple-700">Monitor competitive pricing carefully</p>
+          <h4 className="font-semibold text-purple-900 mb-2">風險因素</h4>
+          <p className="text-2xl font-bold text-purple-600 mb-2">價格敏感度</p>
+          <p className="text-sm text-purple-700">謹慎監控競爭定價</p>
         </div>
       </div>
     </div>

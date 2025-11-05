@@ -86,7 +86,7 @@ export default function SettingsPage() {
         <p className="text-gray-600 mt-2">管理公司資料、減排目標與系統配置</p>
       </div>
 
-      {/* 標籤導航 */}
+      {/* 分頁導航 */}
       <div className="bg-white rounded-lg shadow-md">
         <div className="flex border-b">
           <TabButton
@@ -178,7 +178,7 @@ export default function SettingsPage() {
   );
 }
 
-// 標籤按鈕
+// 分頁按鈕
 function TabButton({ active, onClick, icon, label }: any) {
   return (
     <button
@@ -257,7 +257,7 @@ function CompanyPanel({ data, onChange, onSave }: CompanyPanelProps) {
           className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
           <Save className="w-5 h-5" />
-          保存設定
+          儲存設定
         </button>
       </div>
     </div>
@@ -392,7 +392,7 @@ function TargetsPanel({ targets, onAdd, onUpdate, onDelete }: any) {
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               <Save className="w-5 h-5" />
-              保存
+              儲存
             </button>
             <button
               onClick={() => {
@@ -417,7 +417,7 @@ function TargetsPanel({ targets, onAdd, onUpdate, onDelete }: any) {
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <h3 className="text-lg font-semibold">
-                    {target.targetYear}年 - {target.targetType === 'NET_ZERO' ? '淨零排放' : target.targetType === 'REDUCTION' ? '絕對減量' : '強度減量'}
+                    {target.targetYear} - {target.targetType === 'NET_ZERO' ? '淨零排放' : target.targetType === 'REDUCTION' ? '絕對減量' : '強度減量'}
                   </h3>
                   <StatusBadge status={target.status} />
                 </div>
@@ -510,7 +510,7 @@ function SettingsPanel({ settings, onUpdate }: any) {
   );
 }
 
-// 表單欄位組件
+// 表單欄位元件
 function FormField({ label, value, onChange, type = 'text', placeholder = '', fullWidth = false }: any) {
   return (
     <div className={fullWidth ? 'md:col-span-2' : ''}>
@@ -546,7 +546,7 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-// 加載動畫
+// 載入動畫
 function LoadingSpinner() {
   return (
     <div className="flex items-center justify-center py-12">

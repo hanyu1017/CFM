@@ -13,7 +13,7 @@ export default function AIChat() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: 'Hello! I am the CFM AI assistant. How can I help you today?',
+      content: '您好！我是 CFM AI 助理。今天有什麼可以幫助您的嗎？',
     },
   ]);
   const [input, setInput] = useState('');
@@ -57,7 +57,7 @@ export default function AIChat() {
           ...prev,
           {
             role: 'assistant',
-            content: 'Sorry, I cannot respond right now. Please try again later.',
+            content: '抱歉，目前無法回應。請稍後再試。',
           },
         ]);
       }
@@ -67,7 +67,7 @@ export default function AIChat() {
         ...prev,
         {
           role: 'assistant',
-          content: 'Connection failed. Please check your network or try again later.',
+          content: '連線失敗。請檢查網路連線或稍後再試。',
         },
       ]);
     } finally {
@@ -101,8 +101,8 @@ export default function AIChat() {
                 <MessageCircle className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-white">AI Assistant</h3>
-                <p className="text-xs text-blue-100">Always here to help</p>
+                <h3 className="font-semibold text-white">AI 助理</h3>
+                <p className="text-xs text-blue-100">隨時為您服務</p>
               </div>
             </div>
             <button
@@ -149,7 +149,7 @@ export default function AIChat() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Type your question..."
+                placeholder="輸入您的問題..."
                 disabled={isLoading}
                 className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed text-sm"
               />
@@ -162,7 +162,7 @@ export default function AIChat() {
               </button>
             </div>
             <p className="text-xs text-gray-500 mt-2">
-              Press Enter to send, Shift + Enter for new line
+              按 Enter 傳送，Shift + Enter 換行
             </p>
           </div>
         </div>

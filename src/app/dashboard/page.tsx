@@ -124,7 +124,7 @@ export default function DashboardPage() {
       {/* 頁面標題 */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">碳排放監控儀表板</h1>
-        <p className="text-gray-600 mt-2">實時監控企業碳排放數據與趨勢分析</p>
+        <p className="text-gray-600 mt-2">即時監控企業碳排放數據與趨勢分析</p>
       </div>
 
       {/* 關鍵指標卡片 */}
@@ -174,9 +174,9 @@ export default function DashboardPage() {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="scope1" stroke="#3b82f6" name="Scope 1" />
-              <Line type="monotone" dataKey="scope2" stroke="#10b981" name="Scope 2" />
-              <Line type="monotone" dataKey="scope3" stroke="#f59e0b" name="Scope 3" />
+              <Line type="monotone" dataKey="scope1" stroke="#3b82f6" name="範疇一" />
+              <Line type="monotone" dataKey="scope2" stroke="#10b981" name="範疇二" />
+              <Line type="monotone" dataKey="scope3" stroke="#f59e0b" name="範疇三" />
             </LineChart>
           </ResponsiveContainer>
         </ChartCard>
