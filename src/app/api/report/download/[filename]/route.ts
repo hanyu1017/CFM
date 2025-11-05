@@ -1,5 +1,5 @@
 // src/app/api/report/download/[filename]/route.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 
 // 示範 PDF 下載（實際應該從檔案系統或雲端儲存讀取）
 export async function GET(
@@ -11,7 +11,8 @@ export async function GET(
     // 實際應該從儲存系統讀取真實的 PDF 檔案
     const pdfContent = generateDemoPDF(params.filename);
 
-    return new NextResponse(pdfContent, {
+    // 使用標準 Response 而不是 NextResponse 來處理 Buffer
+    return new Response(pdfContent, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
@@ -20,10 +21,12 @@ export async function GET(
     });
   } catch (error) {
     console.error('Download PDF error:', error);
-    return NextResponse.json(
-      { error: 'PDF 下載失敗' },
-      { status: 500 }
-    );
+    return new Response(JSON.stringify({ error: 'PDF 下載失敗' }), {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
   }
 }
 
