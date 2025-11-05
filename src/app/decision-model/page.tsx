@@ -137,7 +137,12 @@ export default function DecisionModelPage() {
 
   const fetchSavedModels = async () => {
     try {
-      const response = await fetch('/api/model/saved');
+      const response = await fetch('/api/model/saved', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         setSavedModels(Array.isArray(data) ? data : []);
@@ -275,8 +280,8 @@ export default function DecisionModelPage() {
       if (response.ok) {
         setShowSaveDialog(false);
         setModelName('');
+        await fetchSavedModels(); // 重新載入模型列表
         showSuccessMessage('模型已成功儲存');
-        fetchSavedModels(); // 重新載入模型列表
       } else {
         alert('儲存失敗，請稍後再試');
       }
@@ -394,8 +399,8 @@ export default function DecisionModelPage() {
         setShowEditDialog(false);
         setEditingModel(null);
         setModelName('');
+        await fetchSavedModels();
         showSuccessMessage('模型已更新');
-        fetchSavedModels();
       } else {
         alert('更新失敗，請稍後再試');
       }
@@ -413,9 +418,9 @@ export default function DecisionModelPage() {
       });
 
       if (response.ok) {
-        showSuccessMessage('模型已刪除');
-        fetchSavedModels(); // 重新載入模型列表
+        await fetchSavedModels(); // 重新載入模型列表
         setShowDeleteConfirm(null);
+        showSuccessMessage('模型已刪除');
       } else {
         alert('刪除失敗，請稍後再試');
       }
