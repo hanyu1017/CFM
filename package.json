@@ -9,7 +9,7 @@
     "build:with-prisma": "prisma generate && next build",
     "start": "next start -p ${PORT:-8080}",
     "lint": "next lint",
-    "postinstall": "exit 0",
+    "postinstall": "node scripts/setup-prisma-types.js",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
     "prisma:studio": "prisma studio",
