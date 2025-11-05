@@ -5,14 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-<<<<<<< HEAD
     "build": "prisma generate && next build",
     "start": "next start -p ${PORT:-8080}",
-=======
-    "build": "next build",
-    "build:with-prisma": "prisma generate && next build",
-    "start": "next start",
->>>>>>> 4f39a8f20331644b02e01938e7a5447b7abd172a
     "lint": "next lint",
     "postinstall": "exit 0",
     "prisma:generate": "prisma generate",
