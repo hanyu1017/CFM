@@ -161,7 +161,7 @@ ${carbonSummary}
         htmlContent: htmlContent,
         generatedBy: 'AI',
         totalEmissions: totalEmissions,
-      }
+      } as any
     });
 
     return NextResponse.json({
