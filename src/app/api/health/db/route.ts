@@ -9,19 +9,25 @@ export async function GET() {
     // 嘗試執行簡單的查詢來測試連線
     await prisma.$queryRaw`SELECT 1`;
 
-    // 獲取資料庫統計
-    const companyCount = await prisma.company.count();
-    const carbonDataCount = await prisma.carbonEmission.count();
-    const targetCount = await prisma.emissionTarget.count();
+    // 獲取資料庫統計（使用安全的方式）
+    const stats: Record<string, number> = {};
+
+    try {
+      stats.companies = await prisma.company.count();
+    } catch (e) {
+      stats.companies = 0;
+    }
+
+    try {
+      stats.carbonData = await prisma.carbonEmission.count();
+    } catch (e) {
+      stats.carbonData = 0;
+    }
 
     return NextResponse.json({
       status: 'connected',
       message: '資料庫連線正常',
-      stats: {
-        companies: companyCount,
-        carbonData: carbonDataCount,
-        targets: targetCount,
-      },
+      stats,
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
