@@ -8,9 +8,23 @@ export async function POST(request: NextRequest) {
   try {
     const params = await request.json();
 
+    // 獲取或創建默認公司
+    let company = await prisma.company.findFirst();
+
+    if (!company) {
+      // 如果沒有公司記錄，創建一個默認公司
+      company = await prisma.company.create({
+        data: {
+          id: 'default',
+          name: '預設公司',
+          industry: '未設定',
+        }
+      });
+    }
+
     const savedParams = await prisma.modelParameter.create({
       data: {
-        companyId: 'default',
+        companyId: company.id,
         ...params,
         isActive: true,
       },

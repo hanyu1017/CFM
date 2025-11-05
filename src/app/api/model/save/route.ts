@@ -10,13 +10,18 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { name, description, parameters, result } = body;
 
-    // 獲取公司 ID
-    const company = await prisma.company.findFirst();
+    // 獲取或創建默認公司
+    let company = await prisma.company.findFirst();
+
     if (!company) {
-      return NextResponse.json(
-        { error: '請先建立公司資料' },
-        { status: 400 }
-      );
+      // 如果沒有公司記錄，創建一個默認公司
+      company = await prisma.company.create({
+        data: {
+          id: 'default',
+          name: '預設公司',
+          industry: '未設定',
+        }
+      });
     }
 
     // 儲存模型參數
