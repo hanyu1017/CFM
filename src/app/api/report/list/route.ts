@@ -4,6 +4,10 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+// 禁用路由緩存
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // GET - 取得所有報告
 export async function GET() {
   try {

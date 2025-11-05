@@ -53,7 +53,12 @@ export default function ReportPage() {
   // 獲取報告列表
   const fetchReports = async () => {
     try {
-      const response = await fetch('/api/report/list');
+      const response = await fetch('/api/report/list', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
       if (!response.ok) {
         throw new Error('Failed to fetch reports');
       }
