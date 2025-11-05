@@ -8,13 +8,18 @@ export async function POST(request: NextRequest) {
   try {
     const config = await request.json();
 
-    // 獲取公司資料
-    const company = await prisma.company.findFirst();
+    // 獲取或創建默認公司
+    let company = await prisma.company.findFirst();
+
     if (!company) {
-      return NextResponse.json(
-        { error: '請先建立公司資料', success: false },
-        { status: 400 }
-      );
+      // 如果沒有公司記錄，創建一個默認公司
+      company = await prisma.company.create({
+        data: {
+          id: 'default',
+          name: '預設公司',
+          industry: '未設定',
+        }
+      });
     }
 
     // 生成示範 PDF URL（實際應該生成真實的 PDF 檔案）

@@ -11,8 +11,23 @@ export async function POST(request: NextRequest) {
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0);
 
+    // 獲取或創建默認公司
+    let company = await prisma.company.findFirst();
+
+    if (!company) {
+      // 如果沒有公司記錄，創建一個默認公司
+      company = await prisma.company.create({
+        data: {
+          id: 'default',
+          name: '預設公司',
+          industry: '未設定',
+        }
+      });
+    }
+
     const carbonData = await prisma.carbonEmission.findMany({
       where: {
+        companyId: company.id,
         date: { gte: startDate, lte: endDate }
       }
     });
@@ -21,7 +36,7 @@ export async function POST(request: NextRequest) {
 
     const report = await prisma.sustainabilityReport.create({
       data: {
-        companyId: 'default',
+        companyId: company.id,
         title: `${year}年${month}月永續報告書`,
         reportPeriod: `${year}-${String(month).padStart(2, '0')}`,
         startDate,
@@ -41,6 +56,7 @@ export async function POST(request: NextRequest) {
         createdAt: report.createdAt,
       },
       success: true,
+      message: '報告已成功生成！',
     });
   } catch (error) {
     console.error('Quick report API error:', error);
