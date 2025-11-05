@@ -56,11 +56,50 @@ interface OptimizationResult {
 }
 
 interface SavedModel {
-  id: number;
+  id: string;
   description: string;
-  parameters: ModelParams;
-  result?: OptimizationResult;
-  created_at: string;
+  a: number;
+  b: number;
+  M: number;
+  rho: number;
+  W: number;
+  V: number;
+  Dcost: number;
+  S: number;
+  Ii: number;
+  A: number;
+  UR: number;
+  Uf: number;
+  Ij: number;
+  H: number;
+  alpha: number;
+  beta: number;
+  SHat: number;
+  VHat: number;
+  DcostHat: number;
+  UFHat: number;
+  IiHat: number;
+  IjHat: number;
+  AHat: number;
+  WHat: number;
+  URHat: number;
+  MHat: number;
+  CapitalDelta: number;
+  TP: number;
+  results?: Array<{
+    id: string;
+    optimalProfit: number;
+    optimalP: number;
+    optimalTf: number;
+    optimalTR: number;
+    optimalG: number;
+    totalCycle: number;
+    totalRevenue?: number;
+    totalCost?: number;
+    carbonReduction?: number;
+  }>;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export default function DecisionModelPage() {
@@ -84,9 +123,11 @@ export default function DecisionModelPage() {
 
   // 新增：儲存模型相關狀態
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editingModel, setEditingModel] = useState<SavedModel | null>(null);
   const [modelName, setModelName] = useState('');
   const [savedModels, setSavedModels] = useState<SavedModel[]>([]);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState('');
 
   // 載入已儲存的模型
@@ -99,7 +140,7 @@ export default function DecisionModelPage() {
       const response = await fetch('/api/model/saved');
       if (response.ok) {
         const data = await response.json();
-        setSavedModels(data.models || []);
+        setSavedModels(Array.isArray(data) ? data : []);
       }
     } catch (error) {
       console.error('Failed to fetch saved models:', error);
@@ -207,19 +248,6 @@ export default function DecisionModelPage() {
     };
   };
 
-  // 保存參數配置
-  const saveConfiguration = async () => {
-    try {
-      await fetch('/api/model/save-params', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params)
-      });
-      alert('參數配置已保存！');
-    } catch (error) {
-      console.error('Failed to save configuration:', error);
-    }
-  };
 
   // 新增：儲存模型功能
   const openSaveDialog = () => {
@@ -260,16 +288,125 @@ export default function DecisionModelPage() {
 
   // 新增：載入模型功能
   const loadModel = (model: SavedModel) => {
-    setParams(model.parameters);
-    if (model.result) {
-      setResult(model.result);
+    setParams({
+      a: model.a,
+      b: model.b,
+      M: model.M,
+      rho: model.rho,
+      W: model.W,
+      V: model.V,
+      Dcost: model.Dcost,
+      S: model.S,
+      Ii: model.Ii,
+      A: model.A,
+      UR: model.UR,
+      Uf: model.Uf,
+      Ij: model.Ij,
+      H: model.H,
+      alpha: model.alpha,
+      beta: model.beta,
+      SHat: model.SHat,
+      VHat: model.VHat,
+      DcostHat: model.DcostHat,
+      UFHat: model.UFHat,
+      IiHat: model.IiHat,
+      IjHat: model.IjHat,
+      AHat: model.AHat,
+      WHat: model.WHat,
+      URHat: model.URHat,
+      MHat: model.MHat,
+      CapitalDelta: model.CapitalDelta,
+      TP: model.TP,
+    });
+    if (model.results && model.results.length > 0) {
+      const latestResult = model.results[0];
+      setResult({
+        optimalProfit: latestResult.optimalProfit,
+        optimalP: latestResult.optimalP,
+        optimalTf: latestResult.optimalTf,
+        optimalTR: latestResult.optimalTR,
+        optimalG: latestResult.optimalG,
+        totalCycle: latestResult.totalCycle,
+        totalRevenue: latestResult.totalRevenue || 0,
+        totalCost: latestResult.totalCost || 0,
+        carbonReduction: latestResult.carbonReduction || 0,
+      });
     }
     showSuccessMessage('模型已載入');
     setActiveTab('input');
   };
 
+  // 新增：開啟編輯對話框
+  const openEditDialog = (model: SavedModel) => {
+    setEditingModel(model);
+    setModelName(model.description);
+    setParams({
+      a: model.a,
+      b: model.b,
+      M: model.M,
+      rho: model.rho,
+      W: model.W,
+      V: model.V,
+      Dcost: model.Dcost,
+      S: model.S,
+      Ii: model.Ii,
+      A: model.A,
+      UR: model.UR,
+      Uf: model.Uf,
+      Ij: model.Ij,
+      H: model.H,
+      alpha: model.alpha,
+      beta: model.beta,
+      SHat: model.SHat,
+      VHat: model.VHat,
+      DcostHat: model.DcostHat,
+      UFHat: model.UFHat,
+      IiHat: model.IiHat,
+      IjHat: model.IjHat,
+      AHat: model.AHat,
+      WHat: model.WHat,
+      URHat: model.URHat,
+      MHat: model.MHat,
+      CapitalDelta: model.CapitalDelta,
+      TP: model.TP,
+    });
+    setShowEditDialog(true);
+  };
+
+  // 新增：更新模型功能
+  const updateModel = async () => {
+    if (!editingModel || !modelName.trim()) {
+      alert('請輸入模型名稱');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/model/${editingModel.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: modelName,
+          parameters: params,
+        }),
+      });
+
+      if (response.ok) {
+        setShowEditDialog(false);
+        setEditingModel(null);
+        setModelName('');
+        showSuccessMessage('模型已更新');
+        fetchSavedModels();
+      } else {
+        alert('更新失敗，請稍後再試');
+      }
+    } catch (error) {
+      console.error('Failed to update model:', error);
+      alert('更新失敗，請稍後再試');
+    }
+  };
+
   // 新增：刪除模型功能
-  const deleteModel = async (id: number) => {
+  const deleteModel = async (id: string) => {
     try {
       const response = await fetch(`/api/model/${id}`, {
         method: 'DELETE'
@@ -353,6 +490,64 @@ export default function DecisionModelPage() {
         </div>
       )}
 
+      {/* 編輯模型對話框 */}
+      {showEditDialog && editingModel && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-semibold">編輯模型</h3>
+              <button
+                onClick={() => {
+                  setShowEditDialog(false);
+                  setEditingModel(null);
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                模型名稱
+              </label>
+              <input
+                type="text"
+                value={modelName}
+                onChange={(e) => setModelName(e.target.value)}
+                placeholder="輸入模型名稱..."
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                autoFocus
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    updateModel();
+                  }
+                }}
+              />
+            </div>
+            <p className="text-sm text-gray-600 mb-6">
+              注意：當前頁面的參數將保存為此模型的新參數。
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowEditDialog(false);
+                  setEditingModel(null);
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                取消
+              </button>
+              <button
+                onClick={updateModel}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                更新
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {loading && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
           <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
@@ -413,7 +608,6 @@ export default function DecisionModelPage() {
               params={params}
               onParamChange={handleParamChange}
               onCalculate={calculateOptimization}
-              onSave={saveConfiguration}
               onSaveModel={openSaveDialog}
               loading={loading}
             />
@@ -456,28 +650,37 @@ export default function DecisionModelPage() {
                 <div className="mb-4 text-sm text-gray-600">
                   <p className="mb-2">
                     <span className="font-medium">建立時間：</span>
-                    {new Date(model.created_at).toLocaleString('zh-TW')}
+                    {new Date(model.createdAt).toLocaleString('zh-TW')}
                   </p>
                   <div className="bg-gray-50 rounded p-3 space-y-1">
-                    <p><span className="font-medium">需求參數 (a)：</span>{model.parameters.a}</p>
-                    <p><span className="font-medium">價格敏感度 (b)：</span>{model.parameters.b}</p>
-                    <p><span className="font-medium">市場成長率 (M)：</span>{model.parameters.M}</p>
+                    <p><span className="font-medium">需求參數 (a)：</span>{model.a}</p>
+                    <p><span className="font-medium">價格敏感度 (b)：</span>{model.b}</p>
+                    <p><span className="font-medium">市場成長率 (M)：</span>{model.M}</p>
                   </div>
-                  {model.result && (
+                  {model.results && model.results.length > 0 && (
                     <div className="mt-3 bg-blue-50 rounded p-3">
                       <p className="font-medium text-blue-900 mb-1">優化結果：</p>
-                      <p className="text-blue-700">最大利潤：{model.result.optimalProfit.toFixed(2)} 萬元/月</p>
+                      <p className="text-blue-700">最大利潤：{model.results[0].optimalProfit.toFixed(2)} 萬元/月</p>
                     </div>
                   )}
                 </div>
 
-                <button
-                  onClick={() => loadModel(model)}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  <Upload className="w-4 h-4" />
-                  載入模型
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => loadModel(model)}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    <Upload className="w-4 h-4" />
+                    載入
+                  </button>
+                  <button
+                    onClick={() => openEditDialog(model)}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    <Save className="w-4 h-4" />
+                    編輯
+                  </button>
+                </div>
 
                 {/* 刪除確認對話框 */}
                 {showDeleteConfirm === model.id && (
@@ -533,7 +736,7 @@ function TabButton({ active, onClick, icon, label, disabled = false }: any) {
 }
 
 // 參數輸入面板
-function InputPanel({ params, onParamChange, onCalculate, onSave, onSaveModel, loading }: any) {
+function InputPanel({ params, onParamChange, onCalculate, onSaveModel, loading }: any) {
   const paramGroups = [
     {
       title: '基本經濟參數',
@@ -605,13 +808,6 @@ function InputPanel({ params, onParamChange, onCalculate, onSave, onSaveModel, l
         >
           <Save className="w-5 h-5" />
           儲存模型
-        </button>
-        <button
-          onClick={onSave}
-          className="flex items-center gap-2 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-        >
-          <Save className="w-5 h-5" />
-          保存配置
         </button>
       </div>
     </div>

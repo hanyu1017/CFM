@@ -58,7 +58,7 @@ export default function ReportPage() {
         throw new Error('Failed to fetch reports');
       }
       const data = await response.json();
-      setGeneratedReports(data.reports || []);
+      setGeneratedReports(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to fetch reports:', error);
     }
