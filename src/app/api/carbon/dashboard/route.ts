@@ -4,34 +4,6 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// 生成模擬數據（當資料庫為空時使用）
-function generateMockData() {
-  const carbonData = Array.from({ length: 30 }, (_, i) => {
-    const date = new Date();
-    date.setDate(date.getDate() - (29 - i));
-    const scope1 = Math.random() * 50 + 40;
-    const scope2 = Math.random() * 80 + 100;
-    const scope3 = Math.random() * 100 + 150;
-    return {
-      date: date.toISOString().split('T')[0],
-      scope1,
-      scope2,
-      scope3,
-      total: scope1 + scope2 + scope3,
-    };
-  });
-
-  return {
-    carbonData,
-    metrics: {
-      currentEmission: 345.6,
-      todayReduction: 12.3,
-      monthlyTarget: 10000,
-      efficiency: 87.5,
-    },
-  };
-}
-
 export async function GET(request: NextRequest) {
   try {
     // 解析查詢參數
@@ -53,15 +25,20 @@ export async function GET(request: NextRequest) {
     const company = await prisma.company.findFirst();
 
     if (!company) {
-      const mockData = generateMockData();
       return NextResponse.json({
-        ...mockData,
+        carbonData: [],
+        metrics: {
+          currentEmission: 0,
+          todayReduction: 0,
+          monthlyTarget: 10000,
+          efficiency: 0,
+        },
         dateRange: {
           startDate: startDate.toISOString().split('T')[0],
           endDate: endDate.toISOString().split('T')[0],
         },
-        success: true,
-        message: '使用模擬數據（尚無公司資料）',
+        success: false,
+        message: '尚無公司資料，請先導入數據',
       });
     }
 
@@ -92,17 +69,22 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // 如果數據庫沒有數據，返回模擬數據
+    // 如果數據庫沒有數據，返回空數據
     if (!carbonData || carbonData.length === 0) {
-      const mockData = generateMockData();
       return NextResponse.json({
-        ...mockData,
+        carbonData: [],
+        metrics: {
+          currentEmission: 0,
+          todayReduction: 0,
+          monthlyTarget: 10000,
+          efficiency: 0,
+        },
         dateRange: {
           startDate: startDate.toISOString().split('T')[0],
           endDate: endDate.toISOString().split('T')[0],
         },
-        success: true,
-        message: '使用模擬數據（尚無碳排放數據）',
+        success: false,
+        message: '查詢時間範圍內無碳排放數據，請調整日期範圍或導入數據',
       });
     }
 
@@ -188,12 +170,18 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Dashboard API Error:', error);
-    const mockData = generateMockData();
     return NextResponse.json({
-      ...mockData,
-      success: true,
-      error: 'Failed to fetch data, using mock data',
-    });
+      carbonData: [],
+      metrics: {
+        currentEmission: 0,
+        todayReduction: 0,
+        monthlyTarget: 10000,
+        efficiency: 0,
+      },
+      success: false,
+      error: '查詢資料時發生錯誤，請檢查資料庫連接或稍後再試',
+      message: error instanceof Error ? error.message : '未知錯誤',
+    }, { status: 500 });
   } finally {
     await prisma.$disconnect();
   }
