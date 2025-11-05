@@ -6,10 +6,10 @@ import Link from 'next/link';
 import { LayoutDashboard, Calculator, FileText, Settings, Leaf } from 'lucide-react';
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Decision Model', href: '/decision-model', icon: Calculator },
-  { name: 'Reports', href: '/report', icon: FileText },
-  { name: 'Settings', href: '/settings', icon: Settings },
+  { name: '儀表板', href: '/dashboard', icon: LayoutDashboard },
+  { name: '決策模型', href: '/decision-model', icon: Calculator },
+  { name: '報告', href: '/report', icon: FileText },
+  { name: '設定', href: '/settings', icon: Settings },
 ];
 
 export default function Sidebar() {
@@ -24,7 +24,7 @@ export default function Sidebar() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-gray-900">CFM System</h1>
-            <p className="text-xs text-gray-500">Carbon Management</p>
+            <p className="text-xs text-gray-500">碳排管理系統</p>
           </div>
         </Link>
       </div>

@@ -20,7 +20,7 @@ export default function Home() {
                 href="/dashboard"
                 className="gradient-primary text-white px-6 py-2 rounded-lg hover:opacity-90 transition-opacity"
               >
-                Get Started
+                開始使用
               </Link>
             </div>
           </div>
@@ -31,19 +31,19 @@ export default function Home() {
         <div className="max-w-6xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 mb-8 px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
             <Leaf className="w-4 h-4" />
-            Carbon Footprint Management
+            碳足跡管理系統
           </div>
           <h1 className="text-5xl md:text-7xl font-extrabold mb-6 bg-gradient-to-r from-blue-600 via-green-600 to-teal-600 bg-clip-text text-transparent">
             CFM System
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto">
-            Professional Carbon Management & Monitoring Platform
+            專業的碳排管理與監控平台
           </p>
           <Link
             href="/dashboard"
             className="inline-block gradient-primary text-white px-10 py-4 rounded-xl text-lg font-semibold hover:shadow-2xl transition-all hover:-translate-y-1"
           >
-            Start Now
+            立即開始
           </Link>
         </div>
       </section>
