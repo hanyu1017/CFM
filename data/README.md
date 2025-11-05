@@ -22,6 +22,9 @@
 
 ```bash
 # 1. 確保已設置 DATABASE_URL 環境變數
+# Windows PowerShell:
+$env:DATABASE_URL="postgresql://user:password@localhost:5432/carbon_db"
+# macOS/Linux:
 export DATABASE_URL="postgresql://user:password@localhost:5432/carbon_db"
 
 # 2. 生成 Prisma Client
@@ -30,8 +33,11 @@ npx prisma generate
 # 3. 推送資料庫結構
 npx prisma db push
 
-# 4. 導入數據
-npx ts-node scripts/import-seed-data.ts
+# 4. 導入數據（使用 npm 腳本）
+npm run seed:import
+
+# 或直接使用 node
+node scripts/import-seed-data.js
 ```
 
 ### 方法 2: 使用 Prisma Seed 腳本
@@ -102,12 +108,24 @@ GET /api/carbon/dashboard?startDate=2025-05-10&endDate=2025-11-05
 如果您需要生成不同時間範圍的數據：
 
 ```bash
-# 編輯 scripts/generate-seed-data.ts
-# 修改 generateCarbonEmissionData(180) 中的天數參數
+# 方法 1: 使用 npm 腳本（推薦）
+npm run seed:generate > data/carbon-emissions-seed-new.json
 
-# 重新生成數據
-mkdir -p data
-npx ts-node scripts/generate-seed-data.ts > data/carbon-emissions-seed.json 2>&1
+# 方法 2: 直接使用 node
+node scripts/generate-seed-data.js > data/carbon-emissions-seed-new.json
+
+# 如果需要修改天數，編輯 scripts/generate-seed-data.js
+# 修改 generateCarbonEmissionData(180) 中的天數參數
+```
+
+### 完整流程：生成新數據並導入
+
+```bash
+# 1. 生成新的碳排放數據
+npm run seed:generate > data/carbon-emissions-seed.json
+
+# 2. 導入到資料庫
+npm run seed:import
 ```
 
 ## 📝 數據結構
@@ -142,8 +160,10 @@ npx ts-node scripts/generate-seed-data.ts > data/carbon-emissions-seed.json 2>&1
 
 ## 🎯 相關文件
 
-- `/prisma/seed.ts`: Prisma 種子腳本
-- `/scripts/generate-seed-data.ts`: JSON 數據生成腳本
-- `/scripts/import-seed-data.ts`: 數據庫導入腳本
+- `/prisma/seed.ts`: Prisma 種子腳本（TypeScript）
+- `/scripts/generate-seed-data.js`: JSON 數據生成腳本（JavaScript，推薦）
+- `/scripts/generate-seed-data.ts`: JSON 數據生成腳本（TypeScript）
+- `/scripts/import-seed-data.js`: 數據庫導入腳本（JavaScript，推薦）
+- `/scripts/import-seed-data.ts`: 數據庫導入腳本（TypeScript）
 - `/src/app/api/carbon/dashboard/route.ts`: 儀表板 API（支持日期篩選）
 - `/src/app/dashboard/page.tsx`: 儀表板前端頁面
