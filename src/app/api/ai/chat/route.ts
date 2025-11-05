@@ -1,9 +1,9 @@
 // src/app/api/ai/chat/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+import OpenAI from 'openai';
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || '',
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || '',
 });
 
 export async function POST(request: NextRequest) {
@@ -12,19 +12,22 @@ export async function POST(request: NextRequest) {
 
     const systemPrompt = `你是一個專業的永續發展和碳排放管理助手。`;
 
-    const response = await anthropic.messages.create({
-      model: 'claude-3-sonnet-20240229',
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages: messages.map((msg: any) => ({
+    // 將系統提示添加到消息數組的開頭
+    const allMessages = [
+      { role: 'system' as const, content: systemPrompt },
+      ...messages.map((msg: any) => ({
         role: msg.role,
         content: msg.content,
       })),
+    ];
+
+    const response = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      max_tokens: 1024,
+      messages: allMessages,
     });
 
-    const assistantMessage = response.content[0].type === 'text' 
-      ? response.content[0].text 
-      : '';
+    const assistantMessage = response.choices[0]?.message?.content || '';
 
     return NextResponse.json({
       response: assistantMessage,

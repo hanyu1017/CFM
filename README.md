@@ -43,7 +43,7 @@
 - 智能問答系統
 - 數據查詢與分析
 - 減排建議提供
-- 由 Anthropic Claude 驅動
+- 由 OpenAI GPT 驅動
 
 ## 🏗️ 技術架構
 
@@ -59,7 +59,7 @@
 - **資料庫**: PostgreSQL 15
 - **ORM**: Prisma
 - **API**: Next.js API Routes
-- **AI**: Anthropic Claude API
+- **AI**: OpenAI API
 
 ### 部署
 - **前端**: Vercel
@@ -97,7 +97,7 @@ cp .env.example .env.local
 編輯 `.env.local`：
 ```env
 DATABASE_URL="postgresql://user:password@localhost:5432/carbon_db"
-ANTHROPIC_API_KEY="your-anthropic-api-key"
+OPENAI_API_KEY="your-openai-api-key"
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
 ```
 

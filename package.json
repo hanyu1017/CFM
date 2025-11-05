@@ -23,12 +23,12 @@
     "prisma:fix": "node scripts/fix-prisma.js"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.20.0",
     "@prisma/client": "^6.18.0",
     "chart.js": "^4.4.2",
     "date-fns": "^3.6.0",
     "lucide-react": "^0.263.1",
     "next": "14.2.3",
+    "openai": "^6.8.1",
     "react": "^18.3.1",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.3.1",
