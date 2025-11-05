@@ -1,8 +1,8 @@
 // src/app/decision-model/page.tsx
 'use client';
 
-import { useState } from 'react';
-import { Calculator, TrendingUp, Info, Download, Save } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Calculator, TrendingUp, Info, Download, Save, Trash2, Upload, X } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 
@@ -55,6 +55,14 @@ interface OptimizationResult {
   carbonReduction: number;
 }
 
+interface SavedModel {
+  id: number;
+  description: string;
+  parameters: ModelParams;
+  result?: OptimizationResult;
+  created_at: string;
+}
+
 export default function DecisionModelPage() {
   const [params, setParams] = useState<ModelParams>({
     a: 1000, b: 2.5, M: 0.15, rho: 0.2, W: 180,
@@ -73,6 +81,30 @@ export default function DecisionModelPage() {
   const [sensitivityData, setSensitivityData] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'input' | 'result' | 'sensitivity'>('input');
   const [abortController, setAbortController] = useState<AbortController | null>(null);
+
+  // 新增：儲存模型相關狀態
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [modelName, setModelName] = useState('');
+  const [savedModels, setSavedModels] = useState<SavedModel[]>([]);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null);
+  const [successMessage, setSuccessMessage] = useState('');
+
+  // 載入已儲存的模型
+  useEffect(() => {
+    fetchSavedModels();
+  }, []);
+
+  const fetchSavedModels = async () => {
+    try {
+      const response = await fetch('/api/model/saved');
+      if (response.ok) {
+        const data = await response.json();
+        setSavedModels(data.models || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch saved models:', error);
+    }
+  };
 
   // 處理參數變更
   const handleParamChange = (key: keyof ModelParams, value: string) => {
@@ -189,8 +221,138 @@ export default function DecisionModelPage() {
     }
   };
 
+  // 新增：儲存模型功能
+  const openSaveDialog = () => {
+    setModelName('');
+    setShowSaveDialog(true);
+  };
+
+  const saveModel = async () => {
+    if (!modelName.trim()) {
+      alert('請輸入模型名稱');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/model/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: modelName,
+          parameters: params,
+          result: result
+        })
+      });
+
+      if (response.ok) {
+        setShowSaveDialog(false);
+        setModelName('');
+        showSuccessMessage('模型已成功儲存');
+        fetchSavedModels(); // 重新載入模型列表
+      } else {
+        alert('儲存失敗，請稍後再試');
+      }
+    } catch (error) {
+      console.error('Failed to save model:', error);
+      alert('儲存失敗，請稍後再試');
+    }
+  };
+
+  // 新增：載入模型功能
+  const loadModel = (model: SavedModel) => {
+    setParams(model.parameters);
+    if (model.result) {
+      setResult(model.result);
+    }
+    showSuccessMessage('模型已載入');
+    setActiveTab('input');
+  };
+
+  // 新增：刪除模型功能
+  const deleteModel = async (id: number) => {
+    try {
+      const response = await fetch(`/api/model/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        showSuccessMessage('模型已刪除');
+        fetchSavedModels(); // 重新載入模型列表
+        setShowDeleteConfirm(null);
+      } else {
+        alert('刪除失敗，請稍後再試');
+      }
+    } catch (error) {
+      console.error('Failed to delete model:', error);
+      alert('刪除失敗，請稍後再試');
+    }
+  };
+
+  // 顯示成功訊息
+  const showSuccessMessage = (message: string) => {
+    setSuccessMessage(message);
+    setTimeout(() => setSuccessMessage(''), 3000);
+  };
+
   return (
     <DashboardLayout>
+      {/* 成功訊息通知 */}
+      {successMessage && (
+        <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-bounce">
+          <span className="text-xl">✓</span>
+          <span>{successMessage}</span>
+        </div>
+      )}
+
+      {/* 儲存模型對話框 */}
+      {showSaveDialog && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-semibold">儲存模型</h3>
+              <button
+                onClick={() => setShowSaveDialog(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                模型名稱
+              </label>
+              <input
+                type="text"
+                value={modelName}
+                onChange={(e) => setModelName(e.target.value)}
+                placeholder="輸入模型名稱..."
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                autoFocus
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    saveModel();
+                  }
+                }}
+              />
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowSaveDialog(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                取消
+              </button>
+              <button
+                onClick={saveModel}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                儲存
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {loading && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
           <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
@@ -252,6 +414,7 @@ export default function DecisionModelPage() {
               onParamChange={handleParamChange}
               onCalculate={calculateOptimization}
               onSave={saveConfiguration}
+              onSaveModel={openSaveDialog}
               loading={loading}
             />
           )}
@@ -264,6 +427,87 @@ export default function DecisionModelPage() {
             <SensitivityPanel data={sensitivityData} />
           )}
         </div>
+      </div>
+
+      {/* 已儲存的模型區域 */}
+      <div className="bg-white rounded-lg shadow-md p-6 mt-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">已儲存的模型</h2>
+        {savedModels.length === 0 ? (
+          <div className="text-center py-12 text-gray-500">
+            <Save className="w-16 h-16 mx-auto mb-4 opacity-30" />
+            <p>尚無已儲存的模型</p>
+            <p className="text-sm mt-2">使用「儲存模型」按鈕來保存您的參數配置</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {savedModels.map((model) => (
+              <div key={model.id} className="border border-gray-200 rounded-lg p-5 hover:shadow-lg transition-shadow">
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="font-semibold text-lg text-gray-900">{model.description}</h3>
+                  <button
+                    onClick={() => setShowDeleteConfirm(model.id)}
+                    className="text-red-500 hover:text-red-700 transition-colors"
+                    title="刪除模型"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="mb-4 text-sm text-gray-600">
+                  <p className="mb-2">
+                    <span className="font-medium">建立時間：</span>
+                    {new Date(model.created_at).toLocaleString('zh-TW')}
+                  </p>
+                  <div className="bg-gray-50 rounded p-3 space-y-1">
+                    <p><span className="font-medium">需求參數 (a)：</span>{model.parameters.a}</p>
+                    <p><span className="font-medium">價格敏感度 (b)：</span>{model.parameters.b}</p>
+                    <p><span className="font-medium">市場成長率 (M)：</span>{model.parameters.M}</p>
+                  </div>
+                  {model.result && (
+                    <div className="mt-3 bg-blue-50 rounded p-3">
+                      <p className="font-medium text-blue-900 mb-1">優化結果：</p>
+                      <p className="text-blue-700">最大利潤：{model.result.optimalProfit.toFixed(2)} 萬元/月</p>
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => loadModel(model)}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <Upload className="w-4 h-4" />
+                  載入模型
+                </button>
+
+                {/* 刪除確認對話框 */}
+                {showDeleteConfirm === model.id && (
+                  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+                    <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+                      <h3 className="text-xl font-semibold mb-4">確認刪除</h3>
+                      <p className="text-gray-600 mb-6">
+                        確定要刪除模型「{model.description}」嗎？此操作無法復原。
+                      </p>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => setShowDeleteConfirm(null)}
+                          className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                        >
+                          取消
+                        </button>
+                        <button
+                          onClick={() => deleteModel(model.id)}
+                          className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                        >
+                          刪除
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       </div>
     </DashboardLayout>
@@ -289,7 +533,7 @@ function TabButton({ active, onClick, icon, label, disabled = false }: any) {
 }
 
 // 參數輸入面板
-function InputPanel({ params, onParamChange, onCalculate, onSave, loading }: any) {
+function InputPanel({ params, onParamChange, onCalculate, onSave, onSaveModel, loading }: any) {
   const paramGroups = [
     {
       title: '基本經濟參數',
@@ -346,7 +590,7 @@ function InputPanel({ params, onParamChange, onCalculate, onSave, loading }: any
       ))}
 
       {/* 操作按鈕 */}
-      <div className="flex gap-4 pt-4">
+      <div className="flex gap-4 pt-4 flex-wrap">
         <button
           onClick={onCalculate}
           disabled={loading}
@@ -356,8 +600,15 @@ function InputPanel({ params, onParamChange, onCalculate, onSave, loading }: any
           {loading ? '計算中...' : '開始優化計算'}
         </button>
         <button
-          onClick={onSave}
+          onClick={onSaveModel}
           className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+        >
+          <Save className="w-5 h-5" />
+          儲存模型
+        </button>
+        <button
+          onClick={onSave}
+          className="flex items-center gap-2 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
         >
           <Save className="w-5 h-5" />
           保存配置

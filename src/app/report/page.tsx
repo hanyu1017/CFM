@@ -1,8 +1,8 @@
 // src/app/report/page.tsx
 'use client';
 
-import { useState } from 'react';
-import { FileText, Download, Calendar, Settings, Sparkles, CheckCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { FileText, Download, Calendar, Settings, Sparkles, CheckCircle, Trash2 } from 'lucide-react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 
 interface ReportConfig {
@@ -50,13 +50,32 @@ export default function ReportPage() {
   const [generating, setGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState<'create' | 'history'>('create');
 
+  // 獲取報告列表
+  const fetchReports = async () => {
+    try {
+      const response = await fetch('/api/report/list');
+      if (!response.ok) {
+        throw new Error('Failed to fetch reports');
+      }
+      const data = await response.json();
+      setGeneratedReports(data.reports || []);
+    } catch (error) {
+      console.error('Failed to fetch reports:', error);
+    }
+  };
+
+  // 組件掛載時獲取報告列表
+  useEffect(() => {
+    fetchReports();
+  }, []);
+
   // 一鍵生成報告（使用上個月數據）
   const generateQuickReport = async () => {
     setGenerating(true);
     try {
       const lastMonth = new Date();
       lastMonth.setMonth(lastMonth.getMonth() - 1);
-      
+
       const response = await fetch('/api/report/generate-quick', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -66,9 +85,20 @@ export default function ReportPage() {
         })
       });
 
+      if (!response.ok) {
+        throw new Error('Failed to generate quick report');
+      }
+
       const data = await response.json();
-      setGeneratedReports(prev => [data.report, ...prev]);
-      alert('報告生成成功！');
+
+      // 刷新報告列表
+      await fetchReports();
+
+      // 顯示成功消息
+      alert(data.message || '報告已成功生成！您可以在報告歷史中查看和下載。');
+
+      // 切換到歷史標籤
+      setActiveTab('history');
     } catch (error) {
       console.error('Failed to generate quick report:', error);
       alert('報告生成失敗，請稍後再試');
@@ -87,10 +117,20 @@ export default function ReportPage() {
         body: JSON.stringify(config)
       });
 
+      if (!response.ok) {
+        throw new Error('Failed to generate report');
+      }
+
       const data = await response.json();
-      setGeneratedReports(prev => [data.report, ...prev]);
+
+      // 刷新報告列表
+      await fetchReports();
+
+      // 顯示成功消息
+      alert(data.message || '報告已成功生成！您可以在報告歷史中查看和下載。');
+
+      // 切換到歷史標籤
       setActiveTab('history');
-      alert('報告生成成功！');
     } catch (error) {
       console.error('Failed to generate report:', error);
       alert('報告生成失敗，請稍後再試');
@@ -109,7 +149,7 @@ export default function ReportPage() {
       <div className="min-h-screen bg-gray-50 p-6">
       {/* 頁面標題 */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">永續報告書生成系統</h1>
+        <h1 className="text-3xl font-bold text-gray-900">永續報告書生成</h1>
         <p className="text-gray-600 mt-2">自動化生成符合國際標準的永續發展報告書</p>
       </div>
 
@@ -165,7 +205,7 @@ export default function ReportPage() {
           )}
 
           {activeTab === 'history' && (
-            <ReportHistoryPanel reports={generatedReports} />
+            <ReportHistoryPanel reports={generatedReports} onRefresh={fetchReports} />
           )}
         </div>
       </div>
@@ -325,7 +365,41 @@ function CreateReportPanel({ config, onConfigChange, onGenerate, generating }: a
 }
 
 // 報告歷史面板
-function ReportHistoryPanel({ reports }: { reports: GeneratedReport[] }) {
+function ReportHistoryPanel({ reports, onRefresh }: { reports: GeneratedReport[], onRefresh: () => Promise<void> }) {
+  const [deleting, setDeleting] = useState<string | null>(null);
+
+  const handleDownloadPdf = (pdfUrl: string) => {
+    window.open(pdfUrl, '_blank');
+  };
+
+  const handleDelete = async (report: GeneratedReport) => {
+    const confirmed = window.confirm(
+      `確定要刪除報告「${report.title}」嗎？此操作無法復原。`
+    );
+
+    if (!confirmed) return;
+
+    setDeleting(report.id);
+    try {
+      const response = await fetch(`/api/report/${report.id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete report');
+      }
+
+      // 刷新報告列表
+      await onRefresh();
+      alert('報告已成功刪除');
+    } catch (error) {
+      console.error('Failed to delete report:', error);
+      alert('刪除報告失敗，請稍後再試');
+    } finally {
+      setDeleting(null);
+    }
+  };
+
   if (reports.length === 0) {
     return (
       <div className="text-center py-12">
@@ -338,34 +412,52 @@ function ReportHistoryPanel({ reports }: { reports: GeneratedReport[] }) {
   return (
     <div className="space-y-4">
       {reports.map((report) => (
-        <div key={report.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-          <div className="flex items-start justify-between">
+        <div key={report.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow relative">
+          {/* 刪除按鈕 - 右上角 */}
+          <button
+            onClick={() => handleDelete(report)}
+            disabled={deleting === report.id}
+            className="absolute top-4 right-4 p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            title="刪除報告"
+          >
+            <Trash2 className="w-5 h-5" />
+          </button>
+
+          <div className="flex items-start justify-between pr-12">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
                 <h3 className="text-lg font-semibold text-gray-900">{report.title}</h3>
                 <StatusBadge status={report.status} />
               </div>
-              <div className="flex items-center gap-4 text-sm text-gray-600">
+              <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
                 <span className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
                   {report.period}
                 </span>
                 <span>生成於: {new Date(report.createdAt).toLocaleString('zh-TW')}</span>
               </div>
-            </div>
-            <div className="flex gap-2">
-              {report.pdfUrl && (
-                <button className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                  <Download className="w-4 h-4" />
-                  PDF
-                </button>
-              )}
-              {report.docxUrl && (
-                <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                  <Download className="w-4 h-4" />
-                  DOCX
-                </button>
-              )}
+
+              {/* 下載按鈕 */}
+              <div className="flex gap-2">
+                {report.pdfUrl && (
+                  <button
+                    onClick={() => handleDownloadPdf(report.pdfUrl!)}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    <Download className="w-4 h-4" />
+                    下載 PDF
+                  </button>
+                )}
+                {report.docxUrl && (
+                  <button
+                    onClick={() => handleDownloadPdf(report.docxUrl!)}
+                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    <Download className="w-4 h-4" />
+                    下載 DOCX
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
