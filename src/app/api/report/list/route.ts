@@ -29,8 +29,16 @@ export async function GET() {
     return NextResponse.json(reports);
   } catch (error) {
     console.error('Get reports error:', error);
+    console.error('Error name:', error instanceof Error ? error.name : 'Unknown');
+    console.error('Error message:', error instanceof Error ? error.message : 'Unknown');
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+
     return NextResponse.json(
-      { error: '取得報告列表失敗' },
+      {
+        error: '取得報告列表失敗',
+        details: error instanceof Error ? error.message : 'Unknown error',
+        errorType: error instanceof Error ? error.name : typeof error
+      },
       { status: 500 }
     );
   } finally {
