@@ -38,18 +38,40 @@ npx prisma db push
 
 ### 步驟 3: 導入數據
 
+#### 方法 A: 使用 pg 庫（推薦，最可靠）
+
 ```bash
-# 使用預先生成的數據（推薦）
+# 安裝 pg 庫（如果尚未安裝）
+npm install pg
+
+# 導入數據（不依賴 Prisma Client）
+npm run seed:import-pg
+```
+
+#### 方法 B: 生成 SQL 文件手動執行（100% 可靠）
+
+```bash
+# 1. 生成 SQL 文件
+npm run seed:generate-sql
+
+# 2. 使用 psql 執行
+psql -U username -d carbon_db -f data/seed-data.sql
+
+# 或使用 pgAdmin 等圖形工具開啟並執行 data/seed-data.sql
+```
+
+#### 方法 C: 使用 Prisma Client（可能需要修復）
+
+```bash
+# 如果遇到錯誤，先重新生成 Prisma Client
+rmdir /s /q node_modules\.prisma  # Windows
+npx prisma generate
+
+# 然後導入
 npm run seed:import
 ```
 
-**或者**，如果您想生成新的數據：
-
-```bash
-# 生成新數據並導入
-npm run seed:generate > data/carbon-emissions-seed.json
-npm run seed:import
-```
+> 💡 **建議**: 如果遇到 Prisma Client 錯誤，使用方法 A 或 B
 
 ## ✅ 驗證導入
 
@@ -123,6 +145,23 @@ npm run prisma:seed
 
 ## ❓ 常見問題
 
+### Q: 出現 "Cannot find module '#main-entry-point'" 錯誤
+
+**A:** 這是 Prisma Client 生成問題。使用以下解決方案：
+
+**推薦解決方案**：使用 pg 庫（不依賴 Prisma Client）
+```bash
+npm install pg
+npm run seed:import-pg
+```
+
+或者重新生成 Prisma Client：
+```bash
+rmdir /s /q node_modules\.prisma
+npx prisma generate
+npm run seed:import
+```
+
 ### Q: 導入時出現 "找不到數據文件" 錯誤
 
 **A:** 確保 `data/carbon-emissions-seed.json` 文件存在。如果不存在，運行：
@@ -132,7 +171,7 @@ npm run seed:generate > data/carbon-emissions-seed.json
 
 ### Q: 出現 "Cannot find module '@prisma/client'" 錯誤
 
-**A:** 運行 `npx prisma generate` 來生成 Prisma Client。
+**A:** 運行 `npx prisma generate` 來生成 Prisma Client。或使用 `npm run seed:import-pg` 避免此問題。
 
 ### Q: 資料庫連接失敗
 
