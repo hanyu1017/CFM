@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import { FileText, Download, Calendar, Settings, Sparkles, CheckCircle, Trash2 } from 'lucide-react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
+import { useConfirmModal } from '@/components/ui/ConfirmModal';
 
 interface ReportConfig {
   title: string;
@@ -31,6 +32,8 @@ interface GeneratedReport {
 }
 
 export default function ReportPage() {
+  const { showModal, hideModal, ModalComponent } = useConfirmModal();
+
   const [config, setConfig] = useState<ReportConfig>({
     title: '永續發展報告書',
     period: '2024年度',
@@ -100,13 +103,24 @@ export default function ReportPage() {
       await fetchReports();
 
       // 顯示成功消息
-      alert(data.message || '報告已成功生成！您可以在報告歷史中查看和下載。');
-
-      // 切換到歷史標籤
-      setActiveTab('history');
+      showModal({
+        title: '報告生成成功',
+        message: data.message || '報告已成功生成！您可以在報告歷史中查看和下載。',
+        type: 'success',
+        showCancel: false,
+        onConfirm: () => {
+          // 切換到歷史標籤
+          setActiveTab('history');
+        },
+      });
     } catch (error) {
       console.error('Failed to generate quick report:', error);
-      alert('報告生成失敗，請稍後再試');
+      showModal({
+        title: '報告生成失敗',
+        message: '報告生成失敗，請稍後再試',
+        type: 'error',
+        showCancel: false,
+      });
     } finally {
       setGenerating(false);
     }
@@ -132,13 +146,24 @@ export default function ReportPage() {
       await fetchReports();
 
       // 顯示成功消息
-      alert(data.message || '報告已成功生成！您可以在報告歷史中查看和下載。');
-
-      // 切換到歷史標籤
-      setActiveTab('history');
+      showModal({
+        title: '報告生成成功',
+        message: data.message || '報告已成功生成！您可以在報告歷史中查看和下載。',
+        type: 'success',
+        showCancel: false,
+        onConfirm: () => {
+          // 切換到歷史標籤
+          setActiveTab('history');
+        },
+      });
     } catch (error) {
       console.error('Failed to generate report:', error);
-      alert('報告生成失敗，請稍後再試');
+      showModal({
+        title: '報告生成失敗',
+        message: '報告生成失敗，請稍後再試',
+        type: 'error',
+        showCancel: false,
+      });
     } finally {
       setGenerating(false);
     }
@@ -151,6 +176,7 @@ export default function ReportPage() {
 
   return (
     <DashboardLayout>
+      <ModalComponent />
       <div className="min-h-screen bg-gray-50 p-6">
       {/* 頁面標題 */}
       <div className="mb-8">
@@ -210,7 +236,7 @@ export default function ReportPage() {
           )}
 
           {activeTab === 'history' && (
-            <ReportHistoryPanel reports={generatedReports} onRefresh={fetchReports} />
+            <ReportHistoryPanel reports={generatedReports} onRefresh={fetchReports} showModal={showModal} />
           )}
         </div>
       </div>
@@ -370,7 +396,17 @@ function CreateReportPanel({ config, onConfigChange, onGenerate, generating }: a
 }
 
 // 報告歷史面板
-function ReportHistoryPanel({ reports, onRefresh }: { reports: GeneratedReport[], onRefresh: () => Promise<void> }) {
+function ReportHistoryPanel({ reports, onRefresh, showModal }: {
+  reports: GeneratedReport[],
+  onRefresh: () => Promise<void>,
+  showModal: (config: {
+    title: string;
+    message: string;
+    type?: 'info' | 'success' | 'warning' | 'error';
+    onConfirm?: () => void;
+    showCancel?: boolean;
+  }) => void
+}) {
   const [deleting, setDeleting] = useState<string | null>(null);
 
   const handleDownloadPdf = (pdfUrl: string) => {
@@ -378,31 +414,43 @@ function ReportHistoryPanel({ reports, onRefresh }: { reports: GeneratedReport[]
   };
 
   const handleDelete = async (report: GeneratedReport) => {
-    const confirmed = window.confirm(
-      `確定要刪除報告「${report.title}」嗎？此操作無法復原。`
-    );
+    showModal({
+      title: '確認刪除',
+      message: `確定要刪除報告「${report.title}」嗎？此操作無法復原。`,
+      type: 'warning',
+      showCancel: true,
+      onConfirm: async () => {
+        setDeleting(report.id);
+        try {
+          const response = await fetch(`/api/report/${report.id}`, {
+            method: 'DELETE',
+          });
 
-    if (!confirmed) return;
+          if (!response.ok) {
+            throw new Error('Failed to delete report');
+          }
 
-    setDeleting(report.id);
-    try {
-      const response = await fetch(`/api/report/${report.id}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete report');
-      }
-
-      // 刷新報告列表
-      await onRefresh();
-      alert('報告已成功刪除');
-    } catch (error) {
-      console.error('Failed to delete report:', error);
-      alert('刪除報告失敗，請稍後再試');
-    } finally {
-      setDeleting(null);
-    }
+          // 刷新報告列表
+          await onRefresh();
+          showModal({
+            title: '刪除成功',
+            message: '報告已成功刪除',
+            type: 'success',
+            showCancel: false,
+          });
+        } catch (error) {
+          console.error('Failed to delete report:', error);
+          showModal({
+            title: '刪除失敗',
+            message: '刪除報告失敗，請稍後再試',
+            type: 'error',
+            showCancel: false,
+          });
+        } finally {
+          setDeleting(null);
+        }
+      },
+    });
   };
 
   if (reports.length === 0) {
