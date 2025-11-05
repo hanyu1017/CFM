@@ -4,6 +4,8 @@
 import { useState, useEffect } from 'react';
 import { FileText, Download, Calendar, Settings, Sparkles, CheckCircle, Trash2 } from 'lucide-react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
+import { ConfirmDialog, AlertDialog, Toast } from '@/components/ui/Dialog';
+import { useConfirmDialog, useAlertDialog, useToast } from '@/hooks/useDialog';
 
 interface ReportConfig {
   title: string;
@@ -49,6 +51,10 @@ export default function ReportPage() {
   const [generatedReports, setGeneratedReports] = useState<GeneratedReport[]>([]);
   const [generating, setGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState<'create' | 'history'>('create');
+
+  // 對話框狀態管理
+  const { alertState, showAlert, closeAlert } = useAlertDialog();
+  const { toastState, showToast, closeToast } = useToast();
 
   // 獲取報告列表
   const fetchReports = async () => {
@@ -100,13 +106,13 @@ export default function ReportPage() {
       await fetchReports();
 
       // 顯示成功消息
-      alert(data.message || '報告已成功生成！您可以在報告歷史中查看和下載。');
+      showToast(data.message || '報告已成功生成！您可以在報告歷史中查看和下載。', 'success');
 
       // 切換到歷史標籤
       setActiveTab('history');
     } catch (error) {
       console.error('Failed to generate quick report:', error);
-      alert('報告生成失敗，請稍後再試');
+      showAlert('錯誤', '報告生成失敗，請稍後再試', 'error');
     } finally {
       setGenerating(false);
     }
@@ -132,13 +138,13 @@ export default function ReportPage() {
       await fetchReports();
 
       // 顯示成功消息
-      alert(data.message || '報告已成功生成！您可以在報告歷史中查看和下載。');
+      showToast(data.message || '報告已成功生成！您可以在報告歷史中查看和下載。', 'success');
 
       // 切換到歷史標籤
       setActiveTab('history');
     } catch (error) {
       console.error('Failed to generate report:', error);
-      alert('報告生成失敗，請稍後再試');
+      showAlert('錯誤', '報告生成失敗，請稍後再試', 'error');
     } finally {
       setGenerating(false);
     }
@@ -151,6 +157,21 @@ export default function ReportPage() {
 
   return (
     <DashboardLayout>
+      {/* 對話框組件 */}
+      <AlertDialog
+        isOpen={alertState.isOpen}
+        onClose={closeAlert}
+        title={alertState.title}
+        message={alertState.message}
+        type={alertState.type}
+      />
+      <Toast
+        isOpen={toastState.isOpen}
+        onClose={closeToast}
+        message={toastState.message}
+        type={toastState.type}
+      />
+
       <div className="min-h-screen bg-gray-50 p-6">
       {/* 頁面標題 */}
       <div className="mb-8">
@@ -372,18 +393,27 @@ function CreateReportPanel({ config, onConfigChange, onGenerate, generating }: a
 // 報告歷史面板
 function ReportHistoryPanel({ reports, onRefresh }: { reports: GeneratedReport[], onRefresh: () => Promise<void> }) {
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [reportToDelete, setReportToDelete] = useState<GeneratedReport | null>(null);
+
+  // 對話框管理
+  const { confirmState, showConfirm, closeConfirm } = useConfirmDialog();
+  const { toastState, showToast, closeToast } = useToast();
 
   const handleDownloadPdf = (pdfUrl: string) => {
     window.open(pdfUrl, '_blank');
   };
 
   const handleDelete = async (report: GeneratedReport) => {
-    const confirmed = window.confirm(
-      `確定要刪除報告「${report.title}」嗎？此操作無法復原。`
+    setReportToDelete(report);
+    showConfirm(
+      '確認刪除',
+      `確定要刪除報告「${report.title}」嗎？此操作無法復原。`,
+      () => performDelete(report),
+      'error'
     );
+  };
 
-    if (!confirmed) return;
-
+  const performDelete = async (report: GeneratedReport) => {
     setDeleting(report.id);
     try {
       const response = await fetch(`/api/report/${report.id}`, {
@@ -396,12 +426,13 @@ function ReportHistoryPanel({ reports, onRefresh }: { reports: GeneratedReport[]
 
       // 刷新報告列表
       await onRefresh();
-      alert('報告已成功刪除');
+      showToast('報告已成功刪除', 'success');
     } catch (error) {
       console.error('Failed to delete report:', error);
-      alert('刪除報告失敗，請稍後再試');
+      showToast('刪除報告失敗，請稍後再試', 'error');
     } finally {
       setDeleting(null);
+      setReportToDelete(null);
     }
   };
 
@@ -415,8 +446,25 @@ function ReportHistoryPanel({ reports, onRefresh }: { reports: GeneratedReport[]
   }
 
   return (
-    <div className="space-y-4">
-      {reports.map((report) => (
+    <>
+      {/* 對話框組件 */}
+      <ConfirmDialog
+        isOpen={confirmState.isOpen}
+        onClose={closeConfirm}
+        onConfirm={confirmState.onConfirm}
+        title={confirmState.title}
+        message={confirmState.message}
+        type={confirmState.type}
+      />
+      <Toast
+        isOpen={toastState.isOpen}
+        onClose={closeToast}
+        message={toastState.message}
+        type={toastState.type}
+      />
+
+      <div className="space-y-4">
+        {reports.map((report) => (
         <div key={report.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow relative">
           {/* 刪除按鈕 - 右上角 */}
           <button
@@ -467,7 +515,8 @@ function ReportHistoryPanel({ reports, onRefresh }: { reports: GeneratedReport[]
           </div>
         </div>
       ))}
-    </div>
+      </div>
+    </>
   );
 }
 

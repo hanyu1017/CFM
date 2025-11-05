@@ -4,6 +4,8 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Save, X, Building2, Target, Settings as SettingsIcon } from 'lucide-react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
+import { ConfirmDialog, AlertDialog, Toast } from '@/components/ui/Dialog';
+import { useConfirmDialog, useAlertDialog, useToast } from '@/hooks/useDialog';
 
 interface CompanyData {
   id?: string;
@@ -50,6 +52,11 @@ export default function SettingsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // 對話框狀態管理
+  const { confirmState, showConfirm, closeConfirm } = useConfirmDialog();
+  const { alertState, showAlert, closeAlert } = useAlertDialog();
+  const { toastState, showToast, closeToast } = useToast();
+
   useEffect(() => {
     fetchData();
   }, [activeTab]);
@@ -87,7 +94,7 @@ export default function SettingsPage() {
       }
     } catch (error) {
       console.error('載入資料失敗:', error);
-      alert(`載入資料時發生錯誤：${error instanceof Error ? error.message : '未知錯誤'}`);
+      showAlert('錯誤', `載入資料時發生錯誤：${error instanceof Error ? error.message : '未知錯誤'}`, 'error');
     } finally {
       setLoading(false);
     }
@@ -95,6 +102,29 @@ export default function SettingsPage() {
 
   return (
     <DashboardLayout>
+      {/* 對話框組件 */}
+      <ConfirmDialog
+        isOpen={confirmState.isOpen}
+        onClose={closeConfirm}
+        onConfirm={confirmState.onConfirm}
+        title={confirmState.title}
+        message={confirmState.message}
+        type={confirmState.type}
+      />
+      <AlertDialog
+        isOpen={alertState.isOpen}
+        onClose={closeAlert}
+        title={alertState.title}
+        message={alertState.message}
+        type={alertState.type}
+      />
+      <Toast
+        isOpen={toastState.isOpen}
+        onClose={closeToast}
+        message={toastState.message}
+        type={toastState.type}
+      />
+
       <div className="min-h-screen bg-gray-50 p-6">
       {/* 頁面標題 */}
       <div className="mb-8">
@@ -150,10 +180,10 @@ export default function SettingsPage() {
 
                       const savedData = await response.json();
                       setCompanyData(savedData);
-                      alert('✓ 公司資料已成功儲存！');
+                      showToast('公司資料已成功儲存！', 'success');
                     } catch (error) {
                       console.error('儲存公司資料失敗:', error);
-                      alert(`儲存失敗：${error instanceof Error ? error.message : '未知錯誤'}`);
+                      showAlert('錯誤', `儲存失敗：${error instanceof Error ? error.message : '未知錯誤'}`, 'error');
                     } finally {
                       setLoading(false);
                     }
@@ -181,11 +211,11 @@ export default function SettingsPage() {
 
                       const data = await response.json();
                       setTargets([...targets, data]);
-                      alert('✓ 減排目標已成功新增！');
+                      showToast('減排目標已成功新增！', 'success');
                       return true; // 表示成功
                     } catch (error) {
                       console.error('新增減排目標失敗:', error);
-                      alert(`新增失敗：${error instanceof Error ? error.message : '未知錯誤'}`);
+                      showAlert('錯誤', `新增失敗：${error instanceof Error ? error.message : '未知錯誤'}`, 'error');
                       return false; // 表示失敗
                     } finally {
                       setLoading(false);
@@ -207,42 +237,47 @@ export default function SettingsPage() {
 
                       const updatedData = await response.json();
                       setTargets(targets.map(t => t.id === id ? updatedData : t));
-                      alert('✓ 減排目標已成功更新！');
+                      showToast('減排目標已成功更新！', 'success');
                       return true;
                     } catch (error) {
                       console.error('更新減排目標失敗:', error);
-                      alert(`更新失敗：${error instanceof Error ? error.message : '未知錯誤'}`);
+                      showAlert('錯誤', `更新失敗：${error instanceof Error ? error.message : '未知錯誤'}`, 'error');
                       return false;
                     } finally {
                       setLoading(false);
                     }
                   }}
                   onDelete={async (id: string) => {
-                    if (!confirm('確定要刪除此減排目標嗎？此操作無法復原。')) {
-                      return false;
-                    }
+                    return new Promise<boolean>((resolve) => {
+                      showConfirm(
+                        '確認刪除',
+                        '確定要刪除此減排目標嗎？此操作無法復原。',
+                        async () => {
+                          setLoading(true);
+                          try {
+                            const response = await fetch(`/api/settings/targets/${id}`, {
+                              method: 'DELETE',
+                            });
 
-                    setLoading(true);
-                    try {
-                      const response = await fetch(`/api/settings/targets/${id}`, {
-                        method: 'DELETE',
-                      });
+                            if (!response.ok) {
+                              const errorData = await response.json().catch(() => ({}));
+                              throw new Error(errorData.error || '刪除失敗');
+                            }
 
-                      if (!response.ok) {
-                        const errorData = await response.json().catch(() => ({}));
-                        throw new Error(errorData.error || '刪除失敗');
-                      }
-
-                      setTargets(targets.filter(t => t.id !== id));
-                      alert('✓ 減排目標已成功刪除！');
-                      return true;
-                    } catch (error) {
-                      console.error('刪除減排目標失敗:', error);
-                      alert(`刪除失敗：${error instanceof Error ? error.message : '未知錯誤'}`);
-                      return false;
-                    } finally {
-                      setLoading(false);
-                    }
+                            setTargets(targets.filter(t => t.id !== id));
+                            showToast('減排目標已成功刪除！', 'success');
+                            resolve(true);
+                          } catch (error) {
+                            console.error('刪除減排目標失敗:', error);
+                            showAlert('錯誤', `刪除失敗：${error instanceof Error ? error.message : '未知錯誤'}`, 'error');
+                            resolve(false);
+                          } finally {
+                            setLoading(false);
+                          }
+                        },
+                        'error'
+                      );
+                    });
                   }}
                 />
               )}
@@ -267,11 +302,11 @@ export default function SettingsPage() {
 
                       const updatedData = await response.json();
                       setSettings(settings.map(s => s.id === id ? updatedData : s));
-                      alert('✓ 系統配置已成功更新！');
+                      showToast('系統配置已成功更新！', 'success');
                       return true;
                     } catch (error) {
                       console.error('更新系統配置失敗:', error);
-                      alert(`更新失敗：${error instanceof Error ? error.message : '未知錯誤'}`);
+                      showAlert('錯誤', `更新失敗：${error instanceof Error ? error.message : '未知錯誤'}`, 'error');
                       return false;
                     } finally {
                       setLoading(false);

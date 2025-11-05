@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react';
 import { Calculator, TrendingUp, Info, Download, Save, Trash2, Upload, X } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import DashboardLayout from '@/components/layout/DashboardLayout';
+import { AlertDialog } from '@/components/ui/Dialog';
+import { useAlertDialog } from '@/hooks/useDialog';
 
 interface ModelParams {
   // 基本參數
@@ -129,6 +131,9 @@ export default function DecisionModelPage() {
   const [savedModels, setSavedModels] = useState<SavedModel[]>([]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState('');
+
+  // 對話框狀態管理
+  const { alertState, showAlert, closeAlert } = useAlertDialog();
 
   // 載入已儲存的模型
   useEffect(() => {
@@ -262,7 +267,7 @@ export default function DecisionModelPage() {
 
   const saveModel = async () => {
     if (!modelName.trim()) {
-      alert('請輸入模型名稱');
+      showAlert('提示', '請輸入模型名稱', 'warning');
       return;
     }
 
@@ -283,11 +288,11 @@ export default function DecisionModelPage() {
         await fetchSavedModels(); // 重新載入模型列表
         showSuccessMessage('模型已成功儲存');
       } else {
-        alert('儲存失敗，請稍後再試');
+        showAlert('錯誤', '儲存失敗，請稍後再試', 'error');
       }
     } catch (error) {
       console.error('Failed to save model:', error);
-      alert('儲存失敗，請稍後再試');
+      showAlert('錯誤', '儲存失敗，請稍後再試', 'error');
     }
   };
 
@@ -381,7 +386,7 @@ export default function DecisionModelPage() {
   // 新增：更新模型功能
   const updateModel = async () => {
     if (!editingModel || !modelName.trim()) {
-      alert('請輸入模型名稱');
+      showAlert('提示', '請輸入模型名稱', 'warning');
       return;
     }
 
@@ -402,11 +407,11 @@ export default function DecisionModelPage() {
         await fetchSavedModels();
         showSuccessMessage('模型已更新');
       } else {
-        alert('更新失敗，請稍後再試');
+        showAlert('錯誤', '更新失敗，請稍後再試', 'error');
       }
     } catch (error) {
       console.error('Failed to update model:', error);
-      alert('更新失敗，請稍後再試');
+      showAlert('錯誤', '更新失敗，請稍後再試', 'error');
     }
   };
 
@@ -422,11 +427,11 @@ export default function DecisionModelPage() {
         setShowDeleteConfirm(null);
         showSuccessMessage('模型已刪除');
       } else {
-        alert('刪除失敗，請稍後再試');
+        showAlert('錯誤', '刪除失敗，請稍後再試', 'error');
       }
     } catch (error) {
       console.error('Failed to delete model:', error);
-      alert('刪除失敗，請稍後再試');
+      showAlert('錯誤', '刪除失敗，請稍後再試', 'error');
     }
   };
 
@@ -438,6 +443,15 @@ export default function DecisionModelPage() {
 
   return (
     <DashboardLayout>
+      {/* 對話框組件 */}
+      <AlertDialog
+        isOpen={alertState.isOpen}
+        onClose={closeAlert}
+        title={alertState.title}
+        message={alertState.message}
+        type={alertState.type}
+      />
+
       {/* 成功訊息通知 */}
       {successMessage && (
         <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-bounce">
