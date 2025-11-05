@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import { FileText, Download, Calendar, Settings, Sparkles, CheckCircle } from 'lucide-react';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 interface ReportConfig {
   title: string;
@@ -104,7 +105,8 @@ export default function ReportPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <DashboardLayout>
+      <div className="min-h-screen bg-gray-50 p-6">
       {/* 頁面標題 */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">永續報告書生成系統</h1>
@@ -167,7 +169,8 @@ export default function ReportPage() {
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 }
 

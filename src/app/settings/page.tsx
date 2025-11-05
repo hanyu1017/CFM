@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Save, X, Building2, Target, Settings as SettingsIcon } from 'lucide-react';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 interface CompanyData {
   id?: string;
@@ -77,7 +78,8 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <DashboardLayout>
+      <div className="min-h-screen bg-gray-50 p-6">
       {/* 頁面標題 */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">系統設定</h1>
@@ -171,7 +173,8 @@ export default function SettingsPage() {
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 }
 
