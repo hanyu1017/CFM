@@ -34,6 +34,10 @@ export async function POST(request: NextRequest) {
 
     const totalEmissions = carbonData.reduce((sum: number, item: { totalCarbon: number }) => sum + item.totalCarbon, 0);
 
+    // 生成 PDF 檔案名稱和 URL
+    const pdfFileName = `report_${year}_${String(month).padStart(2, '0')}_${Date.now()}.pdf`;
+    const pdfUrl = `/api/report/download/${pdfFileName}`;
+
     const report = await prisma.sustainabilityReport.create({
       data: {
         companyId: company.id,
@@ -44,6 +48,7 @@ export async function POST(request: NextRequest) {
         status: 'DRAFT',
         executiveSummary: `本月總碳排放量為 ${totalEmissions.toFixed(2)} tCO2e。`,
         generatedBy: 'AUTO',
+        pdfUrl,
       }
     });
 
@@ -54,6 +59,7 @@ export async function POST(request: NextRequest) {
         period: report.reportPeriod,
         status: report.status,
         createdAt: report.createdAt,
+        pdfUrl: report.pdfUrl,
       },
       success: true,
       message: '報告已成功生成！',
