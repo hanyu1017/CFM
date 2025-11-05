@@ -2,11 +2,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { 
+import {
   LineChart, Line, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
 import { TrendingUp, TrendingDown, Activity, Zap, Droplets, Wind } from 'lucide-react';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 interface CarbonData {
   date: string;
@@ -109,14 +110,17 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-screen">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        </div>
+      </DashboardLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <DashboardLayout>
+      <div className="min-h-screen bg-gray-50 p-6">
       {/* 頁面標題 */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">碳排放監控儀表板</h1>
@@ -225,7 +229,8 @@ export default function DashboardPage() {
           <SummaryItem label="最低月份" value={Math.min(...carbonData.map(d => d.total)).toFixed(0)} unit="tCO2e" />
         </div>
       </div>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 }
 

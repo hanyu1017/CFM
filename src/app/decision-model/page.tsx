@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { Calculator, TrendingUp, Info, Download, Save } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
 interface ModelParams {
   // 基本參數
@@ -155,7 +156,8 @@ export default function DecisionModelPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <DashboardLayout>
+      <div className="min-h-screen bg-gray-50 p-6">
       {/* 頁面標題 */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">綠色製造決策優化模型</h1>
@@ -208,7 +210,8 @@ export default function DecisionModelPage() {
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </DashboardLayout>
   );
 }
 
