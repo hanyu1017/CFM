@@ -57,6 +57,13 @@ export async function POST(request: NextRequest) {
       const webhookUrl = 'https://primary-production-94491.up.railway.app/webhook-test/27370e56-64bd-4b60-aa48-d128d3db7049';
       const webhookPayload = {
         event: 'report.generated',
+        type: 'quick', // 快速生成
+        dateRange: {
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
+          year: year,
+          month: month,
+        },
         report: {
           id: report.id,
           title: report.title,
