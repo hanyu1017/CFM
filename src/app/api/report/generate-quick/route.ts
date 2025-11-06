@@ -52,6 +52,46 @@ export async function POST(request: NextRequest) {
       }
     });
 
+    // 發送 webhook 通知
+    try {
+      const webhookUrl = 'https://primary-production-94491.up.railway.app/webhook-test/68b2cbd2-2114-4693-9b39-64bcf9dc3a16';
+      const webhookPayload = {
+        event: 'report.generated',
+        report: {
+          id: report.id,
+          title: report.title,
+          period: report.reportPeriod,
+          status: report.status,
+          createdAt: report.createdAt.toISOString(),
+          pdfUrl: report.pdfUrl,
+          totalEmissions: totalEmissions.toFixed(2),
+          dataCount: carbonData.length,
+        },
+        company: {
+          id: company.id,
+          name: company.name,
+        },
+        timestamp: new Date().toISOString(),
+      };
+
+      const webhookResponse = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(webhookPayload),
+      });
+
+      if (webhookResponse.ok) {
+        console.log('Webhook notification sent successfully');
+      } else {
+        console.error('Webhook notification failed:', webhookResponse.status, webhookResponse.statusText);
+      }
+    } catch (webhookError) {
+      // Webhook 失敗不影響主要功能
+      console.error('Failed to send webhook notification:', webhookError);
+    }
+
     return NextResponse.json({
       report: {
         id: report.id,
