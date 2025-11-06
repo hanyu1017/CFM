@@ -50,21 +50,23 @@ const styles = StyleSheet.create({
     borderBottom: '3 solid #2563eb',
   },
   title: {
-    fontSize: 28,
+    fontSize: 24, // 減小標題字體避免溢出
     fontWeight: 700,
     color: '#1e40af',
     marginBottom: 8,
+    maxWidth: '100%',
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#64748b',
     marginBottom: 4,
+    maxWidth: '100%',
   },
   section: {
     marginBottom: 20,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 700,
     color: '#1e40af',
     marginBottom: 12,
@@ -72,56 +74,58 @@ const styles = StyleSheet.create({
     borderBottom: '2 solid #e2e8f0',
   },
   text: {
-    fontSize: 11,
+    fontSize: 10,
     lineHeight: 1.6,
     color: '#334155',
     marginBottom: 8,
   },
   label: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: 700,
     color: '#475569',
     marginBottom: 4,
   },
   value: {
-    fontSize: 11,
+    fontSize: 10,
     color: '#1e293b',
-    marginBottom: 12,
+    marginBottom: 10,
     lineHeight: 1.6,
   },
   card: {
     backgroundColor: '#f8fafc',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 12,
+    padding: 12,
+    borderRadius: 6,
+    marginBottom: 10,
     border: '1 solid #e2e8f0',
   },
   row: {
     flexDirection: 'row',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   column: {
     flex: 1,
+    paddingRight: 8, // 添加間距避免文字相連
   },
   highlight: {
     backgroundColor: '#dbeafe',
-    padding: 12,
+    padding: 10,
     borderRadius: 6,
-    marginBottom: 12,
+    marginBottom: 10,
     borderLeft: '4 solid #2563eb',
   },
   highlightText: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#1e40af',
-    lineHeight: 1.5,
+    lineHeight: 1.6,
   },
   table: {
-    marginBottom: 12,
+    marginBottom: 10,
   },
   tableRow: {
     flexDirection: 'row',
     borderBottom: '1 solid #e2e8f0',
-    paddingVertical: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 4,
   },
   tableHeader: {
     backgroundColor: '#f1f5f9',
@@ -129,8 +133,9 @@ const styles = StyleSheet.create({
   },
   tableCell: {
     flex: 1,
-    fontSize: 10,
+    fontSize: 9,
     color: '#475569',
+    paddingHorizontal: 4, // 添加水平間距
   },
   footer: {
     position: 'absolute',
@@ -138,17 +143,16 @@ const styles = StyleSheet.create({
     left: 40,
     right: 40,
     textAlign: 'center',
-    fontSize: 9,
+    fontSize: 8,
     color: '#94a3b8',
     borderTop: '1 solid #e2e8f0',
     paddingTop: 10,
   },
   longText: {
     fontSize: 10,
-    lineHeight: 1.8,
+    lineHeight: 1.7,
     color: '#334155',
     marginBottom: 8,
-    textAlign: 'justify',
   },
 });
 
