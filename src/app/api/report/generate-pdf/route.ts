@@ -6,26 +6,30 @@ import { Document, Page, Text, View, StyleSheet, Font, pdf } from '@react-pdf/re
 
 const prisma = new PrismaClient();
 
-// 註冊中文字體（使用 Google Fonts 的 Noto Sans TC）
+// 註冊中文字體
+// 使用 Noto Sans TC（繁體中文）從可靠的 CDN
 Font.register({
-  family: 'Noto Sans TC',
+  family: 'NotoSans',
   fonts: [
     {
-      src: 'https://fonts.gstatic.com/s/notosanstc/v35/-nFuOG829Oofr2wohFbTp9i9kwMvFI.ttf',
-      fontWeight: 400,
+      src: 'https://fonts.gstatic.com/s/notosanstc/v26/-nF7OG829Oofr2wohFbTp9i9WyEJIfNZ1sjy.woff2',
+      fontWeight: 'normal',
     },
     {
-      src: 'https://fonts.gstatic.com/s/notosanstc/v35/-nFvOG829Oofr2wohFbTp9i9kwMPBZf1bw.ttf',
-      fontWeight: 700,
+      src: 'https://fonts.gstatic.com/s/notosanstc/v26/-nF7OG829Oofr2wohFbTp9i9UyYJIfNZ1sjy.woff2',
+      fontWeight: 'bold',
     },
   ],
 });
+
+// 設置斷字規則
+Font.registerHyphenationCallback((word) => [word]);
 
 // 定義樣式
 const styles = StyleSheet.create({
   page: {
     padding: 40,
-    fontFamily: 'Noto Sans TC',
+    fontFamily: 'NotoSans',
     backgroundColor: '#ffffff',
   },
   header: {
