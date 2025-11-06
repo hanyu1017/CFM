@@ -524,7 +524,14 @@ export async function POST(request: NextRequest) {
 
     // 生成 PDF
     const pdfDoc = createPDFDocument(report, carbonData, webhookData, company);
-    const pdfBuffer = await pdf(pdfDoc).toBuffer();
+
+    // 使用 renderToReadableStream 生成 PDF
+    const pdfInstance = pdf(pdfDoc);
+
+    // 將 PDF 轉換為 Blob，然後轉為 ArrayBuffer
+    const pdfBlob = await pdfInstance.toBlob();
+    const pdfArrayBuffer = await pdfBlob.arrayBuffer();
+    const pdfBuffer = Buffer.from(pdfArrayBuffer);
 
     // 返回 PDF
     return new NextResponse(pdfBuffer, {
