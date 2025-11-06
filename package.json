@@ -25,6 +25,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.20.0",
     "@prisma/client": "^6.18.0",
+    "@react-pdf/renderer": "^4.3.1",
     "chart.js": "^4.4.2",
     "date-fns": "^3.6.0",
     "lucide-react": "^0.263.1",

@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
 
     // 發送 webhook 通知
     try {
-      const webhookUrl = 'https://primary-production-94491.up.railway.app/webhook-test/27370e56-64bd-4b60-aa48-d128d3db7049';
+      const webhookUrl = 'https://primary-production-94491.up.railway.app/webhook/27370e56-64bd-4b60-aa48-d128d3db7049';
       const webhookPayload = {
         start_date: formatDate(config.startDate),
         end_date: formatDate(config.endDate),
