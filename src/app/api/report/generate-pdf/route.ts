@@ -3,21 +3,32 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Font, pdf } from '@react-pdf/renderer';
+import path from 'path';
+import fs from 'fs';
 
 const prisma = new PrismaClient();
 
-// 註冊中文字體
-// 使用 Noto Sans SC（簡體中文，同時支持繁體）
-// 使用 jsdelivr CDN 確保穩定性
+// 註冊中文字體 - 使用本地字體文件
+// 讀取字體文件並轉換為 base64
+const fontDir = path.join(process.cwd(), 'public', 'fonts');
+const regularFontPath = path.join(fontDir, 'NotoSansSC-Regular.otf');
+const boldFontPath = path.join(fontDir, 'NotoSansSC-Bold.otf');
+
+// 讀取字體文件並轉換為 data URI
+const regularFontBuffer = fs.readFileSync(regularFontPath);
+const boldFontBuffer = fs.readFileSync(boldFontPath);
+const regularFontBase64 = regularFontBuffer.toString('base64');
+const boldFontBase64 = boldFontBuffer.toString('base64');
+
 Font.register({
   family: 'NotoSans',
   fonts: [
     {
-      src: 'https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSansSC/hinted/ttf/NotoSansSC-Regular.ttf',
+      src: `data:font/otf;base64,${regularFontBase64}`,
       fontWeight: 'normal',
     },
     {
-      src: 'https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSansSC/hinted/ttf/NotoSansSC-Bold.ttf',
+      src: `data:font/otf;base64,${boldFontBase64}`,
       fontWeight: 'bold',
     },
   ],
