@@ -14,10 +14,23 @@ function formatDate(date: Date): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const { month, year } = await request.json();
+    // 自動使用上個月的資料
+    const now = new Date();
+    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const year = lastMonth.getFullYear();
+    const month = lastMonth.getMonth() + 1;
 
+    // 計算上個月的開始和結束日期
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0);
+
+    console.log('=== 報告生成開始 ===');
+    console.log('查詢期間:', {
+      year,
+      month,
+      startDate: formatDate(startDate),
+      endDate: formatDate(endDate)
+    });
 
     // 獲取或創建默認公司
     let company = await prisma.company.findFirst();
@@ -37,8 +50,13 @@ export async function POST(request: NextRequest) {
       where: {
         companyId: company.id,
         date: { gte: startDate, lte: endDate }
+      },
+      orderBy: {
+        date: 'asc'
       }
     });
+
+    console.log(`找到 ${carbonData.length} 筆碳排放數據`);
 
     const totalEmissions = carbonData.reduce((sum: number, item: { totalCarbon: number }) => sum + item.totalCarbon, 0);
 
@@ -60,7 +78,8 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    // 發送 webhook 通知
+    // 發送 webhook 通知並等待回應
+    let webhookData = null;
     try {
       const webhookUrl = 'https://primary-production-94491.up.railway.app/webhook-test/27370e56-64bd-4b60-aa48-d128d3db7049';
       const webhookPayload = {
@@ -87,6 +106,10 @@ export async function POST(request: NextRequest) {
         timestamp: new Date().toISOString(),
       };
 
+      console.log('=== 發送 Webhook ===');
+      console.log('URL:', webhookUrl);
+      console.log('Payload:', JSON.stringify(webhookPayload, null, 2));
+
       const webhookResponse = await fetch(webhookUrl, {
         method: 'POST',
         headers: {
@@ -95,15 +118,42 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify(webhookPayload),
       });
 
+      console.log('=== Webhook 回應 ===');
+      console.log('狀態碼:', webhookResponse.status);
+      console.log('狀態文字:', webhookResponse.statusText);
+
       if (webhookResponse.ok) {
-        console.log('Webhook notification sent successfully');
+        const responseText = await webhookResponse.text();
+        console.log('回應內容:', responseText);
+
+        try {
+          webhookData = JSON.parse(responseText);
+          console.log('解析後的回應資料:', JSON.stringify(webhookData, null, 2));
+        } catch (parseError) {
+          console.log('回應內容無法解析為 JSON，使用原始文字');
+          webhookData = { rawResponse: responseText };
+        }
+
+        // 更新報告，將 webhook 資料儲存為 JSON
+        await prisma.sustainabilityReport.update({
+          where: { id: report.id },
+          data: {
+            carbonFootprint: webhookData || { webhookReceived: true },
+          }
+        });
+
+        console.log('✅ Webhook 通知發送成功，資料已儲存到報告中');
       } else {
-        console.error('Webhook notification failed:', webhookResponse.status, webhookResponse.statusText);
+        const errorText = await webhookResponse.text();
+        console.error('❌ Webhook 通知失敗');
+        console.error('錯誤回應:', errorText);
       }
     } catch (webhookError) {
       // Webhook 失敗不影響主要功能
-      console.error('Failed to send webhook notification:', webhookError);
+      console.error('❌ Webhook 發送異常:', webhookError);
     }
+
+    console.log('=== 報告生成完成 ===');
 
     return NextResponse.json({
       report: {
@@ -113,12 +163,13 @@ export async function POST(request: NextRequest) {
         status: report.status,
         createdAt: report.createdAt,
         pdfUrl: report.pdfUrl,
+        webhookData: webhookData,
       },
       success: true,
       message: '報告已成功生成！',
     });
   } catch (error) {
-    console.error('Quick report API error:', error);
+    console.error('❌ 快速報告生成錯誤:', error);
     return NextResponse.json(
       { error: 'Failed to generate report', success: false },
       { status: 500 }
