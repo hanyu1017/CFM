@@ -450,8 +450,10 @@ function createPDFDocument(report: any, carbonData: any[], webhookData: any, com
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('========== PDF 生成開始 ==========');
     const body = await request.json();
     const { reportId } = body;
+    console.log('請求的報告 ID:', reportId);
 
     if (!reportId) {
       return NextResponse.json({ error: '缺少報告 ID', success: false }, { status: 400 });
@@ -461,6 +463,11 @@ export async function POST(request: NextRequest) {
     const report = await prisma.sustainabilityReport.findUnique({
       where: { id: reportId },
     });
+    console.log('報告資料:', {
+      id: report?.id,
+      title: report?.title,
+      period: report?.reportPeriod,
+    });
 
     if (!report) {
       return NextResponse.json({ error: '找不到報告', success: false }, { status: 404 });
@@ -469,6 +476,12 @@ export async function POST(request: NextRequest) {
     // 獲取公司數據
     const company = await prisma.company.findUnique({
       where: { id: report.companyId },
+    });
+    console.log('公司資料:', {
+      id: company?.id,
+      name: company?.name,
+      nameLength: company?.name?.length,
+      nameBytes: Buffer.from(company?.name || '', 'utf8').toString('hex'),
     });
 
     if (!company) {
@@ -516,7 +529,10 @@ export async function POST(request: NextRequest) {
         timestamp: new Date().toISOString(),
       };
 
-      console.log('發送 Webhook 以獲取 AI 分析...');
+      console.log('========== 發送 Webhook ==========');
+      console.log('Webhook URL:', webhookUrl);
+      console.log('Webhook Payload:', JSON.stringify(webhookPayload, null, 2));
+
       const webhookResponse = await fetch(webhookUrl, {
         method: 'POST',
         headers: {
@@ -525,29 +541,67 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify(webhookPayload),
       });
 
+      console.log('Webhook 回應狀態:', webhookResponse.status);
+      console.log('Webhook 回應 headers:', Object.fromEntries(webhookResponse.headers.entries()));
+
       if (webhookResponse.ok) {
         const responseText = await webhookResponse.text();
+        console.log('========== Webhook 原始回應 ==========');
+        console.log('回應長度:', responseText.length);
+        console.log('前 200 字符:', responseText.substring(0, 200));
+        console.log('回應的 hex 編碼（前 100 bytes）:', Buffer.from(responseText.substring(0, 50), 'utf8').toString('hex'));
+
         try {
           webhookData = JSON.parse(responseText);
-          console.log('成功獲取 Webhook AI 分析數據');
-        } catch {
+          console.log('========== Webhook 解析後的數據 ==========');
+          console.log('數據類型:', typeof webhookData);
+          console.log('數據鍵:', Object.keys(webhookData));
+
+          if (webhookData.aiAnalysis) {
+            console.log('AI 分析類型:', typeof webhookData.aiAnalysis);
+            console.log('AI 分析前 100 字符:', String(webhookData.aiAnalysis).substring(0, 100));
+            console.log('AI 分析 hex（前 50 bytes）:',
+              Buffer.from(String(webhookData.aiAnalysis).substring(0, 50), 'utf8').toString('hex')
+            );
+          }
+
+          console.log('完整 webhookData:', JSON.stringify(webhookData, null, 2));
+        } catch (parseError) {
+          console.error('JSON 解析失敗:', parseError);
           webhookData = { rawResponse: responseText };
         }
+      } else {
+        console.error('Webhook 請求失敗，狀態碼:', webhookResponse.status);
       }
     } catch (webhookError) {
-      console.error('Webhook 請求失敗:', webhookError);
+      console.error('========== Webhook 請求異常 ==========');
+      console.error('錯誤:', webhookError);
     }
 
     // 生成 PDF
+    console.log('========== 開始生成 PDF ==========');
+    console.log('傳入 createPDFDocument 的數據:');
+    console.log('- Report title:', report.title);
+    console.log('- Company name:', company.name);
+    console.log('- Carbon data count:', carbonData.length);
+    console.log('- Webhook data:', webhookData ? 'Yes' : 'No');
+
     const pdfDoc = createPDFDocument(report, carbonData, webhookData, company);
+    console.log('PDF Document 創建成功');
 
     // 使用 renderToReadableStream 生成 PDF
     const pdfInstance = pdf(pdfDoc);
+    console.log('PDF Instance 創建成功');
 
     // 將 PDF 轉換為 Blob，然後轉為 ArrayBuffer
     const pdfBlob = await pdfInstance.toBlob();
+    console.log('PDF Blob 大小:', pdfBlob.size, 'bytes');
+
     const pdfArrayBuffer = await pdfBlob.arrayBuffer();
     const pdfBuffer = Buffer.from(pdfArrayBuffer);
+    console.log('PDF Buffer 大小:', pdfBuffer.length, 'bytes');
+
+    console.log('========== PDF 生成完成 ==========');
 
     // 返回 PDF
     return new NextResponse(pdfBuffer, {
