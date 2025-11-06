@@ -8,11 +8,11 @@ import fs from 'fs';
 
 const prisma = new PrismaClient();
 
-// 註冊中文字體 - 使用本地字體文件
+// 註冊中文字體 - 使用思源黑體（Source Han Sans）
 // 讀取字體文件並轉換為 base64
 const fontDir = path.join(process.cwd(), 'public', 'fonts');
-const regularFontPath = path.join(fontDir, 'NotoSansSC-Regular.otf');
-const boldFontPath = path.join(fontDir, 'NotoSansSC-Bold.otf');
+const regularFontPath = path.join(fontDir, 'SourceHanSansCN-Regular.otf');
+const boldFontPath = path.join(fontDir, 'SourceHanSansCN-Bold.otf');
 
 // 讀取字體文件並轉換為 data URI
 const regularFontBuffer = fs.readFileSync(regularFontPath);
@@ -21,7 +21,7 @@ const regularFontBase64 = regularFontBuffer.toString('base64');
 const boldFontBase64 = boldFontBuffer.toString('base64');
 
 Font.register({
-  family: 'NotoSans',
+  family: 'SourceHanSans',
   fonts: [
     {
       src: `data:font/otf;base64,${regularFontBase64}`,
@@ -41,7 +41,7 @@ Font.registerHyphenationCallback((word) => [word]);
 const styles = StyleSheet.create({
   page: {
     padding: 40,
-    fontFamily: 'NotoSans',
+    fontFamily: 'SourceHanSans',
     backgroundColor: '#ffffff',
   },
   header: {
