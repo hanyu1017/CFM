@@ -51,6 +51,7 @@ export default function ReportPage() {
   const [generatedReports, setGeneratedReports] = useState<GeneratedReport[]>([]);
   const [generating, setGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState<'create' | 'history'>('create');
+  const [generatingPdf, setGeneratingPdf] = useState(false); // PDF 生成狀態
 
   // 對話框狀態管理
   const { alertState, showAlert, closeAlert } = useAlertDialog();
@@ -84,8 +85,14 @@ export default function ReportPage() {
   const generateQuickReport = async () => {
     setGenerating(true);
     try {
+      console.log('========== 一鍵生成報告開始 ==========');
       const lastMonth = new Date();
       lastMonth.setMonth(lastMonth.getMonth() - 1);
+
+      console.log('請求參數:', {
+        month: lastMonth.getMonth() + 1,
+        year: lastMonth.getFullYear(),
+      });
 
       const response = await fetch('/api/report/generate-quick', {
         method: 'POST',
@@ -96,22 +103,42 @@ export default function ReportPage() {
         })
       });
 
+      console.log('API 回應狀態:', response.status);
+
       if (!response.ok) {
         throw new Error('Failed to generate quick report');
       }
 
       const data = await response.json();
+      console.log('========== 報告生成成功 ==========');
+      console.log('完整回傳數據:', JSON.stringify(data, null, 2));
+      console.log('報告 ID:', data.report?.id);
+      console.log('報告標題:', data.report?.title);
+      console.log('Webhook 數據:', data.report?.webhookData);
 
       // 刷新報告列表
       await fetchReports();
 
       // 顯示成功消息
-      showToast(data.message || '報告已成功生成！您可以在報告歷史中查看和下載。', 'success');
+      showToast(data.message || '報告已成功生成！', 'success');
+
+      // 如果有報告 ID，自動生成 PDF
+      if (data.report?.id) {
+        console.log('========== 開始自動生成 PDF ==========');
+        console.log('報告 ID:', data.report.id);
+
+        // 延遲一下讓用戶看到報告生成成功
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // 生成 PDF
+        await handleGeneratePdf(data.report.id);
+      }
 
       // 切換到歷史標籤
       setActiveTab('history');
     } catch (error) {
-      console.error('Failed to generate quick report:', error);
+      console.error('========== 報告生成失敗 ==========');
+      console.error('錯誤詳情:', error);
       showAlert('錯誤', '報告生成失敗，請稍後再試', 'error');
     } finally {
       setGenerating(false);
@@ -155,8 +182,91 @@ export default function ReportPage() {
     setConfig(prev => ({ ...prev, [key]: value }));
   };
 
+  // 生成 PDF
+  const handleGeneratePdf = async (reportId: string) => {
+    setGeneratingPdf(true);
+    try {
+      console.log('========== PDF 生成開始 ==========');
+      console.log('報告 ID:', reportId);
+      console.log('請求時間:', new Date().toLocaleString('zh-TW'));
+
+      const requestBody = { reportId };
+      console.log('請求 Body:', JSON.stringify(requestBody, null, 2));
+
+      const response = await fetch('/api/report/generate-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      console.log('API 回應狀態:', response.status);
+      console.log('API 回應 Headers:', {
+        contentType: response.headers.get('content-type'),
+        contentDisposition: response.headers.get('content-disposition'),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('========== PDF 生成失敗 ==========');
+        console.error('錯誤回應:', errorData);
+        throw new Error(errorData.error || 'PDF 生成失敗');
+      }
+
+      // 獲取 PDF blob
+      const blob = await response.blob();
+      console.log('========== PDF Blob 獲取成功 ==========');
+      console.log('Blob 大小:', blob.size, 'bytes');
+      console.log('Blob 類型:', blob.type);
+
+      // 創建下載鏈接
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `report_${reportId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+      console.log('========== PDF 下載成功 ==========');
+      console.log('文件名:', `report_${reportId}.pdf`);
+      console.log('完成時間:', new Date().toLocaleString('zh-TW'));
+
+      showToast('PDF 已成功生成並下載！', 'success');
+    } catch (error: any) {
+      console.error('========== PDF 生成錯誤 ==========');
+      console.error('錯誤類型:', error.name);
+      console.error('錯誤訊息:', error.message);
+      console.error('錯誤堆疊:', error.stack);
+      showAlert('錯誤', error.message || 'PDF 生成失敗，請稍後再試', 'error');
+    } finally {
+      setGeneratingPdf(false);
+    }
+  };
+
   return (
     <DashboardLayout>
+      {/* AI 生成遮罩 */}
+      {(generating || generatingPdf) && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+          <div className="bg-white p-10 rounded-2xl shadow-2xl text-center max-w-md">
+            {/* 動畫載入圖示 */}
+            <div className="w-20 h-20 mx-auto mb-6 border-6 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
+            <h3 className="text-2xl font-bold text-blue-900 mb-3">
+              🤖 AI 正在生成中
+            </h3>
+            <p className="text-gray-600 leading-relaxed">
+              {generatingPdf
+                ? '正在透過 AI 分析碳排放數據並生成專業 PDF 報告，請稍候...'
+                : '正在分析數據並生成報告，請稍候...'
+              }
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* 對話框組件 */}
       <AlertDialog
         isOpen={alertState.isOpen}
@@ -231,7 +341,11 @@ export default function ReportPage() {
           )}
 
           {activeTab === 'history' && (
-            <ReportHistoryPanel reports={generatedReports} onRefresh={fetchReports} />
+            <ReportHistoryPanel
+              reports={generatedReports}
+              onRefresh={fetchReports}
+              onGeneratePdf={handleGeneratePdf}
+            />
           )}
         </div>
       </div>
@@ -391,17 +505,21 @@ function CreateReportPanel({ config, onConfigChange, onGenerate, generating }: a
 }
 
 // 報告歷史面板
-function ReportHistoryPanel({ reports, onRefresh }: { reports: GeneratedReport[], onRefresh: () => Promise<void> }) {
+function ReportHistoryPanel({
+  reports,
+  onRefresh,
+  onGeneratePdf
+}: {
+  reports: GeneratedReport[],
+  onRefresh: () => Promise<void>,
+  onGeneratePdf: (reportId: string) => Promise<void>
+}) {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [reportToDelete, setReportToDelete] = useState<GeneratedReport | null>(null);
 
   // 對話框管理
   const { confirmState, showConfirm, closeConfirm } = useConfirmDialog();
   const { toastState, showToast, closeToast } = useToast();
-
-  const handleDownloadPdf = (pdfUrl: string) => {
-    window.open(pdfUrl, '_blank');
-  };
 
   const handleDelete = async (report: GeneratedReport) => {
     setReportToDelete(report);
@@ -492,24 +610,13 @@ function ReportHistoryPanel({ reports, onRefresh }: { reports: GeneratedReport[]
 
               {/* 下載按鈕 */}
               <div className="flex gap-2">
-                {report.pdfUrl && (
-                  <button
-                    onClick={() => handleDownloadPdf(report.pdfUrl!)}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    <Download className="w-4 h-4" />
-                    下載 PDF
-                  </button>
-                )}
-                {report.docxUrl && (
-                  <button
-                    onClick={() => handleDownloadPdf(report.docxUrl!)}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                  >
-                    <Download className="w-4 h-4" />
-                    下載 DOCX
-                  </button>
-                )}
+                <button
+                  onClick={() => onGeneratePdf(report.id)}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                  生成並下載 PDF
+                </button>
               </div>
             </div>
           </div>
