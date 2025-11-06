@@ -3,12 +3,13 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { LayoutDashboard, Calculator, FileText, Settings, Leaf } from 'lucide-react';
+import { LayoutDashboard, Calculator, FileText, Settings, Leaf, Database } from 'lucide-react';
 
 const navigation = [
   { name: '儀表板', href: '/dashboard', icon: LayoutDashboard },
   { name: '決策模型', href: '/decision-model', icon: Calculator },
   { name: '永續報告書生成', href: '/report', icon: FileText },
+  { name: '資料管理', href: '/data-management', icon: Database },
   { name: '設定', href: '/settings', icon: Settings },
 ];
 
