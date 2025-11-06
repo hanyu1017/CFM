@@ -4,6 +4,14 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+// 格式化日期為 YYYY-MM-DD
+function formatDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { month, year } = await request.json();
@@ -56,14 +64,12 @@ export async function POST(request: NextRequest) {
     try {
       const webhookUrl = 'https://primary-production-94491.up.railway.app/webhook-test/27370e56-64bd-4b60-aa48-d128d3db7049';
       const webhookPayload = {
+        start_date: formatDate(startDate),
+        end_date: formatDate(endDate),
         event: 'report.generated',
-        type: 'quick', // 快速生成
-        dateRange: {
-          startDate: startDate.toISOString(),
-          endDate: endDate.toISOString(),
-          year: year,
-          month: month,
-        },
+        type: 'quick',
+        year: year,
+        month: month,
         report: {
           id: report.id,
           title: report.title,
