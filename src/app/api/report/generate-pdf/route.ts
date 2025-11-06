@@ -127,14 +127,6 @@ const styles = StyleSheet.create({
     borderTop: '1 solid #e2e8f0',
     paddingTop: 10,
   },
-  badge: {
-    backgroundColor: '#10b981',
-    color: '#ffffff',
-    fontSize: 10,
-    padding: '4 8',
-    borderRadius: 4,
-    marginLeft: 8,
-  },
   longText: {
     fontSize: 10,
     lineHeight: 1.8,
@@ -180,202 +172,6 @@ function splitLongText(text: string, maxLength: number = 500): string[] {
   return paragraphs;
 }
 
-// PDF 文檔組件
-interface PDFDocumentProps {
-  report: any;
-  carbonData: any[];
-  webhookData: any;
-  company: any;
-}
-
-const PDFDocument: React.FC<PDFDocumentProps> = ({ report, carbonData, webhookData, company }) => {
-  const totalEmissions = carbonData.reduce((sum, item) => sum + item.totalCarbon, 0);
-
-  return (
-    <Document>
-      <Page size="A4" style={styles.page}>
-        {/* 標題區域 */}
-        <View style={styles.header}>
-          <Text style={styles.title}>{report.title}</Text>
-          <Text style={styles.subtitle}>
-            {company.name} | 永續發展報告書
-          </Text>
-          <Text style={styles.subtitle}>
-            報告期間：{formatDate(report.startDate)} - {formatDate(report.endDate)}
-          </Text>
-          <Text style={styles.subtitle}>
-            生成時間：{formatDate(report.createdAt)}
-          </Text>
-        </View>
-
-        {/* 執行摘要 */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📋 執行摘要</Text>
-          <View style={styles.highlight}>
-            <Text style={styles.highlightText}>
-              {report.executiveSummary || `本報告涵蓋 ${report.reportPeriod} 期間的永續發展成果與碳排放數據分析。`}
-            </Text>
-          </View>
-        </View>
-
-        {/* 碳排放總覽 */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>🌍 碳排放總覽</Text>
-          <View style={styles.card}>
-            <View style={styles.row}>
-              <View style={styles.column}>
-                <Text style={styles.label}>總碳排放量</Text>
-                <Text style={styles.value}>{totalEmissions.toFixed(2)} tCO2e</Text>
-              </View>
-              <View style={styles.column}>
-                <Text style={styles.label}>數據筆數</Text>
-                <Text style={styles.value}>{carbonData.length} 筆</Text>
-              </View>
-            </View>
-            <View style={styles.row}>
-              <View style={styles.column}>
-                <Text style={styles.label}>平均每日排放</Text>
-                <Text style={styles.value}>
-                  {carbonData.length > 0 ? (totalEmissions / carbonData.length).toFixed(2) : '0.00'} tCO2e
-                </Text>
-              </View>
-              <View style={styles.column}>
-                <Text style={styles.label}>報告狀態</Text>
-                <Text style={styles.value}>{report.status}</Text>
-              </View>
-            </View>
-          </View>
-        </View>
-
-        {/* 頁腳 */}
-        <Text style={styles.footer}>
-          {company.name} | 第 1 頁 | 機密文件
-        </Text>
-      </Page>
-
-      {/* 第二頁：詳細數據 */}
-      <Page size="A4" style={styles.page}>
-        <View style={styles.header}>
-          <Text style={styles.title}>詳細碳排放數據</Text>
-        </View>
-
-        {/* 碳排放數據表格 */}
-        {carbonData.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>📊 每日碳排放明細</Text>
-            <View style={styles.table}>
-              <View style={[styles.tableRow, styles.tableHeader]}>
-                <Text style={[styles.tableCell, { flex: 1.5 }]}>日期</Text>
-                <Text style={styles.tableCell}>類別</Text>
-                <Text style={styles.tableCell}>排放量 (tCO2e)</Text>
-              </View>
-              {carbonData.slice(0, 15).map((item, index) => (
-                <View key={index} style={styles.tableRow}>
-                  <Text style={[styles.tableCell, { flex: 1.5 }]}>
-                    {formatDate(item.date)}
-                  </Text>
-                  <Text style={styles.tableCell}>{item.category}</Text>
-                  <Text style={styles.tableCell}>{item.totalCarbon.toFixed(2)}</Text>
-                </View>
-              ))}
-            </View>
-            {carbonData.length > 15 && (
-              <Text style={styles.text}>... 及其他 {carbonData.length - 15} 筆數據</Text>
-            )}
-          </View>
-        )}
-
-        {/* 頁腳 */}
-        <Text style={styles.footer}>
-          {company.name} | 第 2 頁 | 機密文件
-        </Text>
-      </Page>
-
-      {/* 第三頁：AI 分析 */}
-      {webhookData?.aiAnalysis && (
-        <Page size="A4" style={styles.page}>
-          <View style={styles.header}>
-            <Text style={styles.title}>🤖 AI 智能分析</Text>
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>分析結果</Text>
-            {splitLongText(
-              typeof webhookData.aiAnalysis === 'string'
-                ? webhookData.aiAnalysis
-                : JSON.stringify(webhookData.aiAnalysis, null, 2),
-              800
-            ).map((paragraph, index) => (
-              <View key={index} style={styles.card}>
-                <Text style={styles.longText}>{paragraph}</Text>
-              </View>
-            ))}
-          </View>
-
-          {/* 頁腳 */}
-          <Text style={styles.footer}>
-            {company.name} | 第 3 頁 | 機密文件
-          </Text>
-        </Page>
-      )}
-
-      {/* 第四頁：Webhook 完整數據 */}
-      {webhookData && (
-        <Page size="A4" style={styles.page}>
-          <View style={styles.header}>
-            <Text style={styles.title}>📡 系統數據記錄</Text>
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>完整 Webhook 數據</Text>
-            {webhookData.summary && (
-              <View style={styles.card}>
-                <Text style={styles.label}>數據摘要</Text>
-                {splitLongText(webhookData.summary, 600).map((paragraph, index) => (
-                  <Text key={index} style={styles.longText}>{paragraph}</Text>
-                ))}
-              </View>
-            )}
-
-            {webhookData.insights && (
-              <View style={styles.card}>
-                <Text style={styles.label}>關鍵洞察</Text>
-                {splitLongText(
-                  typeof webhookData.insights === 'string'
-                    ? webhookData.insights
-                    : JSON.stringify(webhookData.insights, null, 2),
-                  600
-                ).map((paragraph, index) => (
-                  <Text key={index} style={styles.longText}>{paragraph}</Text>
-                ))}
-              </View>
-            )}
-
-            {webhookData.recommendations && (
-              <View style={styles.card}>
-                <Text style={styles.label}>改善建議</Text>
-                {splitLongText(
-                  typeof webhookData.recommendations === 'string'
-                    ? webhookData.recommendations
-                    : JSON.stringify(webhookData.recommendations, null, 2),
-                  600
-                ).map((paragraph, index) => (
-                  <Text key={index} style={styles.longText}>{paragraph}</Text>
-                ))}
-              </View>
-            )}
-          </View>
-
-          {/* 頁腳 */}
-          <Text style={styles.footer}>
-            {company.name} | 第 4 頁 | 機密文件
-          </Text>
-        </Page>
-      )}
-    </Document>
-  );
-};
-
 // 格式化日期為 YYYY-MM-DD
 function formatDateYYYYMMDD(dateInput: string | Date): string {
   const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
@@ -385,16 +181,264 @@ function formatDateYYYYMMDD(dateInput: string | Date): string {
   return `${year}-${month}-${day}`;
 }
 
+// 創建 PDF 文檔
+function createPDFDocument(report: any, carbonData: any[], webhookData: any, company: any) {
+  const totalEmissions = carbonData.reduce((sum, item) => sum + item.totalCarbon, 0);
+
+  const pages = [];
+
+  // 第一頁：標題和總覽
+  pages.push(
+    React.createElement(
+      Page,
+      { size: 'A4', style: styles.page, key: 'page-1' },
+      // 標題區域
+      React.createElement(
+        View,
+        { style: styles.header },
+        React.createElement(Text, { style: styles.title }, report.title),
+        React.createElement(Text, { style: styles.subtitle }, `${company.name} | 永續發展報告書`),
+        React.createElement(Text, { style: styles.subtitle }, `報告期間：${formatDate(report.startDate)} - ${formatDate(report.endDate)}`),
+        React.createElement(Text, { style: styles.subtitle }, `生成時間：${formatDate(report.createdAt)}`)
+      ),
+      // 執行摘要
+      React.createElement(
+        View,
+        { style: styles.section },
+        React.createElement(Text, { style: styles.sectionTitle }, '📋 執行摘要'),
+        React.createElement(
+          View,
+          { style: styles.highlight },
+          React.createElement(
+            Text,
+            { style: styles.highlightText },
+            report.executiveSummary || `本報告涵蓋 ${report.reportPeriod} 期間的永續發展成果與碳排放數據分析。`
+          )
+        )
+      ),
+      // 碳排放總覽
+      React.createElement(
+        View,
+        { style: styles.section },
+        React.createElement(Text, { style: styles.sectionTitle }, '🌍 碳排放總覽'),
+        React.createElement(
+          View,
+          { style: styles.card },
+          React.createElement(
+            View,
+            { style: styles.row },
+            React.createElement(
+              View,
+              { style: styles.column },
+              React.createElement(Text, { style: styles.label }, '總碳排放量'),
+              React.createElement(Text, { style: styles.value }, `${totalEmissions.toFixed(2)} tCO2e`)
+            ),
+            React.createElement(
+              View,
+              { style: styles.column },
+              React.createElement(Text, { style: styles.label }, '數據筆數'),
+              React.createElement(Text, { style: styles.value }, `${carbonData.length} 筆`)
+            )
+          ),
+          React.createElement(
+            View,
+            { style: styles.row },
+            React.createElement(
+              View,
+              { style: styles.column },
+              React.createElement(Text, { style: styles.label }, '平均每日排放'),
+              React.createElement(
+                Text,
+                { style: styles.value },
+                `${carbonData.length > 0 ? (totalEmissions / carbonData.length).toFixed(2) : '0.00'} tCO2e`
+              )
+            ),
+            React.createElement(
+              View,
+              { style: styles.column },
+              React.createElement(Text, { style: styles.label }, '報告狀態'),
+              React.createElement(Text, { style: styles.value }, report.status)
+            )
+          )
+        )
+      ),
+      // 頁腳
+      React.createElement(Text, { style: styles.footer }, `${company.name} | 第 1 頁 | 機密文件`)
+    )
+  );
+
+  // 第二頁：詳細數據
+  if (carbonData.length > 0) {
+    const tableRows = carbonData.slice(0, 15).map((item, index) =>
+      React.createElement(
+        View,
+        { style: styles.tableRow, key: `row-${index}` },
+        React.createElement(Text, { style: [styles.tableCell, { flex: 1.5 }] }, formatDate(item.date)),
+        React.createElement(Text, { style: styles.tableCell }, item.category),
+        React.createElement(Text, { style: styles.tableCell }, item.totalCarbon.toFixed(2))
+      )
+    );
+
+    pages.push(
+      React.createElement(
+        Page,
+        { size: 'A4', style: styles.page, key: 'page-2' },
+        React.createElement(
+          View,
+          { style: styles.header },
+          React.createElement(Text, { style: styles.title }, '詳細碳排放數據')
+        ),
+        React.createElement(
+          View,
+          { style: styles.section },
+          React.createElement(Text, { style: styles.sectionTitle }, '📊 每日碳排放明細'),
+          React.createElement(
+            View,
+            { style: styles.table },
+            React.createElement(
+              View,
+              { style: [styles.tableRow, styles.tableHeader] },
+              React.createElement(Text, { style: [styles.tableCell, { flex: 1.5 }] }, '日期'),
+              React.createElement(Text, { style: styles.tableCell }, '類別'),
+              React.createElement(Text, { style: styles.tableCell }, '排放量 (tCO2e)')
+            ),
+            ...tableRows
+          ),
+          carbonData.length > 15
+            ? React.createElement(Text, { style: styles.text }, `... 及其他 ${carbonData.length - 15} 筆數據`)
+            : null
+        ),
+        React.createElement(Text, { style: styles.footer }, `${company.name} | 第 2 頁 | 機密文件`)
+      )
+    );
+  }
+
+  // 第三頁：AI 分析
+  if (webhookData?.aiAnalysis) {
+    const analysisText =
+      typeof webhookData.aiAnalysis === 'string'
+        ? webhookData.aiAnalysis
+        : JSON.stringify(webhookData.aiAnalysis, null, 2);
+
+    const paragraphs = splitLongText(analysisText, 800).map((paragraph, index) =>
+      React.createElement(
+        View,
+        { style: styles.card, key: `analysis-${index}` },
+        React.createElement(Text, { style: styles.longText }, paragraph)
+      )
+    );
+
+    pages.push(
+      React.createElement(
+        Page,
+        { size: 'A4', style: styles.page, key: 'page-3' },
+        React.createElement(
+          View,
+          { style: styles.header },
+          React.createElement(Text, { style: styles.title }, '🤖 AI 智能分析')
+        ),
+        React.createElement(
+          View,
+          { style: styles.section },
+          React.createElement(Text, { style: styles.sectionTitle }, '分析結果'),
+          ...paragraphs
+        ),
+        React.createElement(Text, { style: styles.footer }, `${company.name} | 第 3 頁 | 機密文件`)
+      )
+    );
+  }
+
+  // 第四頁：Webhook 完整數據
+  if (webhookData) {
+    const webhookSections = [];
+
+    if (webhookData.summary) {
+      const summaryParagraphs = splitLongText(webhookData.summary, 600).map((paragraph, index) =>
+        React.createElement(Text, { style: styles.longText, key: `summary-${index}` }, paragraph)
+      );
+
+      webhookSections.push(
+        React.createElement(
+          View,
+          { style: styles.card, key: 'summary' },
+          React.createElement(Text, { style: styles.label }, '數據摘要'),
+          ...summaryParagraphs
+        )
+      );
+    }
+
+    if (webhookData.insights) {
+      const insightsText =
+        typeof webhookData.insights === 'string'
+          ? webhookData.insights
+          : JSON.stringify(webhookData.insights, null, 2);
+
+      const insightsParagraphs = splitLongText(insightsText, 600).map((paragraph, index) =>
+        React.createElement(Text, { style: styles.longText, key: `insights-${index}` }, paragraph)
+      );
+
+      webhookSections.push(
+        React.createElement(
+          View,
+          { style: styles.card, key: 'insights' },
+          React.createElement(Text, { style: styles.label }, '關鍵洞察'),
+          ...insightsParagraphs
+        )
+      );
+    }
+
+    if (webhookData.recommendations) {
+      const recommendationsText =
+        typeof webhookData.recommendations === 'string'
+          ? webhookData.recommendations
+          : JSON.stringify(webhookData.recommendations, null, 2);
+
+      const recommendationsParagraphs = splitLongText(recommendationsText, 600).map((paragraph, index) =>
+        React.createElement(Text, { style: styles.longText, key: `recommendations-${index}` }, paragraph)
+      );
+
+      webhookSections.push(
+        React.createElement(
+          View,
+          { style: styles.card, key: 'recommendations' },
+          React.createElement(Text, { style: styles.label }, '改善建議'),
+          ...recommendationsParagraphs
+        )
+      );
+    }
+
+    if (webhookSections.length > 0) {
+      pages.push(
+        React.createElement(
+          Page,
+          { size: 'A4', style: styles.page, key: 'page-4' },
+          React.createElement(
+            View,
+            { style: styles.header },
+            React.createElement(Text, { style: styles.title }, '📡 系統數據記錄')
+          ),
+          React.createElement(
+            View,
+            { style: styles.section },
+            React.createElement(Text, { style: styles.sectionTitle }, '完整 Webhook 數據'),
+            ...webhookSections
+          ),
+          React.createElement(Text, { style: styles.footer }, `${company.name} | 第 4 頁 | 機密文件`)
+        )
+      );
+    }
+  }
+
+  return React.createElement(Document, {}, ...pages);
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { reportId } = body;
 
     if (!reportId) {
-      return NextResponse.json(
-        { error: '缺少報告 ID', success: false },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: '缺少報告 ID', success: false }, { status: 400 });
     }
 
     // 獲取報告數據
@@ -403,10 +447,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!report) {
-      return NextResponse.json(
-        { error: '找不到報告', success: false },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: '找不到報告', success: false }, { status: 404 });
     }
 
     // 獲取公司數據
@@ -415,10 +456,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!company) {
-      return NextResponse.json(
-        { error: '找不到公司資料', success: false },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: '找不到公司資料', success: false }, { status: 404 });
     }
 
     // 獲取碳排放數據
@@ -440,7 +478,8 @@ export async function POST(request: NextRequest) {
     // 發送 webhook 並獲取 AI 分析
     let webhookData = null;
     try {
-      const webhookUrl = 'https://primary-production-94491.up.railway.app/webhook/27370e56-64bd-4b60-aa48-d128d3db7049';
+      const webhookUrl =
+        'https://primary-production-94491.up.railway.app/webhook/27370e56-64bd-4b60-aa48-d128d3db7049';
       const webhookPayload = {
         start_date: formatDateYYYYMMDD(report.startDate),
         end_date: formatDateYYYYMMDD(report.endDate),
@@ -484,7 +523,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 生成 PDF
-    const pdfDoc = PDFDocument({ report, carbonData, webhookData, company });
+    const pdfDoc = createPDFDocument(report, carbonData, webhookData, company);
     const pdfBuffer = await pdf(pdfDoc).toBuffer();
 
     // 返回 PDF
@@ -497,10 +536,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('PDF 生成錯誤:', error);
-    return NextResponse.json(
-      { error: 'PDF 生成失敗', success: false },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'PDF 生成失敗', success: false }, { status: 500 });
   } finally {
     await prisma.$disconnect();
   }
