@@ -7,16 +7,17 @@ import { Document, Page, Text, View, StyleSheet, Font, pdf } from '@react-pdf/re
 const prisma = new PrismaClient();
 
 // 註冊中文字體
-// 使用 Noto Sans TC（繁體中文）從可靠的 CDN
+// 使用 Noto Sans SC（簡體中文，同時支持繁體）
+// 使用 jsdelivr CDN 確保穩定性
 Font.register({
   family: 'NotoSans',
   fonts: [
     {
-      src: 'https://fonts.gstatic.com/s/notosanstc/v26/-nF7OG829Oofr2wohFbTp9i9WyEJIfNZ1sjy.woff2',
+      src: 'https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSansSC/hinted/ttf/NotoSansSC-Regular.ttf',
       fontWeight: 'normal',
     },
     {
-      src: 'https://fonts.gstatic.com/s/notosanstc/v26/-nF7OG829Oofr2wohFbTp9i9UyYJIfNZ1sjy.woff2',
+      src: 'https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSansSC/hinted/ttf/NotoSansSC-Bold.ttf',
       fontWeight: 'bold',
     },
   ],
