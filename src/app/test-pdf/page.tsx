@@ -1,12 +1,34 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function TestPDFPage() {
   const [reportId, setReportId] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [reports, setReports] = useState<any[]>([]);
+  const [loadingReports, setLoadingReports] = useState(false);
+
+  // 載入報告列表
+  const loadReports = async () => {
+    setLoadingReports(true);
+    try {
+      const response = await fetch('/api/report/list');
+      const data = await response.json();
+      console.log('可用的報告:', data);
+      setReports(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('載入報告列表失敗:', err);
+    } finally {
+      setLoadingReports(false);
+    }
+  };
+
+  // 頁面載入時自動獲取報告列表
+  useEffect(() => {
+    loadReports();
+  }, []);
 
   const testPDFGeneration = async () => {
     setLoading(true);
@@ -173,6 +195,78 @@ export default function TestPDFPage() {
         </button>
       </div>
 
+      {/* 可用報告列表 */}
+      <div style={{
+        padding: '20px',
+        backgroundColor: '#fefce8',
+        borderRadius: '8px',
+        marginBottom: '30px',
+        border: '2px solid #eab308'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+          <h2 style={{ fontSize: '24px', fontWeight: 'bold' }}>
+            📋 可用的報告列表
+          </h2>
+          <button
+            onClick={loadReports}
+            disabled={loadingReports}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: loadingReports ? '#94a3b8' : '#eab308',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              cursor: loadingReports ? 'not-allowed' : 'pointer',
+            }}
+          >
+            {loadingReports ? '載入中...' : '🔄 重新載入'}
+          </button>
+        </div>
+
+        {reports.length === 0 ? (
+          <p style={{ color: '#64748b', fontStyle: 'italic' }}>
+            {loadingReports ? '載入中...' : '沒有找到報告，請先生成一個報告'}
+          </p>
+        ) : (
+          <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+            {reports.map((report, index) => (
+              <div
+                key={report.id}
+                onClick={() => setReportId(report.id)}
+                style={{
+                  padding: '12px',
+                  marginBottom: '8px',
+                  backgroundColor: reportId === report.id ? '#fef08a' : '#ffffff',
+                  border: reportId === report.id ? '2px solid #eab308' : '1px solid #e2e8f0',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+                onMouseEnter={(e) => {
+                  if (reportId !== report.id) {
+                    e.currentTarget.style.backgroundColor = '#fefce8';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (reportId !== report.id) {
+                    e.currentTarget.style.backgroundColor = '#ffffff';
+                  }
+                }}
+              >
+                <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>
+                  {report.title}
+                </div>
+                <div style={{ fontSize: '13px', color: '#64748b' }}>
+                  ID: {report.id} | 期間: {report.reportPeriod} | 狀態: {report.status}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* PDF 生成測試區 */}
       <div style={{
         padding: '20px',
@@ -192,7 +286,7 @@ export default function TestPDFPage() {
             type="text"
             value={reportId}
             onChange={(e) => setReportId(e.target.value)}
-            placeholder="輸入報告 ID"
+            placeholder="輸入報告 ID 或從上面列表點選"
             style={{
               width: '100%',
               padding: '10px',
@@ -201,6 +295,11 @@ export default function TestPDFPage() {
               fontSize: '16px',
             }}
           />
+          {reportId && (
+            <p style={{ marginTop: '8px', fontSize: '14px', color: '#059669' }}>
+              ✓ 已選擇報告 ID: {reportId}
+            </p>
+          )}
         </div>
         <button
           onClick={testPDFGeneration}
