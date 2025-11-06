@@ -85,8 +85,14 @@ export default function ReportPage() {
   const generateQuickReport = async () => {
     setGenerating(true);
     try {
+      console.log('========== 一鍵生成報告開始 ==========');
       const lastMonth = new Date();
       lastMonth.setMonth(lastMonth.getMonth() - 1);
+
+      console.log('請求參數:', {
+        month: lastMonth.getMonth() + 1,
+        year: lastMonth.getFullYear(),
+      });
 
       const response = await fetch('/api/report/generate-quick', {
         method: 'POST',
@@ -97,22 +103,42 @@ export default function ReportPage() {
         })
       });
 
+      console.log('API 回應狀態:', response.status);
+
       if (!response.ok) {
         throw new Error('Failed to generate quick report');
       }
 
       const data = await response.json();
+      console.log('========== 報告生成成功 ==========');
+      console.log('完整回傳數據:', JSON.stringify(data, null, 2));
+      console.log('報告 ID:', data.report?.id);
+      console.log('報告標題:', data.report?.title);
+      console.log('Webhook 數據:', data.report?.webhookData);
 
       // 刷新報告列表
       await fetchReports();
 
       // 顯示成功消息
-      showToast(data.message || '報告已成功生成！您可以在報告歷史中查看和下載。', 'success');
+      showToast(data.message || '報告已成功生成！', 'success');
+
+      // 如果有報告 ID，自動生成 PDF
+      if (data.report?.id) {
+        console.log('========== 開始自動生成 PDF ==========');
+        console.log('報告 ID:', data.report.id);
+
+        // 延遲一下讓用戶看到報告生成成功
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // 生成 PDF
+        await handleGeneratePdf(data.report.id);
+      }
 
       // 切換到歷史標籤
       setActiveTab('history');
     } catch (error) {
-      console.error('Failed to generate quick report:', error);
+      console.error('========== 報告生成失敗 ==========');
+      console.error('錯誤詳情:', error);
       showAlert('錯誤', '報告生成失敗，請稍後再試', 'error');
     } finally {
       setGenerating(false);
@@ -160,23 +186,39 @@ export default function ReportPage() {
   const handleGeneratePdf = async (reportId: string) => {
     setGeneratingPdf(true);
     try {
-      console.log('開始生成 PDF，報告 ID:', reportId);
+      console.log('========== PDF 生成開始 ==========');
+      console.log('報告 ID:', reportId);
+      console.log('請求時間:', new Date().toLocaleString('zh-TW'));
+
+      const requestBody = { reportId };
+      console.log('請求 Body:', JSON.stringify(requestBody, null, 2));
 
       const response = await fetch('/api/report/generate-pdf', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ reportId }),
+        body: JSON.stringify(requestBody),
+      });
+
+      console.log('API 回應狀態:', response.status);
+      console.log('API 回應 Headers:', {
+        contentType: response.headers.get('content-type'),
+        contentDisposition: response.headers.get('content-disposition'),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
+        console.error('========== PDF 生成失敗 ==========');
+        console.error('錯誤回應:', errorData);
         throw new Error(errorData.error || 'PDF 生成失敗');
       }
 
       // 獲取 PDF blob
       const blob = await response.blob();
+      console.log('========== PDF Blob 獲取成功 ==========');
+      console.log('Blob 大小:', blob.size, 'bytes');
+      console.log('Blob 類型:', blob.type);
 
       // 創建下載鏈接
       const url = window.URL.createObjectURL(blob);
@@ -188,9 +230,16 @@ export default function ReportPage() {
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
 
+      console.log('========== PDF 下載成功 ==========');
+      console.log('文件名:', `report_${reportId}.pdf`);
+      console.log('完成時間:', new Date().toLocaleString('zh-TW'));
+
       showToast('PDF 已成功生成並下載！', 'success');
     } catch (error: any) {
-      console.error('PDF 生成失敗:', error);
+      console.error('========== PDF 生成錯誤 ==========');
+      console.error('錯誤類型:', error.name);
+      console.error('錯誤訊息:', error.message);
+      console.error('錯誤堆疊:', error.stack);
       showAlert('錯誤', error.message || 'PDF 生成失敗，請稍後再試', 'error');
     } finally {
       setGeneratingPdf(false);
