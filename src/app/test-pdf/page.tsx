@@ -36,7 +36,8 @@ export default function TestPDFPage() {
     setResult(null);
 
     try {
-      console.log('開始測試 PDF 生成，報告 ID:', reportId);
+      console.log('========== 開始測試 PDF 生成 ==========');
+      console.log('報告 ID:', reportId);
 
       // 調用 PDF 生成 API
       const response = await fetch('/api/report/generate-pdf', {
@@ -158,7 +159,67 @@ export default function TestPDFPage() {
   };
 
   return (
-    <div style={{ padding: '40px', fontFamily: 'system-ui, sans-serif', maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ padding: '40px', fontFamily: 'system-ui, sans-serif', maxWidth: '1200px', margin: '0 auto', position: 'relative' }}>
+      {/* AI 生成遮罩 */}
+      {loading && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.75)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            padding: '40px',
+            borderRadius: '16px',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+            textAlign: 'center',
+            maxWidth: '400px',
+          }}>
+            {/* 動畫載入圖示 */}
+            <div style={{
+              width: '80px',
+              height: '80px',
+              margin: '0 auto 24px',
+              border: '6px solid #e2e8f0',
+              borderTop: '6px solid #3b82f6',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+            }} />
+            <style>
+              {`
+                @keyframes spin {
+                  0% { transform: rotate(0deg); }
+                  100% { transform: rotate(360deg); }
+                }
+              `}
+            </style>
+            <h3 style={{
+              fontSize: '24px',
+              fontWeight: 'bold',
+              color: '#1e40af',
+              marginBottom: '12px',
+            }}>
+              🤖 AI 正在生成中
+            </h3>
+            <p style={{
+              fontSize: '16px',
+              color: '#64748b',
+              lineHeight: '1.6',
+            }}>
+              正在透過 AI 分析碳排放數據<br/>
+              並生成專業報告，請稍候...
+            </p>
+          </div>
+        </div>
+      )}
+
       <h1 style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '20px' }}>
         📋 PDF 生成測試頁面
       </h1>
