@@ -51,6 +51,7 @@ export default function ReportPage() {
   const [generatedReports, setGeneratedReports] = useState<GeneratedReport[]>([]);
   const [generating, setGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState<'create' | 'history'>('create');
+  const [generatingPdf, setGeneratingPdf] = useState(false); // PDF 生成狀態
 
   // 對話框狀態管理
   const { alertState, showAlert, closeAlert } = useAlertDialog();
@@ -155,8 +156,68 @@ export default function ReportPage() {
     setConfig(prev => ({ ...prev, [key]: value }));
   };
 
+  // 生成 PDF
+  const handleGeneratePdf = async (reportId: string) => {
+    setGeneratingPdf(true);
+    try {
+      console.log('開始生成 PDF，報告 ID:', reportId);
+
+      const response = await fetch('/api/report/generate-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ reportId }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'PDF 生成失敗');
+      }
+
+      // 獲取 PDF blob
+      const blob = await response.blob();
+
+      // 創建下載鏈接
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `report_${reportId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+      showToast('PDF 已成功生成並下載！', 'success');
+    } catch (error: any) {
+      console.error('PDF 生成失敗:', error);
+      showAlert('錯誤', error.message || 'PDF 生成失敗，請稍後再試', 'error');
+    } finally {
+      setGeneratingPdf(false);
+    }
+  };
+
   return (
     <DashboardLayout>
+      {/* AI 生成遮罩 */}
+      {(generating || generatingPdf) && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+          <div className="bg-white p-10 rounded-2xl shadow-2xl text-center max-w-md">
+            {/* 動畫載入圖示 */}
+            <div className="w-20 h-20 mx-auto mb-6 border-6 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
+            <h3 className="text-2xl font-bold text-blue-900 mb-3">
+              🤖 AI 正在生成中
+            </h3>
+            <p className="text-gray-600 leading-relaxed">
+              {generatingPdf
+                ? '正在透過 AI 分析碳排放數據並生成專業 PDF 報告，請稍候...'
+                : '正在分析數據並生成報告，請稍候...'
+              }
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* 對話框組件 */}
       <AlertDialog
         isOpen={alertState.isOpen}
@@ -231,7 +292,11 @@ export default function ReportPage() {
           )}
 
           {activeTab === 'history' && (
-            <ReportHistoryPanel reports={generatedReports} onRefresh={fetchReports} />
+            <ReportHistoryPanel
+              reports={generatedReports}
+              onRefresh={fetchReports}
+              onGeneratePdf={handleGeneratePdf}
+            />
           )}
         </div>
       </div>
@@ -391,17 +456,21 @@ function CreateReportPanel({ config, onConfigChange, onGenerate, generating }: a
 }
 
 // 報告歷史面板
-function ReportHistoryPanel({ reports, onRefresh }: { reports: GeneratedReport[], onRefresh: () => Promise<void> }) {
+function ReportHistoryPanel({
+  reports,
+  onRefresh,
+  onGeneratePdf
+}: {
+  reports: GeneratedReport[],
+  onRefresh: () => Promise<void>,
+  onGeneratePdf: (reportId: string) => Promise<void>
+}) {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [reportToDelete, setReportToDelete] = useState<GeneratedReport | null>(null);
 
   // 對話框管理
   const { confirmState, showConfirm, closeConfirm } = useConfirmDialog();
   const { toastState, showToast, closeToast } = useToast();
-
-  const handleDownloadPdf = (pdfUrl: string) => {
-    window.open(pdfUrl, '_blank');
-  };
 
   const handleDelete = async (report: GeneratedReport) => {
     setReportToDelete(report);
@@ -492,24 +561,13 @@ function ReportHistoryPanel({ reports, onRefresh }: { reports: GeneratedReport[]
 
               {/* 下載按鈕 */}
               <div className="flex gap-2">
-                {report.pdfUrl && (
-                  <button
-                    onClick={() => handleDownloadPdf(report.pdfUrl!)}
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    <Download className="w-4 h-4" />
-                    下載 PDF
-                  </button>
-                )}
-                {report.docxUrl && (
-                  <button
-                    onClick={() => handleDownloadPdf(report.docxUrl!)}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-                  >
-                    <Download className="w-4 h-4" />
-                    下載 DOCX
-                  </button>
-                )}
+                <button
+                  onClick={() => onGeneratePdf(report.id)}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                  生成並下載 PDF
+                </button>
               </div>
             </div>
           </div>
