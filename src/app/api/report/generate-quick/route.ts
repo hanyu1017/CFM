@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
 
     // 發送 webhook 通知
     try {
-      const webhookUrl = 'https://primary-production-94491.up.railway.app/webhook-test/68b2cbd2-2114-4693-9b39-64bcf9dc3a16';
+      const webhookUrl = 'https://primary-production-94491.up.railway.app/webhook-test/27370e56-64bd-4b60-aa48-d128d3db7049';
       const webhookPayload = {
         event: 'report.generated',
         report: {
