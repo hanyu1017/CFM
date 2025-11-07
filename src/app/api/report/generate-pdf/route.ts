@@ -163,7 +163,8 @@ function formatDate(date: Date | string): string {
 }
 
 // 分段處理長文字，避免截斷
-function splitLongText(text: string, maxLength: number = 500): string[] {
+// 每 50 個字元換行
+function splitLongText(text: string, maxLength: number = 50): string[] {
   if (!text) return [];
   const paragraphs: string[] = [];
   let remaining = text;
@@ -174,19 +175,10 @@ function splitLongText(text: string, maxLength: number = 500): string[] {
       break;
     }
 
-    // 尋找適當的斷點（句號、逗號、空格）
-    let breakPoint = maxLength;
-    const punctuation = ['。', '！', '？', '\n', '，', '；', ' '];
-
-    for (let i = maxLength; i > maxLength - 100 && i > 0; i--) {
-      if (punctuation.includes(remaining[i])) {
-        breakPoint = i + 1;
-        break;
-      }
-    }
-
-    paragraphs.push(remaining.substring(0, breakPoint).trim());
-    remaining = remaining.substring(breakPoint).trim();
+    // 精確在 maxLength 處切割
+    const chunk = remaining.substring(0, maxLength);
+    paragraphs.push(chunk);
+    remaining = remaining.substring(maxLength);
   }
 
   return paragraphs;
@@ -452,6 +444,14 @@ function createPDFDocument(report: any, carbonData: any[], webhookData: any, com
   return React.createElement(Document, {}, ...pages);
 }
 
+// 清理檔名，移除不安全字符
+function sanitizeFilename(title: string): string {
+  return title
+    .replace(/[<>:"/\\|?*\x00-\x1f]/g, '') // 移除不安全字符
+    .replace(/\s+/g, '_') // 空格替換為底線
+    .substring(0, 100); // 限制長度
+}
+
 export async function POST(request: NextRequest) {
   try {
     console.log('========== PDF 生成開始 ==========');
@@ -605,15 +605,45 @@ export async function POST(request: NextRequest) {
     const pdfBuffer = Buffer.from(pdfArrayBuffer);
     console.log('PDF Buffer 大小:', pdfBuffer.length, 'bytes');
 
+    // 準備儲存 PDF 到檔案系統
+    const reportsDir = path.join(process.cwd(), 'public', 'reports');
+
+    // 確保 reports 目錄存在
+    if (!fs.existsSync(reportsDir)) {
+      fs.mkdirSync(reportsDir, { recursive: true });
+      console.log('創建 reports 目錄:', reportsDir);
+    }
+
+    // 生成檔名：title_id.pdf
+    const sanitizedTitle = sanitizeFilename(report.title);
+    const filename = `${sanitizedTitle}_${report.id}.pdf`;
+    const filePath = path.join(reportsDir, filename);
+    const publicUrl = `/reports/${filename}`;
+
+    console.log('========== 儲存 PDF 文件 ==========');
+    console.log('檔名:', filename);
+    console.log('完整路徑:', filePath);
+    console.log('公開 URL:', publicUrl);
+
+    // 寫入檔案
+    fs.writeFileSync(filePath, pdfBuffer);
+    console.log('PDF 文件已儲存');
+
+    // 更新資料庫中的 pdfUrl
+    await prisma.sustainabilityReport.update({
+      where: { id: reportId },
+      data: { pdfUrl: publicUrl },
+    });
+    console.log('資料庫已更新 pdfUrl');
+
     console.log('========== PDF 生成完成 ==========');
 
-    // 返回 PDF
-    return new NextResponse(pdfBuffer, {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="report_${report.id}.pdf"`,
-      },
+    // 返回 JSON 成功回應
+    return NextResponse.json({
+      success: true,
+      message: 'PDF 已成功生成並儲存',
+      pdfUrl: publicUrl,
+      filename: filename,
     });
   } catch (error) {
     console.error('PDF 生成錯誤:', error);
