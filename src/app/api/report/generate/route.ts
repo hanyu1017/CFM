@@ -31,10 +31,6 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // 生成示範 PDF URL（實際應該生成真實的 PDF 檔案）
-    const pdfFileName = `report_${Date.now()}.pdf`;
-    const pdfUrl = `/api/report/download/${pdfFileName}`;
-
     // 建立報告
     const report = await prisma.sustainabilityReport.create({
       data: {
@@ -68,77 +64,12 @@ export async function POST(request: NextRequest) {
         stakeholders: config.includeStakeholders
           ? { groups: [] }
           : undefined,
-        pdfUrl,
         generatedBy: 'MANUAL',
       },
     });
 
-    // 獲取日期區間的碳排放數據
-    const carbonData = await prisma.carbonEmission.findMany({
-      where: {
-        companyId: company.id,
-        date: {
-          gte: new Date(config.startDate),
-          lte: new Date(config.endDate),
-        }
-      }
-    });
-
-    const totalEmissions = carbonData.reduce((sum: number, item: { totalCarbon: number }) => sum + item.totalCarbon, 0);
-
-    // 發送 webhook 通知
-    try {
-      const webhookUrl = 'https://primary-production-94491.up.railway.app/webhook/27370e56-64bd-4b60-aa48-d128d3db7049';
-      const webhookPayload = {
-        start_date: formatDate(config.startDate),
-        end_date: formatDate(config.endDate),
-        event: 'report.generated',
-        type: 'custom',
-        period: config.period,
-        report: {
-          id: report.id,
-          title: report.title,
-          period: report.reportPeriod,
-          status: report.status,
-          createdAt: report.createdAt.toISOString(),
-          pdfUrl: report.pdfUrl,
-          totalEmissions: totalEmissions.toFixed(2),
-          dataCount: carbonData.length,
-          sections: {
-            executiveSummary: config.includeExecutiveSummary,
-            carbonFootprint: config.includeCarbonFootprint,
-            emissionsSummary: config.includeEmissionsSummary,
-            reductionTargets: config.includeReductionTargets,
-            initiatives: config.includeInitiatives,
-            compliance: config.includeCompliance,
-            financialImpact: config.includeFinancialImpact,
-            stakeholders: config.includeStakeholders,
-          },
-        },
-        company: {
-          id: company.id,
-          name: company.name,
-        },
-        timestamp: new Date().toISOString(),
-      };
-
-      const webhookResponse = await fetch(webhookUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(webhookPayload),
-      });
-
-      if (webhookResponse.ok) {
-        console.log('Webhook notification sent successfully');
-      } else {
-        console.error('Webhook notification failed:', webhookResponse.status, webhookResponse.statusText);
-      }
-    } catch (webhookError) {
-      // Webhook 失敗不影響主要功能
-      console.error('Failed to send webhook notification:', webhookError);
-    }
+    console.log('✅ 報告已建立，ID:', report.id);
+    console.log('📝 提示：Webhook 將在 PDF 生成時調用');
 
     return NextResponse.json({
       report: {
@@ -147,10 +78,9 @@ export async function POST(request: NextRequest) {
         period: report.reportPeriod,
         status: report.status,
         createdAt: report.createdAt.toISOString(),
-        pdfUrl: report.pdfUrl,
       },
       success: true,
-      message: '報告已成功生成！您可以在報告歷史中查看和下載。',
+      message: '報告已成功生成！',
     });
   } catch (error) {
     console.error('Generate report API error:', error);
