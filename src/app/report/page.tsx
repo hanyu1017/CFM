@@ -404,17 +404,17 @@ export default function ReportPage() {
               {/* 霓虹標題 */}
               <h3 className="text-4xl font-bold mb-4 relative">
                 <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent animate-pulse">
-                  AI 智能分析中
+                  正在透過AI分析您的碳排放數據
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent blur-lg opacity-50 animate-pulse">
-                  AI 智能分析中
+                  正在透過AI分析您的碳排放數據
                 </div>
               </h3>
 
               {/* 狀態描述 */}
               <div className="mb-8 space-y-2">
                 <p className="text-cyan-100 text-lg font-medium">
-                  {generatingPdf ? '🤖 生成專業 PDF 報告' : '📊 分析碳排放數據'}
+                  {generatingPdf ? '🤖 正在生成 PDF 報告...' : '📊 正在分析碳排放數據...'}
                 </p>
                 <p className="text-blue-200/70 text-sm">
                   {generatingPdf ? '正在調用 AI 模型進行深度分析...' : '正在處理數據並建立報告...'}
@@ -444,21 +444,7 @@ export default function ReportPage() {
                 </div>
               </div>
 
-              {/* 技術指標 */}
-              <div className="grid grid-cols-3 gap-4 text-xs text-cyan-100/60 font-mono">
-                <div>
-                  <div className="text-cyan-400 font-semibold">CPU</div>
-                  <div className="animate-pulse">87%</div>
-                </div>
-                <div>
-                  <div className="text-purple-400 font-semibold">GPU</div>
-                  <div className="animate-pulse">92%</div>
-                </div>
-                <div>
-                  <div className="text-blue-400 font-semibold">MEM</div>
-                  <div className="animate-pulse">4.2GB</div>
-                </div>
-              </div>
+              
             </div>
 
             {/* 環繞粒子效果 */}
@@ -505,8 +491,8 @@ export default function ReportPage() {
       {/* 快速操作卡片 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <QuickActionCard
-          title="一鍵生成"
-          description="使用上個月數據自動生成標準報告"
+          title="AI一鍵生成"
+          description="使用上個月數據自動生成永續報告書"
           icon={<Sparkles className="w-8 h-8" />}
           color="blue"
           onClick={generateQuickReport}
