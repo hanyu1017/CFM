@@ -119,9 +119,6 @@ export default function ReportPage() {
       // 刷新報告列表
       await fetchReports();
 
-      // 顯示成功消息
-      showToast(data.message || '報告已成功生成！', 'success');
-
       // 如果有報告 ID，自動生成 PDF
       if (data.report?.id) {
         console.log('========== 開始自動生成 PDF ==========');
@@ -130,7 +127,7 @@ export default function ReportPage() {
         // 延遲一下讓用戶看到報告生成成功
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        // 生成 PDF
+        // 生成 PDF（不在這裡顯示 toast，在 PDF 完成時才顯示）
         await handleGeneratePdf(data.report.id);
       }
 
@@ -149,28 +146,47 @@ export default function ReportPage() {
   const generateCustomReport = async () => {
     setGenerating(true);
     try {
+      console.log('========== 自定義報告生成開始 ==========');
+      console.log('配置:', JSON.stringify(config, null, 2));
+
       const response = await fetch('/api/report/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(config)
       });
 
+      console.log('API 回應狀態:', response.status);
+
       if (!response.ok) {
         throw new Error('Failed to generate report');
       }
 
       const data = await response.json();
+      console.log('========== 報告生成成功 ==========');
+      console.log('完整回傳數據:', JSON.stringify(data, null, 2));
+      console.log('報告 ID:', data.report?.id);
+      console.log('報告標題:', data.report?.title);
 
       // 刷新報告列表
       await fetchReports();
 
-      // 顯示成功消息
-      showToast(data.message || '報告已成功生成！您可以在報告歷史中查看和下載。', 'success');
+      // 如果有報告 ID，自動生成 PDF
+      if (data.report?.id) {
+        console.log('========== 開始自動生成 PDF ==========');
+        console.log('報告 ID:', data.report.id);
+
+        // 延遲一下讓用戶看到報告生成成功
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // 生成 PDF（不在這裡顯示 toast，在 PDF 完成時才顯示）
+        await handleGeneratePdf(data.report.id);
+      }
 
       // 切換到歷史標籤
       setActiveTab('history');
     } catch (error) {
-      console.error('Failed to generate report:', error);
+      console.error('========== 報告生成失敗 ==========');
+      console.error('錯誤詳情:', error);
       showAlert('錯誤', '報告生成失敗，請稍後再試', 'error');
     } finally {
       setGenerating(false);
@@ -285,69 +301,180 @@ export default function ReportPage() {
 
   return (
     <DashboardLayout>
-      {/* AI 生成遮罩 - 增強版動態等待 UI */}
+      {/* AI 生成遮罩 - 專業酷炫版 */}
       {(generating || generatingPdf) && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 backdrop-blur-sm">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-md">
+          <style jsx>{`
+            @keyframes matrix-rain {
+              0% { transform: translateY(-100%); opacity: 0; }
+              10% { opacity: 1; }
+              90% { opacity: 1; }
+              100% { transform: translateY(100vh); opacity: 0; }
+            }
+            @keyframes glow-pulse {
+              0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5), 0 0 40px rgba(147, 51, 234, 0.3); }
+              50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.8), 0 0 80px rgba(147, 51, 234, 0.6); }
+            }
+            @keyframes scan-line {
+              0% { transform: translateY(-100%); }
+              100% { transform: translateY(100%); }
+            }
+            @keyframes orbit {
+              0% { transform: rotate(0deg) translateX(100px) rotate(0deg); }
+              100% { transform: rotate(360deg) translateX(100px) rotate(-360deg); }
+            }
+            .matrix-rain {
+              animation: matrix-rain 3s linear infinite;
+            }
+            .glow-pulse {
+              animation: glow-pulse 2s ease-in-out infinite;
+            }
+            .scan-line {
+              animation: scan-line 2s linear infinite;
+            }
+            .orbit {
+              animation: orbit 4s linear infinite;
+            }
+          `}</style>
+
+          {/* 背景矩陣雨效果 */}
+          <div className="absolute inset-0 overflow-hidden opacity-20">
+            {[...Array(20)].map((_, i) => (
+              <div
+                key={i}
+                className="matrix-rain absolute text-cyan-400 text-xs font-mono"
+                style={{
+                  left: `${i * 5}%`,
+                  animationDelay: `${i * 0.2}s`,
+                  animationDuration: `${3 + Math.random() * 2}s`
+                }}
+              >
+                {Array(20).fill('01').map((v, j) => (
+                  <div key={j}>{Math.random() > 0.5 ? '1' : '0'}</div>
+                ))}
+              </div>
+            ))}
+          </div>
+
           <div className="relative">
-            {/* 背景光暈效果 */}
+            {/* 外圈光環 */}
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-64 h-64 bg-blue-500 rounded-full opacity-20 animate-pulse"></div>
+              <div className="w-96 h-96 rounded-full border-2 border-cyan-500 opacity-20 animate-ping"></div>
             </div>
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-48 h-48 bg-purple-500 rounded-full opacity-20 animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+              <div className="w-80 h-80 rounded-full border-2 border-purple-500 opacity-30 animate-ping" style={{ animationDelay: '0.5s', animationDuration: '3s' }}></div>
             </div>
 
-            {/* 主要卡片 */}
-            <div className="relative bg-white p-12 rounded-3xl shadow-2xl text-center max-w-lg">
-              {/* 複合動畫載入圖示 */}
-              <div className="relative w-32 h-32 mx-auto mb-8">
-                {/* 外圈旋轉 */}
-                <div className="absolute inset-0 border-8 border-gray-200 border-t-blue-600 border-r-purple-600 rounded-full animate-spin"></div>
-                {/* 中圈反向旋轉 */}
-                <div className="absolute inset-4 border-6 border-gray-100 border-b-indigo-500 border-l-pink-500 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
-                {/* 內圈脈動 */}
-                <div className="absolute inset-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full animate-pulse flex items-center justify-center">
-                  <span className="text-3xl">🤖</span>
+            {/* 主卡片 */}
+            <div className="relative bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 p-12 rounded-3xl shadow-2xl text-center max-w-xl border border-cyan-500/30 glow-pulse overflow-hidden">
+              {/* 掃描線效果 */}
+              <div className="scan-line absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-50"></div>
+
+              {/* 六邊形旋轉動畫 */}
+              <div className="relative w-40 h-40 mx-auto mb-8">
+                {/* 外層六邊形 */}
+                <svg className="absolute inset-0 w-full h-full animate-spin" style={{ animationDuration: '3s' }} viewBox="0 0 100 100">
+                  <polygon points="50,5 90,25 90,75 50,95 10,75 10,25" fill="none" stroke="url(#grad1)" strokeWidth="2"/>
+                  <defs>
+                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style={{ stopColor: '#06b6d4', stopOpacity: 1 }} />
+                      <stop offset="100%" style={{ stopColor: '#8b5cf6', stopOpacity: 1 }} />
+                    </linearGradient>
+                  </defs>
+                </svg>
+
+                {/* 中層旋轉圈 */}
+                <div className="absolute inset-4 border-4 border-transparent border-t-cyan-400 border-r-purple-500 rounded-full animate-spin" style={{ animationDuration: '2s' }}></div>
+                <div className="absolute inset-8 border-4 border-transparent border-b-blue-400 border-l-pink-500 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+
+                {/* 中心脈動核心 */}
+                <div className="absolute inset-12 bg-gradient-to-br from-cyan-400 to-purple-600 rounded-full animate-pulse flex items-center justify-center shadow-lg shadow-purple-500/50">
+                  <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M13 7H7v6h6V7z"/>
+                    <path fillRule="evenodd" d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2zM5 5h10v10H5V5z" clipRule="evenodd"/>
+                  </svg>
+                </div>
+
+                {/* 環繞粒子 */}
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="orbit absolute w-3 h-3 bg-cyan-400 rounded-full shadow-lg shadow-cyan-400/50" style={{ animationDelay: `${i * 1.33}s` }}></div>
+                ))}
+              </div>
+
+              {/* 霓虹標題 */}
+              <h3 className="text-4xl font-bold mb-4 relative">
+                <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent animate-pulse">
+                  AI 智能分析中
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent blur-lg opacity-50 animate-pulse">
+                  AI 智能分析中
+                </div>
+              </h3>
+
+              {/* 狀態描述 */}
+              <div className="mb-8 space-y-2">
+                <p className="text-cyan-100 text-lg font-medium">
+                  {generatingPdf ? '🤖 生成專業 PDF 報告' : '📊 分析碳排放數據'}
+                </p>
+                <p className="text-blue-200/70 text-sm">
+                  {generatingPdf ? '正在調用 AI 模型進行深度分析...' : '正在處理數據並建立報告...'}
+                </p>
+              </div>
+
+              {/* 動態進度指示器 */}
+              <div className="mb-6">
+                <div className="flex justify-center items-center gap-3 mb-3">
+                  {[0, 1, 2, 3, 4].map((i) => (
+                    <div
+                      key={i}
+                      className="w-2 h-8 bg-gradient-to-t from-cyan-500 to-purple-500 rounded-full animate-pulse"
+                      style={{
+                        animationDelay: `${i * 0.15}s`,
+                        animationDuration: '1s',
+                        height: `${20 + Math.sin(i) * 12}px`
+                      }}
+                    ></div>
+                  ))}
+                </div>
+
+                {/* 進度條 */}
+                <div className="relative w-full h-2 bg-gray-700/50 rounded-full overflow-hidden border border-cyan-500/30">
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 animate-pulse" style={{ width: '75%' }}></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-pulse"></div>
                 </div>
               </div>
 
-              {/* 標題 */}
-              <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-                AI 正在生成中
-              </h3>
-
-              {/* 描述 */}
-              <p className="text-gray-700 text-lg leading-relaxed mb-6">
-                {generatingPdf
-                  ? '正在透過 AI 分析碳排放數據並生成專業 PDF 報告'
-                  : '正在分析數據並生成報告'
-                }
-              </p>
-
-              {/* 動態載入點 */}
-              <div className="flex justify-center items-center gap-2">
-                <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
-                <div className="w-3 h-3 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                <div className="w-3 h-3 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              {/* 技術指標 */}
+              <div className="grid grid-cols-3 gap-4 text-xs text-cyan-100/60 font-mono">
+                <div>
+                  <div className="text-cyan-400 font-semibold">CPU</div>
+                  <div className="animate-pulse">87%</div>
+                </div>
+                <div>
+                  <div className="text-purple-400 font-semibold">GPU</div>
+                  <div className="animate-pulse">92%</div>
+                </div>
+                <div>
+                  <div className="text-blue-400 font-semibold">MEM</div>
+                  <div className="animate-pulse">4.2GB</div>
+                </div>
               </div>
-
-              {/* 進度條效果 */}
-              <div className="mt-8 w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 rounded-full animate-pulse" style={{ width: '70%' }}></div>
-              </div>
-
-              {/* 提示文字 */}
-              <p className="mt-6 text-sm text-gray-500">
-                請稍候，這可能需要幾秒鐘...
-              </p>
             </div>
 
-            {/* 浮動粒子效果 */}
-            <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-              <div className="absolute top-10 left-10 w-2 h-2 bg-blue-400 rounded-full animate-ping"></div>
-              <div className="absolute top-20 right-20 w-2 h-2 bg-purple-400 rounded-full animate-ping" style={{ animationDelay: '0.3s' }}></div>
-              <div className="absolute bottom-20 left-20 w-2 h-2 bg-indigo-400 rounded-full animate-ping" style={{ animationDelay: '0.6s' }}></div>
-              <div className="absolute bottom-10 right-10 w-2 h-2 bg-pink-400 rounded-full animate-ping" style={{ animationDelay: '0.9s' }}></div>
+            {/* 環繞粒子效果 */}
+            <div className="absolute inset-0 pointer-events-none">
+              {[...Array(12)].map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute w-1 h-1 bg-cyan-400 rounded-full animate-ping"
+                  style={{
+                    top: `${Math.random() * 100}%`,
+                    left: `${Math.random() * 100}%`,
+                    animationDelay: `${i * 0.2}s`,
+                    animationDuration: `${2 + Math.random()}s`
+                  }}
+                ></div>
+              ))}
             </div>
           </div>
         </div>
