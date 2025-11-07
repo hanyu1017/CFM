@@ -204,7 +204,6 @@ export default function ReportPage() {
       console.log('API 回應狀態:', response.status);
       console.log('API 回應 Headers:', {
         contentType: response.headers.get('content-type'),
-        contentDisposition: response.headers.get('content-disposition'),
       });
 
       if (!response.ok) {
@@ -214,27 +213,22 @@ export default function ReportPage() {
         throw new Error(errorData.error || 'PDF 生成失敗');
       }
 
-      // 獲取 PDF blob
-      const blob = await response.blob();
-      console.log('========== PDF Blob 獲取成功 ==========');
-      console.log('Blob 大小:', blob.size, 'bytes');
-      console.log('Blob 類型:', blob.type);
-
-      // 創建下載鏈接
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `report_${reportId}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-
-      console.log('========== PDF 下載成功 ==========');
-      console.log('文件名:', `report_${reportId}.pdf`);
+      // 解析 JSON 回應
+      const data = await response.json();
+      console.log('========== PDF 生成成功 ==========');
+      console.log('回應數據:', JSON.stringify(data, null, 2));
+      console.log('PDF URL:', data.pdfUrl);
+      console.log('檔名:', data.filename);
       console.log('完成時間:', new Date().toLocaleString('zh-TW'));
 
-      showToast('PDF 已成功生成並下載！', 'success');
+      // 刷新報告列表
+      await fetchReports();
+
+      // 顯示成功訊息
+      showToast('PDF 已成功生成並儲存！', 'success');
+
+      // 跳轉到歷史報告頁面
+      setActiveTab('history');
     } catch (error: any) {
       console.error('========== PDF 生成錯誤 ==========');
       console.error('錯誤類型:', error.name);
@@ -248,21 +242,70 @@ export default function ReportPage() {
 
   return (
     <DashboardLayout>
-      {/* AI 生成遮罩 */}
+      {/* AI 生成遮罩 - 增強版動態等待 UI */}
       {(generating || generatingPdf) && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-          <div className="bg-white p-10 rounded-2xl shadow-2xl text-center max-w-md">
-            {/* 動畫載入圖示 */}
-            <div className="w-20 h-20 mx-auto mb-6 border-6 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
-            <h3 className="text-2xl font-bold text-blue-900 mb-3">
-              🤖 AI 正在生成中
-            </h3>
-            <p className="text-gray-600 leading-relaxed">
-              {generatingPdf
-                ? '正在透過 AI 分析碳排放數據並生成專業 PDF 報告，請稍候...'
-                : '正在分析數據並生成報告，請稍候...'
-              }
-            </p>
+        <div className="fixed inset-0 bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 bg-opacity-95 flex items-center justify-center z-50">
+          <div className="relative">
+            {/* 背景光暈效果 */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-64 h-64 bg-blue-500 rounded-full opacity-20 animate-pulse"></div>
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-48 h-48 bg-purple-500 rounded-full opacity-20 animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+            </div>
+
+            {/* 主要卡片 */}
+            <div className="relative bg-white p-12 rounded-3xl shadow-2xl text-center max-w-lg">
+              {/* 複合動畫載入圖示 */}
+              <div className="relative w-32 h-32 mx-auto mb-8">
+                {/* 外圈旋轉 */}
+                <div className="absolute inset-0 border-8 border-gray-200 border-t-blue-600 border-r-purple-600 rounded-full animate-spin"></div>
+                {/* 中圈反向旋轉 */}
+                <div className="absolute inset-4 border-6 border-gray-100 border-b-indigo-500 border-l-pink-500 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+                {/* 內圈脈動 */}
+                <div className="absolute inset-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full animate-pulse flex items-center justify-center">
+                  <span className="text-3xl">🤖</span>
+                </div>
+              </div>
+
+              {/* 標題 */}
+              <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+                AI 正在生成中
+              </h3>
+
+              {/* 描述 */}
+              <p className="text-gray-700 text-lg leading-relaxed mb-6">
+                {generatingPdf
+                  ? '正在透過 AI 分析碳排放數據並生成專業 PDF 報告'
+                  : '正在分析數據並生成報告'
+                }
+              </p>
+
+              {/* 動態載入點 */}
+              <div className="flex justify-center items-center gap-2">
+                <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
+                <div className="w-3 h-3 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                <div className="w-3 h-3 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              </div>
+
+              {/* 進度條效果 */}
+              <div className="mt-8 w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 rounded-full animate-pulse" style={{ width: '70%' }}></div>
+              </div>
+
+              {/* 提示文字 */}
+              <p className="mt-6 text-sm text-gray-500">
+                請稍候，這可能需要幾秒鐘...
+              </p>
+            </div>
+
+            {/* 浮動粒子效果 */}
+            <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+              <div className="absolute top-10 left-10 w-2 h-2 bg-blue-400 rounded-full animate-ping"></div>
+              <div className="absolute top-20 right-20 w-2 h-2 bg-purple-400 rounded-full animate-ping" style={{ animationDelay: '0.3s' }}></div>
+              <div className="absolute bottom-20 left-20 w-2 h-2 bg-indigo-400 rounded-full animate-ping" style={{ animationDelay: '0.6s' }}></div>
+              <div className="absolute bottom-10 right-10 w-2 h-2 bg-pink-400 rounded-full animate-ping" style={{ animationDelay: '0.9s' }}></div>
+            </div>
           </div>
         </div>
       )}
@@ -610,13 +653,24 @@ function ReportHistoryPanel({
 
               {/* 下載按鈕 */}
               <div className="flex gap-2">
-                <button
-                  onClick={() => onGeneratePdf(report.id)}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  <Download className="w-4 h-4" />
-                  生成並下載 PDF
-                </button>
+                {report.pdfUrl ? (
+                  <a
+                    href={report.pdfUrl}
+                    download
+                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    <Download className="w-4 h-4" />
+                    下載 PDF
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => onGeneratePdf(report.id)}
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    <FileText className="w-4 h-4" />
+                    生成 PDF
+                  </button>
+                )}
               </div>
             </div>
           </div>
