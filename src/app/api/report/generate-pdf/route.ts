@@ -163,8 +163,8 @@ function formatDate(date: Date | string): string {
 }
 
 // 分段處理長文字，避免截斷
-// 每 50 個字元換行
-function splitLongText(text: string, maxLength: number = 50): string[] {
+// 智能換行：在合適的斷點處切割
+function splitLongText(text: string, maxLength: number = 80): string[] {
   if (!text) return [];
   const paragraphs: string[] = [];
   let remaining = text;
@@ -175,10 +175,23 @@ function splitLongText(text: string, maxLength: number = 50): string[] {
       break;
     }
 
-    // 精確在 maxLength 處切割
-    const chunk = remaining.substring(0, maxLength);
-    paragraphs.push(chunk);
-    remaining = remaining.substring(maxLength);
+    // 尋找合適的斷點（優先在標點符號處切割）
+    let breakPoint = maxLength;
+    const punctuation = ['。', '！', '？', '\n', '，', '；', '、', ' ', '.', ','];
+
+    // 向後搜尋標點符號
+    for (let i = maxLength; i > maxLength - 30 && i > 0; i--) {
+      if (punctuation.includes(remaining[i])) {
+        breakPoint = i + 1;
+        break;
+      }
+    }
+
+    const chunk = remaining.substring(0, breakPoint).trim();
+    if (chunk) {
+      paragraphs.push(chunk);
+    }
+    remaining = remaining.substring(breakPoint).trim();
   }
 
   return paragraphs;
@@ -332,7 +345,7 @@ function createPDFDocument(report: any, carbonData: any[], webhookData: any, com
         ? webhookData.aiAnalysis
         : JSON.stringify(webhookData.aiAnalysis, null, 2);
 
-    const paragraphs = splitLongText(analysisText, 800).map((paragraph, index) =>
+    const paragraphs = splitLongText(analysisText, 1000).map((paragraph, index) =>
       React.createElement(
         View,
         { style: styles.card, key: `analysis-${index}` },
@@ -365,7 +378,7 @@ function createPDFDocument(report: any, carbonData: any[], webhookData: any, com
     const webhookSections = [];
 
     if (webhookData.summary) {
-      const summaryParagraphs = splitLongText(webhookData.summary, 600).map((paragraph, index) =>
+      const summaryParagraphs = splitLongText(webhookData.summary, 800).map((paragraph, index) =>
         React.createElement(Text, { style: styles.longText, key: `summary-${index}` }, paragraph)
       );
 
@@ -385,7 +398,7 @@ function createPDFDocument(report: any, carbonData: any[], webhookData: any, com
           ? webhookData.insights
           : JSON.stringify(webhookData.insights, null, 2);
 
-      const insightsParagraphs = splitLongText(insightsText, 600).map((paragraph, index) =>
+      const insightsParagraphs = splitLongText(insightsText, 800).map((paragraph, index) =>
         React.createElement(Text, { style: styles.longText, key: `insights-${index}` }, paragraph)
       );
 
@@ -405,7 +418,7 @@ function createPDFDocument(report: any, carbonData: any[], webhookData: any, com
           ? webhookData.recommendations
           : JSON.stringify(webhookData.recommendations, null, 2);
 
-      const recommendationsParagraphs = splitLongText(recommendationsText, 600).map((paragraph, index) =>
+      const recommendationsParagraphs = splitLongText(recommendationsText, 800).map((paragraph, index) =>
         React.createElement(Text, { style: styles.longText, key: `recommendations-${index}` }, paragraph)
       );
 
