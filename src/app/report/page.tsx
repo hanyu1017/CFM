@@ -182,6 +182,49 @@ export default function ReportPage() {
     setConfig(prev => ({ ...prev, [key]: value }));
   };
 
+  // 下載 PDF
+  const handleDownloadPdf = async (pdfUrl: string, reportTitle: string) => {
+    try {
+      console.log('========== 開始下載 PDF ==========');
+      console.log('PDF URL:', pdfUrl);
+
+      // 使用下載 API endpoint
+      const downloadUrl = `/api/report/download-pdf?pdfUrl=${encodeURIComponent(pdfUrl)}`;
+      console.log('下載 API URL:', downloadUrl);
+
+      const response = await fetch(downloadUrl);
+      console.log('下載回應狀態:', response.status);
+      console.log('Content-Type:', response.headers.get('content-type'));
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('下載失敗:', errorData);
+        throw new Error(errorData.error || '無法獲取 PDF 檔案');
+      }
+
+      const blob = await response.blob();
+      console.log('PDF Blob 大小:', blob.size, 'bytes');
+      console.log('PDF Blob 類型:', blob.type);
+
+      // 創建下載連結
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${reportTitle}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+      console.log('========== PDF 下載完成 ==========');
+      showToast('PDF 下載成功！', 'success');
+    } catch (error: any) {
+      console.error('========== PDF 下載錯誤 ==========');
+      console.error('錯誤:', error);
+      showAlert('錯誤', '無法下載 PDF 檔案，請稍後再試', 'error');
+    }
+  };
+
   // 生成 PDF
   const handleGeneratePdf = async (reportId: string) => {
     setGeneratingPdf(true);
@@ -244,7 +287,7 @@ export default function ReportPage() {
     <DashboardLayout>
       {/* AI 生成遮罩 - 增強版動態等待 UI */}
       {(generating || generatingPdf) && (
-        <div className="fixed inset-0 bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 bg-opacity-95 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 backdrop-blur-sm">
           <div className="relative">
             {/* 背景光暈效果 */}
             <div className="absolute inset-0 flex items-center justify-center">
@@ -388,6 +431,7 @@ export default function ReportPage() {
               reports={generatedReports}
               onRefresh={fetchReports}
               onGeneratePdf={handleGeneratePdf}
+              onDownloadPdf={handleDownloadPdf}
             />
           )}
         </div>
@@ -551,11 +595,13 @@ function CreateReportPanel({ config, onConfigChange, onGenerate, generating }: a
 function ReportHistoryPanel({
   reports,
   onRefresh,
-  onGeneratePdf
+  onGeneratePdf,
+  onDownloadPdf
 }: {
   reports: GeneratedReport[],
   onRefresh: () => Promise<void>,
-  onGeneratePdf: (reportId: string) => Promise<void>
+  onGeneratePdf: (reportId: string) => Promise<void>,
+  onDownloadPdf: (pdfUrl: string, reportTitle: string) => Promise<void>
 }) {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [reportToDelete, setReportToDelete] = useState<GeneratedReport | null>(null);
@@ -654,14 +700,13 @@ function ReportHistoryPanel({
               {/* 下載按鈕 */}
               <div className="flex gap-2">
                 {report.pdfUrl ? (
-                  <a
-                    href={report.pdfUrl}
-                    download
+                  <button
+                    onClick={() => onDownloadPdf(report.pdfUrl!, report.title)}
                     className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                   >
                     <Download className="w-4 h-4" />
                     下載 PDF
-                  </a>
+                  </button>
                 ) : (
                   <button
                     onClick={() => onGeneratePdf(report.id)}
