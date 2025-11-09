@@ -2,8 +2,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
+  console.log('🔵 [Webhook] Carbon Query 端點收到請求');
+
   try {
     const body = await request.json();
+    console.log('📦 [Webhook] 請求 body:', JSON.stringify(body, null, 2));
 
     // 提取 n8n webhook 發送的數據
     const {
@@ -14,7 +17,7 @@ export async function POST(request: NextRequest) {
       timestamp,
     } = body;
 
-    console.log('📨 Carbon Query Webhook 接收到請求:', {
+    console.log('📨 [Webhook] Carbon Query 接收到請求:', {
       query,
       user_id,
       username,
@@ -27,9 +30,12 @@ export async function POST(request: NextRequest) {
 
     // 如果需要將數據發送到外部 n8n webhook
     const n8nWebhookUrl = process.env.N8N_CARBON_QUERY_WEBHOOK_URL;
+    console.log('🔍 [Webhook] N8N URL 配置:', n8nWebhookUrl ? '已設置' : '未設置');
 
     if (n8nWebhookUrl) {
       try {
+        console.log('📤 [Webhook] 準備發送到 N8N:', n8nWebhookUrl);
+
         const webhookResponse = await fetch(n8nWebhookUrl, {
           method: 'POST',
           headers: {
@@ -44,8 +50,10 @@ export async function POST(request: NextRequest) {
           }),
         });
 
+        console.log('📥 [Webhook] N8N 響應狀態:', webhookResponse.status, webhookResponse.statusText);
+
         const webhookData = await webhookResponse.json();
-        console.log('✅ N8N Webhook 回應:', webhookData);
+        console.log('✅ [Webhook] N8N 回應數據:', webhookData);
 
         // 返回 n8n 的回應給前端
         return NextResponse.json({
@@ -54,7 +62,10 @@ export async function POST(request: NextRequest) {
           data: webhookData,
         });
       } catch (webhookError) {
-        console.error('❌ N8N Webhook 錯誤:', webhookError);
+        console.error('❌ [Webhook] N8N Webhook 錯誤 - 詳細信息:');
+        console.error('錯誤類型:', webhookError instanceof Error ? webhookError.constructor.name : typeof webhookError);
+        console.error('錯誤消息:', webhookError instanceof Error ? webhookError.message : webhookError);
+        console.error('完整錯誤:', webhookError);
 
         // 即使 webhook 失敗，也返回成功響應
         return NextResponse.json({
@@ -66,9 +77,10 @@ export async function POST(request: NextRequest) {
     }
 
     // 如果沒有配置 webhook URL，直接返回成功
+    console.log('ℹ️ [Webhook] 沒有配置 N8N URL，直接返回成功');
     return NextResponse.json({
       success: true,
-      message: 'Query received',
+      message: 'Query received (no N8N webhook configured)',
       data: {
         query,
         user_id,
@@ -79,7 +91,10 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Carbon Query Webhook 錯誤:', error);
+    console.error('❌ [Webhook] Carbon Query 錯誤 - 詳細信息:');
+    console.error('錯誤類型:', error instanceof Error ? error.constructor.name : typeof error);
+    console.error('錯誤消息:', error instanceof Error ? error.message : error);
+    console.error('完整錯誤:', error);
 
     return NextResponse.json({
       success: false,
