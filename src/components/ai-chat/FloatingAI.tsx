@@ -70,33 +70,33 @@ export default function FloatingAI() {
   // 發送消息到 n8n webhook（不阻塞主流程）
   const sendToWebhook = async (query: string, timestamp: Date) => {
     try {
+      console.log('📤 [Webhook] 開始 Webhook 流程');
       const userId = getUserId();
       const username = getUsername();
 
-      console.log('📤 準備發送 Webhook:', {
+      const webhookData = {
         query,
         user_id: userId,
         username,
         chat_id: chatId,
         timestamp: timestamp.toISOString(),
-      });
+      };
+
+      console.log('📦 [Webhook] 準備發送數據:', JSON.stringify(webhookData, null, 2));
 
       const webhookResponse = await fetch('/api/webhook/carbon-query', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query,
-          user_id: userId,
-          username,
-          chat_id: chatId,
-          timestamp: timestamp.toISOString(),
-        }),
+        body: JSON.stringify(webhookData),
       });
 
-      const webhookData = await webhookResponse.json();
-      console.log('✅ Webhook 發送成功，響應:', webhookData);
+      console.log('📥 [Webhook] 收到響應，狀態:', webhookResponse.status);
+
+      const responseData = await webhookResponse.json();
+      console.log('✅ [Webhook] 響應數據:', JSON.stringify(responseData, null, 2));
     } catch (error) {
-      console.error('⚠️ Webhook 發送失敗:', error);
+      console.error('⚠️ [Webhook] 發送失敗（不影響主流程）');
+      console.error('📝 [Webhook] 錯誤:', error);
       // 不影響主流程，靜默失敗
     }
   };
@@ -111,49 +111,79 @@ export default function FloatingAI() {
       timestamp: new Date(),
     };
 
-    console.log('🚀 開始發送消息:', userMessage.content);
+    console.log('='.repeat(60));
+    console.log('🚀 [FloatingAI] 開始發送消息');
+    console.log('📝 [FloatingAI] 用戶輸入:', userMessage.content);
+    console.log('⏰ [FloatingAI] 時間戳:', userMessage.timestamp.toISOString());
+
     setMessages(prev => [...prev, userMessage]);
     const currentInput = input; // 保存當前輸入
     setInput('');
     setLoading(true);
 
     // 並行發送到 webhook（不等待結果）
+    console.log('🔀 [FloatingAI] 並行觸發 Webhook 發送');
     sendToWebhook(currentInput, userMessage.timestamp);
 
     try {
-      console.log('📡 發送 AI 請求到 /api/ai/chat');
-      console.log('📝 消息歷史:', [...messages, userMessage]);
+      const requestBody = {
+        messages: [...messages, userMessage],
+      };
+
+      console.log('📡 [FloatingAI] 準備發送 POST 請求到 /api/ai/chat');
+      console.log('📦 [FloatingAI] 請求體:', JSON.stringify(requestBody, null, 2));
+      console.log('🔢 [FloatingAI] 消息總數:', requestBody.messages.length);
 
       const response = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [...messages, userMessage],
-        }),
+        body: JSON.stringify(requestBody),
       });
 
-      console.log('📥 收到響應狀態:', response.status, response.statusText);
+      console.log('📥 [FloatingAI] 收到 HTTP 響應');
+      console.log('📊 [FloatingAI] 響應狀態碼:', response.status);
+      console.log('📋 [FloatingAI] 響應狀態文本:', response.statusText);
+      console.log('✅ [FloatingAI] 響應是否成功 (ok):', response.ok);
 
       if (!response.ok) {
+        console.error('❌ [FloatingAI] HTTP 響應不成功，status:', response.status);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
+      console.log('🔄 [FloatingAI] 開始解析 JSON 響應...');
       const data = await response.json();
-      console.log('✅ AI 響應數據:', data);
+      console.log('✅ [FloatingAI] JSON 解析成功');
+      console.log('📦 [FloatingAI] 完整響應數據:', JSON.stringify(data, null, 2));
+      console.log('🔍 [FloatingAI] 響應成功標記:', data.success);
+      console.log('💬 [FloatingAI] AI 回應內容長度:', data.response?.length || 0);
+      console.log('📝 [FloatingAI] AI 回應前 100 字:', data.response?.substring(0, 100));
+
+      if (!data.response) {
+        console.error('❌ [FloatingAI] 警告：響應中沒有 response 字段');
+        console.error('📦 [FloatingAI] 完整數據:', data);
+      }
 
       const assistantMessage: Message = {
         role: 'assistant',
-        content: data.response,
+        content: data.response || '抱歉，我沒有收到有效的回應。',
         timestamp: new Date(),
       };
 
-      console.log('💬 助手消息:', assistantMessage.content);
+      console.log('💡 [FloatingAI] 創建助手消息對象');
+      console.log('📝 [FloatingAI] 助手消息內容:', assistantMessage.content);
+      console.log('⏰ [FloatingAI] 助手消息時間:', assistantMessage.timestamp.toISOString());
+
+      console.log('➕ [FloatingAI] 將助手消息添加到消息列表');
       setMessages(prev => [...prev, assistantMessage]);
+      console.log('✅ [FloatingAI] 消息列表更新完成');
+
     } catch (error) {
-      console.error('❌ AI 聊天錯誤 - 詳細信息:');
-      console.error('錯誤類型:', error instanceof Error ? error.constructor.name : typeof error);
-      console.error('錯誤消息:', error instanceof Error ? error.message : error);
-      console.error('完整錯誤:', error);
+      console.error('='.repeat(60));
+      console.error('❌ [FloatingAI] 發生錯誤！');
+      console.error('🔍 [FloatingAI] 錯誤類型:', error instanceof Error ? error.constructor.name : typeof error);
+      console.error('📝 [FloatingAI] 錯誤消息:', error instanceof Error ? error.message : String(error));
+      console.error('📚 [FloatingAI] 錯誤堆棧:', error instanceof Error ? error.stack : '無堆棧信息');
+      console.error('📦 [FloatingAI] 完整錯誤對象:', error);
 
       const errorMessage: Message = {
         role: 'assistant',
@@ -161,10 +191,15 @@ export default function FloatingAI() {
         timestamp: new Date(),
       };
 
+      console.log('⚠️ [FloatingAI] 創建錯誤消息');
       setMessages(prev => [...prev, errorMessage]);
+      console.log('✅ [FloatingAI] 錯誤消息已添加');
+
     } finally {
       setLoading(false);
-      console.log('🏁 消息處理完成');
+      console.log('🏁 [FloatingAI] 消息處理流程結束');
+      console.log('🔄 [FloatingAI] Loading 狀態設為 false');
+      console.log('='.repeat(60));
     }
   };
 
