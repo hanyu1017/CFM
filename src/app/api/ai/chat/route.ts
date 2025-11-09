@@ -1,10 +1,8 @@
 // src/app/api/ai/chat/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+import { v4 as uuidv4 } from 'uuid';
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || '',
-});
+const WEBHOOK_URL = 'https://primary-production-94491.up.railway.app/webhook/carbon-query';
 
 export async function POST(request: NextRequest) {
   console.log('🔵 [API] AI Chat 端點收到請求');
@@ -23,58 +21,46 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    console.log('📝 [API] 消息數量:', messages.length);
+    // 取得使用者最後一條訊息
+    const userMessage = messages[messages.length - 1].content;
 
-    // 檢查 API Key
-    const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) {
-      console.error('❌ [API] ANTHROPIC_API_KEY 未設置');
-      return NextResponse.json({
-        response: '系統配置錯誤：缺少 API 密鑰',
-        success: false,
-      }, { status: 500 });
+    // 準備 webhook payload
+    const webhookPayload = {
+      query: userMessage,
+      user_id: uuidv4(),
+      username: 'Test',
+      chat_id: uuidv4(),
+      timestamp: new Date().toISOString()
+    };
+
+    console.log('📤 [API] 發送查詢到 webhook:', webhookPayload);
+
+    // 發送請求到 webhook
+    const webhookResponse = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(webhookPayload),
+    });
+
+    if (!webhookResponse.ok) {
+      throw new Error(`Webhook responded with status: ${webhookResponse.status}`);
     }
-    console.log('✅ [API] ANTHROPIC_API_KEY 已設置');
 
-    const systemPrompt = `你是一個專業的永續發展和碳排放管理助手。`;
-
-    console.log('🤖 [API] 準備調用 Anthropic API');
-    const response = await anthropic.messages.create({
-      model: 'claude-3-sonnet-20240229',
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages: messages.map((msg: any) => ({
-        role: msg.role,
-        content: msg.content,
-      })),
-    });
-
-    console.log('✅ [API] Anthropic API 響應:', {
-      id: response.id,
-      model: response.model,
-      role: response.role,
-      contentLength: response.content.length,
-    });
-
-    const assistantMessage = response.content[0].type === 'text'
-      ? response.content[0].text
-      : '';
-
-    console.log('💬 [API] 助手回應長度:', assistantMessage.length);
+    const responseData = await webhookResponse.json();
+    console.log('✅ [API] Webhook 響應:', responseData);
 
     return NextResponse.json({
-      response: assistantMessage,
+      response: responseData,
       success: true,
     });
+
   } catch (error) {
     console.error('❌ [API] AI Chat 錯誤 - 詳細信息:');
     console.error('錯誤類型:', error instanceof Error ? error.constructor.name : typeof error);
     console.error('錯誤消息:', error instanceof Error ? error.message : error);
     console.error('完整錯誤:', error);
-
-    if (error instanceof Error && 'status' in error) {
-      console.error('HTTP 狀態:', (error as any).status);
-    }
 
     return NextResponse.json({
       response: '抱歉，我暫時無法回應。請檢查控制台以獲取詳細錯誤信息。',
