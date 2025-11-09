@@ -1,9 +1,9 @@
 // src/app/api/ai/chat/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+import OpenAI from 'openai';
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || '',
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || '',
 });
 
 export async function POST(request: NextRequest) {
@@ -26,39 +26,43 @@ export async function POST(request: NextRequest) {
     console.log('📝 [API] 消息數量:', messages.length);
 
     // 檢查 API Key
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+    const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
-      console.error('❌ [API] ANTHROPIC_API_KEY 未設置');
+      console.error('❌ [API] OPENAI_API_KEY 未設置');
       return NextResponse.json({
-        response: '系統配置錯誤：缺少 API 密鑰',
+        response: '系統配置錯誤：缺少 OpenAI API 密鑰',
         success: false,
       }, { status: 500 });
     }
-    console.log('✅ [API] ANTHROPIC_API_KEY 已設置');
+    console.log('✅ [API] OPENAI_API_KEY 已設置');
 
-    const systemPrompt = `你是一個專業的永續發展和碳排放管理助手。`;
+    const systemPrompt = `你是一個專業的永續發展和碳排放管理助手。你可以幫助用戶查詢碳排放數據、分析趨勢、提供減排建議，並回答關於永續發展的問題。`;
 
-    console.log('🤖 [API] 準備調用 Anthropic API');
-    const response = await anthropic.messages.create({
-      model: 'claude-3-sonnet-20240229',
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages: messages.map((msg: any) => ({
-        role: msg.role,
+    // 轉換消息格式，將 system prompt 作為第一條消息
+    const openaiMessages = [
+      { role: 'system' as const, content: systemPrompt },
+      ...messages.map((msg: any) => ({
+        role: msg.role as 'user' | 'assistant',
         content: msg.content,
       })),
+    ];
+
+    console.log('🤖 [API] 準備調用 OpenAI API');
+    const response = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: openaiMessages,
+      max_tokens: 1024,
+      temperature: 0.7,
     });
 
-    console.log('✅ [API] Anthropic API 響應:', {
+    console.log('✅ [API] OpenAI API 響應:', {
       id: response.id,
       model: response.model,
-      role: response.role,
-      contentLength: response.content.length,
+      choices: response.choices.length,
+      finishReason: response.choices[0]?.finish_reason,
     });
 
-    const assistantMessage = response.content[0].type === 'text'
-      ? response.content[0].text
-      : '';
+    const assistantMessage = response.choices[0]?.message?.content || '';
 
     console.log('💬 [API] 助手回應長度:', assistantMessage.length);
 
