@@ -105,6 +105,9 @@ export default function FloatingAI() {
   const handleSendMessage = async () => {
     if (!input.trim() || loading) return;
 
+    console.log('🚀 [FloatingAI] 開始發送訊息');
+    console.log('📝 [FloatingAI] 使用者輸入:', input);
+
     const userMessage: Message = {
       role: 'user',
       content: input,
@@ -116,43 +119,64 @@ export default function FloatingAI() {
     setLoading(true);
 
     try {
+      // 準備發送的 payload
+      const requestPayload = {
+        messages: [...messages, userMessage].map(msg => ({
+          role: msg.role,
+          content: msg.content
+        }))
+      };
+
+      console.log('📤 [FloatingAI] 準備發送 POST 請求到 /api/ai/chat');
+      console.log('📦 [FloatingAI] 請求 payload:', JSON.stringify(requestPayload, null, 2));
+
       const response = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [...messages, userMessage].map(msg => ({
-            role: msg.role,
-            content: msg.content
-          }))
-        }),
+        body: JSON.stringify(requestPayload),
       });
 
+      console.log('📨 [FloatingAI] 收到回應狀態:', response.status, response.statusText);
+
       if (!response.ok) {
+        console.error('❌ [FloatingAI] HTTP 錯誤! 狀態:', response.status);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
-      
+      console.log('📥 [FloatingAI] 完整回應資料:', JSON.stringify(data, null, 2));
+      console.log('✅ [FloatingAI] 成功標記:', data.success);
+      console.log('💬 [FloatingAI] AI 回應內容:', data.response);
+
       if (data.success && data.response) {
         const assistantMessage: Message = {
           role: 'assistant',
           content: data.response,
           timestamp: new Date(),
         };
+        console.log('✨ [FloatingAI] 建立 AI 訊息物件:', assistantMessage);
         setMessages(prev => [...prev, assistantMessage]);
+        console.log('✅ [FloatingAI] AI 訊息已加入對話');
       } else {
+        console.error('❌ [FloatingAI] 無效的響應格式 - success:', data.success, 'response:', data.response);
         throw new Error('無效的 AI 響應格式');
       }
     } catch (error) {
-      console.error('❌ AI 聊天錯誤:', error);
+      console.error('❌ [FloatingAI] AI 聊天錯誤 - 詳細資訊:');
+      console.error('錯誤類型:', error instanceof Error ? error.constructor.name : typeof error);
+      console.error('錯誤訊息:', error instanceof Error ? error.message : error);
+      console.error('完整錯誤:', error);
+
       const errorMessage: Message = {
         role: 'assistant',
         content: '抱歉，我暫時無法回應。請稍後再試。',
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, errorMessage]);
+      console.log('⚠️ [FloatingAI] 已顯示錯誤訊息給使用者');
     } finally {
       setLoading(false);
+      console.log('🏁 [FloatingAI] 請求處理完成，loading 狀態已重置');
     }
   };
 
