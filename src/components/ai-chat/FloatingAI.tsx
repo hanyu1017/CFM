@@ -111,60 +111,48 @@ export default function FloatingAI() {
       timestamp: new Date(),
     };
 
-    console.log('🚀 開始發送消息:', userMessage.content);
     setMessages(prev => [...prev, userMessage]);
-    const currentInput = input; // 保存當前輸入
     setInput('');
     setLoading(true);
 
-    // 並行發送到 webhook（不等待結果）
-    sendToWebhook(currentInput, userMessage.timestamp);
-
     try {
-      console.log('📡 發送 AI 請求到 /api/ai/chat');
-      console.log('📝 消息歷史:', [...messages, userMessage]);
-
       const response = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [...messages, userMessage],
+          messages: [...messages, userMessage].map(msg => ({
+            role: msg.role,
+            content: msg.content
+          }))
         }),
       });
-
-      console.log('📥 收到響應狀態:', response.status, response.statusText);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
-      console.log('✅ AI 響應數據:', data);
-
-      const assistantMessage: Message = {
-        role: 'assistant',
-        content: data.response,
-        timestamp: new Date(),
-      };
-
-      console.log('💬 助手消息:', assistantMessage.content);
-      setMessages(prev => [...prev, assistantMessage]);
+      
+      if (data.success && data.response) {
+        const assistantMessage: Message = {
+          role: 'assistant',
+          content: data.response,
+          timestamp: new Date(),
+        };
+        setMessages(prev => [...prev, assistantMessage]);
+      } else {
+        throw new Error('無效的 AI 響應格式');
+      }
     } catch (error) {
-      console.error('❌ AI 聊天錯誤 - 詳細信息:');
-      console.error('錯誤類型:', error instanceof Error ? error.constructor.name : typeof error);
-      console.error('錯誤消息:', error instanceof Error ? error.message : error);
-      console.error('完整錯誤:', error);
-
+      console.error('❌ AI 聊天錯誤:', error);
       const errorMessage: Message = {
         role: 'assistant',
         content: '抱歉，我暫時無法回應。請稍後再試。',
         timestamp: new Date(),
       };
-
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setLoading(false);
-      console.log('🏁 消息處理完成');
     }
   };
 
