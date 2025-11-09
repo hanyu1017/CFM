@@ -147,19 +147,37 @@ export default function FloatingAI() {
       console.log('📥 [FloatingAI] 完整回應資料:', JSON.stringify(data, null, 2));
       console.log('✅ [FloatingAI] 成功標記:', data.success);
       console.log('💬 [FloatingAI] AI 回應內容:', data.response);
+      console.log('📊 [FloatingAI] 額外資料 (data):', data.data);
 
-      if (data.success && data.response) {
+      // 按照 Telegram bot 邏輯處理回應
+      if (data.success) {
+        // 確保有回應內容
+        const responseContent = data.response || data.error || '已收到回應，但內容為空';
+
+        console.log('✨ [FloatingAI] 最終回應內容:', responseContent);
+
         const assistantMessage: Message = {
           role: 'assistant',
-          content: data.response,
+          content: responseContent,
           timestamp: new Date(),
         };
+
         console.log('✨ [FloatingAI] 建立 AI 訊息物件:', assistantMessage);
         setMessages(prev => [...prev, assistantMessage]);
         console.log('✅ [FloatingAI] AI 訊息已加入對話');
       } else {
-        console.error('❌ [FloatingAI] 無效的響應格式 - success:', data.success, 'response:', data.response);
-        throw new Error('無效的 AI 響應格式');
+        // 處理失敗情況
+        const errorContent = data.error || data.response || '查詢失敗，請稍後再試';
+        console.error('❌ [FloatingAI] 收到失敗回應:', errorContent);
+
+        const errorMessage: Message = {
+          role: 'assistant',
+          content: `❌ ${errorContent}`,
+          timestamp: new Date(),
+        };
+
+        setMessages(prev => [...prev, errorMessage]);
+        console.log('⚠️ [FloatingAI] 已顯示錯誤訊息給使用者');
       }
     } catch (error) {
       console.error('❌ [FloatingAI] AI 聊天錯誤 - 詳細資訊:');
