@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import FloatingAI from '@/components/ai-chat/FloatingAI';
 
 export const metadata: Metadata = {
   title: '碳排管理系統 | CFM System',
@@ -27,6 +28,7 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased">
         {children}
+        <FloatingAI />
       </body>
     </html>
   );
