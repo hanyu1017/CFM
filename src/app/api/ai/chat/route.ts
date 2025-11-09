@@ -50,9 +50,14 @@ export async function POST(request: NextRequest) {
 
     const responseData = await webhookResponse.json();
     console.log('✅ [API] Webhook 響應:', responseData);
+    
+    // 檢查回傳的資料結構並提取 AI 回應
+    const aiResponse = responseData.response || responseData.answer || responseData;
+    
+    console.log('🤖 [API] AI 回應內容:', aiResponse);
 
     return NextResponse.json({
-      response: responseData,
+      response: aiResponse,
       success: true,
     });
 
