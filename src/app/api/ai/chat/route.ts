@@ -53,6 +53,7 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(webhookPayload),
+      signal: AbortSignal.timeout(60000), // 60秒超時
     });
 
     console.log('📨 [API] Webhook 回應狀態:', webhookResponse.status, webhookResponse.statusText);
@@ -61,7 +62,21 @@ export async function POST(request: NextRequest) {
     if (!webhookResponse.ok) {
       const errorText = await webhookResponse.text();
       console.error('❌ [API] Webhook 錯誤回應內容:', errorText);
-      throw new Error(`Webhook responded with status: ${webhookResponse.status}`);
+      console.error('❌ [API] Webhook URL:', WEBHOOK_URL);
+      console.error('❌ [API] Webhook Payload:', JSON.stringify(webhookPayload, null, 2));
+
+      // 返回詳細錯誤給前端
+      return NextResponse.json({
+        response: `Webhook 錯誤 (${webhookResponse.status}): ${errorText}`,
+        success: false,
+        error: errorText,
+        debug: {
+          status: webhookResponse.status,
+          statusText: webhookResponse.statusText,
+          url: WEBHOOK_URL,
+          payload: webhookPayload
+        }
+      }, { status: 200 }); // 返回 200 讓前端可以正常處理
     }
 
     const responseData = await webhookResponse.json();

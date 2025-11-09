@@ -149,6 +149,11 @@ export default function FloatingAI() {
       console.log('💬 [FloatingAI] AI 回應內容:', data.response);
       console.log('📊 [FloatingAI] 額外資料 (data):', data.data);
 
+      // 如果有 debug 信息，也顯示出來
+      if (data.debug) {
+        console.log('🐛 [FloatingAI] Debug 信息:', data.debug);
+      }
+
       // 按照 Telegram bot 邏輯處理回應
       if (data.success) {
         // 確保有回應內容
