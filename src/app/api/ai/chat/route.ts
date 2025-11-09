@@ -36,6 +36,8 @@ export async function POST(request: NextRequest) {
     console.log('📤 [API] 發送查詢到 webhook:', webhookPayload);
 
     // 發送請求到 webhook
+    console.log('🌐 [API] 開始發送 POST 請求到 webhook URL:', WEBHOOK_URL);
+
     const webhookResponse = await fetch(WEBHOOK_URL, {
       method: 'POST',
       headers: {
@@ -44,22 +46,34 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify(webhookPayload),
     });
 
+    console.log('📨 [API] Webhook 回應狀態:', webhookResponse.status, webhookResponse.statusText);
+    console.log('📋 [API] Webhook 回應 headers:', Object.fromEntries(webhookResponse.headers.entries()));
+
     if (!webhookResponse.ok) {
+      const errorText = await webhookResponse.text();
+      console.error('❌ [API] Webhook 錯誤回應內容:', errorText);
       throw new Error(`Webhook responded with status: ${webhookResponse.status}`);
     }
 
     const responseData = await webhookResponse.json();
-    console.log('✅ [API] Webhook 響應:', responseData);
-    
+    console.log('📥 [API] Webhook 完整響應資料:', JSON.stringify(responseData, null, 2));
+    console.log('🔍 [API] 響應資料類型:', typeof responseData);
+    console.log('🔍 [API] 響應資料鍵值:', Object.keys(responseData));
+
     // 檢查回傳的資料結構並提取 AI 回應
     const aiResponse = responseData.response || responseData.answer || responseData;
-    
-    console.log('🤖 [API] AI 回應內容:', aiResponse);
 
-    return NextResponse.json({
+    console.log('🤖 [API] 提取的 AI 回應內容:', aiResponse);
+    console.log('🤖 [API] AI 回應類型:', typeof aiResponse);
+
+    const finalResponse = {
       response: aiResponse,
       success: true,
-    });
+    };
+
+    console.log('📤 [API] 準備返回給前端的資料:', JSON.stringify(finalResponse, null, 2));
+
+    return NextResponse.json(finalResponse);
 
   } catch (error) {
     console.error('❌ [API] AI Chat 錯誤 - 詳細信息:');
