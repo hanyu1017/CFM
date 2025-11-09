@@ -1,6 +1,15 @@
 // src/app/api/ai/chat/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
+import { ProxyAgent, setGlobalDispatcher } from 'undici';
+
+// 設置代理（如果環境變數中有的話）
+const proxyUrl = process.env.HTTPS_PROXY || process.env.HTTP_PROXY || process.env.https_proxy || process.env.http_proxy;
+if (proxyUrl) {
+  const proxyAgent = new ProxyAgent(proxyUrl);
+  setGlobalDispatcher(proxyAgent);
+  console.log('✅ [API] 使用代理:', proxyUrl.replace(/:.*@/, ':***@')); // 隱藏密碼
+}
 
 const WEBHOOK_URL = 'https://primary-production-94491.up.railway.app/webhook/carbon-query';
 
