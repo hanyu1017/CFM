@@ -60,15 +60,78 @@ export async function POST(request: NextRequest) {
     console.log('🔍 [API] 響應資料類型:', typeof responseData);
     console.log('🔍 [API] 響應資料鍵值:', Object.keys(responseData));
 
-    // 檢查回傳的資料結構並提取 AI 回應
-    const aiResponse = responseData.response || responseData.answer || responseData;
+    // 按照 Telegram bot 的邏輯處理回應
+    // 檢查 webhook 是否返回 success 標記
+    const webhookSuccess = responseData.success !== undefined ? responseData.success : true;
 
-    console.log('🤖 [API] 提取的 AI 回應內容:', aiResponse);
-    console.log('🤖 [API] AI 回應類型:', typeof aiResponse);
+    console.log('🔍 [API] Webhook success 標記:', webhookSuccess);
+
+    if (!webhookSuccess) {
+      // Webhook 返回失敗
+      const errorMessage = responseData.error || responseData.message || '查詢失敗';
+      console.error('❌ [API] Webhook 返回失敗:', errorMessage);
+
+      return NextResponse.json({
+        response: errorMessage,
+        success: false,
+        error: errorMessage,
+      }, { status: 200 }); // 返回 200 但 success: false
+    }
+
+    // 提取 AI 回應內容 (按照 Telegram bot 的邏輯)
+    let aiResponse = responseData.response || responseData.answer || '';
+
+    console.log('🤖 [API] 提取的 response 字段:', aiResponse);
+    console.log('🤖 [API] response 類型:', typeof aiResponse);
+
+    // 如果 response 是物件，轉換為字串
+    if (typeof aiResponse === 'object' && aiResponse !== null) {
+      console.log('⚠️ [API] response 是物件，嘗試提取文字內容');
+      aiResponse = JSON.stringify(aiResponse, null, 2);
+    }
+
+    // 如果沒有 response，嘗試使用整個 responseData
+    if (!aiResponse || aiResponse.trim() === '') {
+      console.log('⚠️ [API] 沒有找到 response 字段，使用整個響應資料');
+      // 排除一些元數據字段
+      const { success, timestamp, ...contentData } = responseData;
+      aiResponse = JSON.stringify(contentData, null, 2);
+    }
+
+    // 構建額外的資料摘要（如果有 data 字段）
+    const data = responseData.data;
+    if (data && typeof data === 'object') {
+      console.log('📊 [API] 找到額外的 data 字段:', data);
+      let dataSummary = '\n\n📊 數據摘要\n';
+
+      if (data.total_emissions) {
+        dataSummary += `• 總排放量: ${data.total_emissions.toLocaleString()} 噸CO₂e\n`;
+      }
+      if (data.record_count) {
+        dataSummary += `• 記錄數量: ${data.record_count} 筆\n`;
+      }
+      if (data.date_range) {
+        dataSummary += `• 時間範圍: ${data.date_range}\n`;
+      }
+
+      // 如果有數據摘要，附加到回應中
+      if (dataSummary !== '\n\n📊 數據摘要\n') {
+        aiResponse += dataSummary;
+      }
+    }
+
+    // 添加建議（如果有）
+    if (responseData.suggestions) {
+      console.log('💡 [API] 找到建議:', responseData.suggestions);
+      aiResponse += `\n\n💡 建議\n${responseData.suggestions}`;
+    }
+
+    console.log('🤖 [API] 最終 AI 回應內容:', aiResponse);
 
     const finalResponse = {
       response: aiResponse,
       success: true,
+      data: responseData.data, // 保留原始 data 供前端使用
     };
 
     console.log('📤 [API] 準備返回給前端的資料:', JSON.stringify(finalResponse, null, 2));
