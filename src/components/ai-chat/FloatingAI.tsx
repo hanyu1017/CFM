@@ -10,6 +10,31 @@ interface Message {
   timestamp: Date;
 }
 
+// 生成唯一 ID
+function generateId() {
+  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+}
+
+// 獲取或創建用戶 ID
+function getUserId() {
+  let userId = localStorage.getItem('carbon_user_id');
+  if (!userId) {
+    userId = generateId();
+    localStorage.setItem('carbon_user_id', userId);
+  }
+  return userId;
+}
+
+// 獲取或創建用戶名
+function getUsername() {
+  let username = localStorage.getItem('carbon_username');
+  if (!username) {
+    username = `User_${Math.random().toString(36).substr(2, 6)}`;
+    localStorage.setItem('carbon_username', username);
+  }
+  return username;
+}
+
 export default function FloatingAI() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
@@ -22,6 +47,7 @@ export default function FloatingAI() {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [chatId] = useState(() => generateId()); // 每個聊天會話的唯一 ID
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -41,6 +67,31 @@ export default function FloatingAI() {
     }
   }, [isOpen, isMinimized]);
 
+  // 發送消息到 n8n webhook（不阻塞主流程）
+  const sendToWebhook = async (query: string, timestamp: Date) => {
+    try {
+      const userId = getUserId();
+      const username = getUsername();
+
+      await fetch('/api/webhook/carbon-query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query,
+          user_id: userId,
+          username,
+          chat_id: chatId,
+          timestamp: timestamp.toISOString(),
+        }),
+      });
+
+      console.log('✅ Webhook 發送成功');
+    } catch (error) {
+      console.error('⚠️ Webhook 發送失敗:', error);
+      // 不影響主流程，靜默失敗
+    }
+  };
+
   // 發送消息
   const handleSendMessage = async () => {
     if (!input.trim() || loading) return;
@@ -52,8 +103,12 @@ export default function FloatingAI() {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentInput = input; // 保存當前輸入
     setInput('');
     setLoading(true);
+
+    // 並行發送到 webhook（不等待結果）
+    sendToWebhook(currentInput, userMessage.timestamp);
 
     try {
       const response = await fetch('/api/ai/chat', {
@@ -65,7 +120,7 @@ export default function FloatingAI() {
       });
 
       const data = await response.json();
-      
+
       const assistantMessage: Message = {
         role: 'assistant',
         content: data.response,
@@ -75,7 +130,7 @@ export default function FloatingAI() {
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
       console.error('AI chat error:', error);
-      
+
       const errorMessage: Message = {
         role: 'assistant',
         content: '抱歉，我暫時無法回應。請稍後再試。',
