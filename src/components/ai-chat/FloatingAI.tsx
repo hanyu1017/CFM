@@ -235,14 +235,14 @@ export default function FloatingAI() {
       {/* 聊天窗口 */}
       {isOpen && (
         <div
-          className={`fixed bottom-6 right-6 bg-white rounded-2xl shadow-2xl transition-all z-50 ${
+          className={`fixed bottom-6 right-6 bg-white rounded-2xl shadow-2xl transition-all z-50 flex flex-col ${
             isMinimized
               ? 'w-80 h-16'
-              : 'w-96 h-[600px]'
+              : 'w-96 max-h-[90vh]'
           }`}
         >
           {/* 標題欄 */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-t-2xl flex items-center justify-between">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-t-2xl flex items-center justify-between flex-shrink-0">
             <div className="flex items-center gap-3">
               <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
               <h3 className="font-semibold">AI永續助手</h3>
@@ -268,7 +268,7 @@ export default function FloatingAI() {
           {/* 聊天內容 */}
           {!isMinimized && (
             <>
-              <div className="h-[440px] overflow-y-auto p-4 space-y-4">
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
                 {messages.map((message, index) => (
                   <ChatMessage key={index} message={message} />
                 ))}
@@ -289,7 +289,7 @@ export default function FloatingAI() {
 
               {/* 快速問題（僅在對話開始時顯示） */}
               {messages.length === 1 && (
-                <div className="px-4 pb-2">
+                <div className="px-4 pb-2 flex-shrink-0">
                   <p className="text-xs text-gray-500 mb-2">快速問題：</p>
                   <div className="flex flex-wrap gap-2">
                     {quickQuestions.map((question, index) => (
@@ -309,7 +309,7 @@ export default function FloatingAI() {
               )}
 
               {/* 輸入區域 */}
-              <div className="border-t border-gray-200 p-4">
+              <div className="border-t border-gray-200 p-4 flex-shrink-0">
                 <div className="flex items-center gap-2">
                   <input
                     ref={inputRef}
