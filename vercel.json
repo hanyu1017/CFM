@@ -1,0 +1,11 @@
+{
+  "buildCommand": "npm run vercel-build",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "build": {
+    "env": {
+      "PRISMA_GENERATE_SKIP_AUTOINSTALL": "false"
+    }
+  },
+  "crons": []
+}
