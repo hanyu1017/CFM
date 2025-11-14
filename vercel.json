@@ -4,7 +4,8 @@
   "framework": "nextjs",
   "build": {
     "env": {
-      "PRISMA_GENERATE_SKIP_AUTOINSTALL": "false"
+      "PRISMA_GENERATE_SKIP_AUTOINSTALL": "false",
+      "DATABASE_URL": "postgresql://placeholder:placeholder@placeholder:5432/placeholder?schema=public"
     }
   },
   "crons": []
