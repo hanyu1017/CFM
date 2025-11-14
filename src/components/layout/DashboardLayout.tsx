@@ -1,7 +1,6 @@
 'use client';
 
 import Sidebar from './Sidebar';
-import AIChat from './AIChat';
 import DatabaseStatus from '../DatabaseStatus';
 
 interface DashboardLayoutProps {
@@ -19,7 +18,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </div>
         {children}
       </main>
-      <AIChat />
     </div>
   );
 }
