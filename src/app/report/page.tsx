@@ -481,7 +481,7 @@ export default function ReportPage() {
         type={toastState.type}
       />
 
-      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+      <div className="min-h-screen p-4 sm:p-6 lg:p-8">
       {/* 頁面標題 */}
       <div className="mb-8">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">永續報告書生成</h1>
