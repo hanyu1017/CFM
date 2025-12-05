@@ -3,10 +3,10 @@ import './globals.css';
 import FloatingAI from '@/components/ai-chat/FloatingAI';
 
 export const metadata: Metadata = {
-  title: '碳排管理系統 | CFM System',
+  title: '碳智匯 | 智慧碳管理平台',
   description: '專業的永續碳排管理與監控平台 - 協助企業達成淨零目標，符合國際永續標準',
   keywords: '碳排放, 碳管理, 永續發展, 淨零排放, ESG, 綠色製造',
-  authors: [{ name: 'CFM System' }],
+  authors: [{ name: '碳智匯' }],
   viewport: 'width=device-width, initial-scale=1',
   themeColor: '#3B82F6',
 };

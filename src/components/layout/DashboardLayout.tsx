@@ -26,7 +26,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           >
             <Menu className="w-6 h-6 text-gray-700" />
           </button>
-          <h1 className="ml-3 text-lg font-semibold text-gray-900">CFM System</h1>
+          <h1 className="ml-3 text-lg font-semibold text-gray-900">碳智匯</h1>
           <div className="ml-auto">
             <DatabaseStatus />
           </div>
