@@ -6,19 +6,19 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-green-50">
       <nav className="glass-effect fixed top-0 left-0 right-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-14 sm:h-16">
             <Link href="/" className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-600 rounded-lg flex items-center justify-center">
-                <Leaf className="w-6 h-6 text-white" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-green-500 to-blue-600 rounded-lg flex items-center justify-center">
+                <Leaf className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+              <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
                 CFM System
               </span>
             </Link>
-            <div className="hidden md:flex space-x-4">
+            <div className="flex space-x-2 sm:space-x-4">
               <Link
                 href="/dashboard"
-                className="gradient-primary text-white px-6 py-2 rounded-lg hover:opacity-90 transition-opacity"
+                className="gradient-primary text-white px-4 py-2 sm:px-6 sm:py-2 rounded-lg hover:opacity-90 transition-opacity text-sm sm:text-base font-medium"
               >
                 開始使用
               </Link>
@@ -27,51 +27,51 @@ export default function Home() {
         </div>
       </nav>
 
-      <section className="pt-32 pb-20 px-4">
+      <section className="pt-24 sm:pt-32 pb-12 sm:pb-20 px-4">
         <div className="max-w-6xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 mb-8 px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
-            <Leaf className="w-4 h-4" />
+          <div className="inline-flex items-center gap-2 mb-6 sm:mb-8 px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-100 text-blue-700 rounded-full text-xs sm:text-sm font-semibold">
+            <Leaf className="w-3 h-3 sm:w-4 sm:h-4" />
             碳足跡管理系統
           </div>
-          <h1 className="text-5xl md:text-7xl font-extrabold mb-6 bg-gradient-to-r from-blue-600 via-green-600 to-teal-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-4 sm:mb-6 bg-gradient-to-r from-blue-600 via-green-600 to-teal-600 bg-clip-text text-transparent leading-tight">
             CFM System
           </h1>
-          <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto">
+          <p className="text-base sm:text-xl md:text-2xl text-gray-600 mb-8 sm:mb-12 max-w-3xl mx-auto px-4">
             專業的碳排管理與監控平台
           </p>
           <Link
             href="/dashboard"
-            className="inline-block gradient-primary text-white px-10 py-4 rounded-xl text-lg font-semibold hover:shadow-2xl transition-all hover:-translate-y-1"
+            className="inline-block gradient-primary text-white px-8 py-3 sm:px-10 sm:py-4 rounded-xl text-base sm:text-lg font-semibold hover:shadow-2xl transition-all hover:-translate-y-1 active:translate-y-0"
           >
             立即開始
           </Link>
         </div>
       </section>
 
-      <section className="py-20 px-4">
+      <section className="py-12 sm:py-20 px-4">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <FeatureCard
               href="/dashboard"
-              icon={<LayoutDashboard className="w-8 h-8" />}
+              icon={<LayoutDashboard className="w-7 h-7 sm:w-8 sm:h-8" />}
               title="Dashboard"
               description="Real-time carbon emission monitoring"
             />
             <FeatureCard
               href="/decision-model"
-              icon={<Brain className="w-8 h-8" />}
+              icon={<Brain className="w-7 h-7 sm:w-8 sm:h-8" />}
               title="Decision Model"
               description="AI-driven optimization"
             />
             <FeatureCard
               href="/report"
-              icon={<FileText className="w-8 h-8" />}
+              icon={<FileText className="w-7 h-7 sm:w-8 sm:h-8" />}
               title="Reports"
               description="Automated report generation"
             />
             <FeatureCard
               href="/settings"
-              icon={<Settings className="w-8 h-8" />}
+              icon={<Settings className="w-7 h-7 sm:w-8 sm:h-8" />}
               title="Settings"
               description="System configuration"
             />
@@ -90,14 +90,14 @@ function FeatureCard({ href, icon, title, description }: {
 }) {
   return (
     <Link href={href} className="group block">
-      <div className="glass-effect rounded-2xl p-6 card-hover h-full">
-        <div className="w-14 h-14 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform">
+      <div className="glass-effect rounded-xl sm:rounded-2xl p-5 sm:p-6 card-hover h-full min-h-[160px] sm:min-h-[180px] flex flex-col">
+        <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg sm:rounded-xl flex items-center justify-center text-white mb-3 sm:mb-4 group-hover:scale-110 transition-transform">
           {icon}
         </div>
-        <h3 className="text-xl font-bold mb-2 group-hover:text-blue-600 transition-colors">
+        <h3 className="text-lg sm:text-xl font-bold mb-1.5 sm:mb-2 group-hover:text-blue-600 transition-colors">
           {title}
         </h3>
-        <p className="text-gray-600 text-sm">
+        <p className="text-gray-600 text-sm sm:text-base flex-grow">
           {description}
         </p>
       </div>

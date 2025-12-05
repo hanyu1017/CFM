@@ -253,25 +253,25 @@ export default function DataManagementPage() {
 
       {/* 新增數據模態框 */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-4 sm:p-6 lg:p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold">新增碳排放數據</h3>
+              <h3 className="text-lg sm:text-xl font-bold">新增碳排放數據</h3>
               <button onClick={() => setShowAddModal(false)} className="text-gray-500 hover:text-gray-700">
                 <X className="w-6 h-6" />
               </button>
             </div>
             <AddEditForm data={addForm} onChange={setAddForm} />
-            <div className="flex justify-end gap-2 mt-6">
+            <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-4 mt-6">
               <button
                 onClick={() => setShowAddModal(false)}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="px-4 py-2 sm:px-6 sm:py-3 border border-gray-300 rounded-lg hover:bg-gray-50 min-h-[44px] text-sm sm:text-base"
               >
                 取消
               </button>
               <button
                 onClick={handleAdd}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="px-4 py-2 sm:px-6 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 min-h-[44px] text-sm sm:text-base"
               >
                 新增
               </button>
@@ -280,22 +280,22 @@ export default function DataManagementPage() {
         </div>
       )}
 
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
         {/* 頁面標題 */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 flex items-center gap-3">
             <Database className="w-8 h-8" />
             資料管理
           </h1>
-          <p className="text-gray-600 mt-2">管理和查看碳排放數據</p>
+          <p className="text-gray-600 mt-2 text-sm sm:text-base">管理和查看碳排放數據</p>
         </div>
 
         {/* 功能按鈕區 */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:p-8 mb-6">
           <div className="flex flex-wrap gap-4">
             <button
               onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center justify-center gap-2 px-4 py-2 sm:px-6 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors min-h-[44px] text-sm sm:text-base"
             >
               <Plus className="w-5 h-5" />
               新增數據
@@ -303,7 +303,7 @@ export default function DataManagementPage() {
             <button
               onClick={handleGenerateDaily}
               disabled={generating}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="flex items-center justify-center gap-2 px-4 py-2 sm:px-6 sm:py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed min-h-[44px] text-sm sm:text-base"
             >
               <Sparkles className="w-5 h-5" />
               {generating ? '生成中...' : '自動生成每日數據'}
@@ -332,37 +332,37 @@ export default function DataManagementPage() {
         </div>
 
         {/* 查詢區 */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h3 className="text-lg font-semibold mb-4">日期查詢</h3>
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:p-8 mb-6">
+          <h3 className="text-base sm:text-lg font-semibold mb-4">日期查詢</h3>
           <div className="flex flex-wrap gap-4 items-end">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">開始日期</label>
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">開始日期</label>
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-h-[44px]"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">結束日期</label>
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">結束日期</label>
               <input
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-h-[44px]"
               />
             </div>
             <button
               onClick={handleSearch}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center justify-center gap-2 px-4 py-2 sm:px-6 sm:py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors min-h-[44px] text-sm sm:text-base"
             >
               <Search className="w-5 h-5" />
               查詢
             </button>
             <button
               onClick={handleResetSearch}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 sm:px-6 sm:py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors min-h-[44px] text-sm sm:text-base"
             >
               重置
             </button>
@@ -375,27 +375,27 @@ export default function DataManagementPage() {
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">日期</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">總碳排放</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Scope 1</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Scope 2</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Scope 3</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">電力</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">天然氣</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">數據來源</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                  <th className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">日期</th>
+                  <th className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">總碳排放</th>
+                  <th className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Scope 1</th>
+                  <th className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Scope 2</th>
+                  <th className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Scope 3</th>
+                  <th className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">電力</th>
+                  <th className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">天然氣</th>
+                  <th className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">數據來源</th>
+                  <th className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {loading ? (
                   <tr>
-                    <td colSpan={9} className="px-4 py-8 text-center text-gray-500">
+                    <td colSpan={9} className="px-4 py-8 text-center text-gray-500 text-sm sm:text-base">
                       載入中...
                     </td>
                   </tr>
                 ) : data.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="px-4 py-8 text-center text-gray-500">
+                    <td colSpan={9} className="px-4 py-8 text-center text-gray-500 text-sm sm:text-base">
                       無數據
                     </td>
                   </tr>
@@ -404,81 +404,81 @@ export default function DataManagementPage() {
                     <tr key={item.id} className="hover:bg-gray-50">
                       {editingId === item.id ? (
                         <>
-                          <td className="px-4 py-3">
+                          <td className="px-2 sm:px-4 py-3">
                             <input
                               type="date"
                               value={editForm.date?.split('T')[0] || ''}
                               onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
-                              className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                              className="w-full px-2 py-2 border border-gray-300 rounded text-xs sm:text-sm min-h-[44px]"
                             />
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-2 sm:px-4 py-3">
                             <input
                               type="number"
                               value={editForm.totalCarbon || 0}
                               onChange={(e) => setEditForm({ ...editForm, totalCarbon: parseFloat(e.target.value) })}
-                              className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                              className="w-16 sm:w-20 px-2 py-2 border border-gray-300 rounded text-xs sm:text-sm min-h-[44px]"
                             />
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-2 sm:px-4 py-3">
                             <input
                               type="number"
                               value={editForm.scope1 || 0}
                               onChange={(e) => setEditForm({ ...editForm, scope1: parseFloat(e.target.value) })}
-                              className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                              className="w-16 sm:w-20 px-2 py-2 border border-gray-300 rounded text-xs sm:text-sm min-h-[44px]"
                             />
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-2 sm:px-4 py-3">
                             <input
                               type="number"
                               value={editForm.scope2 || 0}
                               onChange={(e) => setEditForm({ ...editForm, scope2: parseFloat(e.target.value) })}
-                              className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                              className="w-16 sm:w-20 px-2 py-2 border border-gray-300 rounded text-xs sm:text-sm min-h-[44px]"
                             />
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-2 sm:px-4 py-3">
                             <input
                               type="number"
                               value={editForm.scope3 || 0}
                               onChange={(e) => setEditForm({ ...editForm, scope3: parseFloat(e.target.value) })}
-                              className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                              className="w-16 sm:w-20 px-2 py-2 border border-gray-300 rounded text-xs sm:text-sm min-h-[44px]"
                             />
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-2 sm:px-4 py-3">
                             <input
                               type="number"
                               value={editForm.electricity || 0}
                               onChange={(e) => setEditForm({ ...editForm, electricity: parseFloat(e.target.value) })}
-                              className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                              className="w-16 sm:w-20 px-2 py-2 border border-gray-300 rounded text-xs sm:text-sm min-h-[44px]"
                             />
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-2 sm:px-4 py-3">
                             <input
                               type="number"
                               value={editForm.naturalGas || 0}
                               onChange={(e) => setEditForm({ ...editForm, naturalGas: parseFloat(e.target.value) })}
-                              className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                              className="w-16 sm:w-20 px-2 py-2 border border-gray-300 rounded text-xs sm:text-sm min-h-[44px]"
                             />
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-2 sm:px-4 py-3">
                             <input
                               type="text"
                               value={editForm.dataSource || ''}
                               onChange={(e) => setEditForm({ ...editForm, dataSource: e.target.value })}
-                              className="w-24 px-2 py-1 border border-gray-300 rounded text-sm"
+                              className="w-20 sm:w-24 px-2 py-2 border border-gray-300 rounded text-xs sm:text-sm min-h-[44px]"
                             />
                           </td>
-                          <td className="px-4 py-3">
-                            <div className="flex gap-2">
+                          <td className="px-2 sm:px-4 py-3">
+                            <div className="flex gap-2 flex-col sm:flex-row">
                               <button
                                 onClick={() => handleSaveEdit(item.id)}
-                                className="text-green-600 hover:text-green-800"
+                                className="text-green-600 hover:text-green-800 px-2 py-1 text-xs sm:text-sm"
                               >
                                 保存
                               </button>
                               <button
                                 onClick={handleCancelEdit}
-                                className="text-gray-600 hover:text-gray-800"
+                                className="text-gray-600 hover:text-gray-800 px-2 py-1 text-xs sm:text-sm"
                               >
                                 取消
                               </button>
@@ -487,30 +487,30 @@ export default function DataManagementPage() {
                         </>
                       ) : (
                         <>
-                          <td className="px-4 py-3 text-sm text-gray-900">
+                          <td className="px-2 sm:px-4 py-3 text-xs sm:text-sm text-gray-900">
                             {new Date(item.date).toLocaleDateString('zh-TW')}
                           </td>
-                          <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                          <td className="px-2 sm:px-4 py-3 text-xs sm:text-sm font-medium text-gray-900">
                             {item.totalCarbon.toFixed(2)} tCO2e
                           </td>
-                          <td className="px-4 py-3 text-sm text-gray-900">{item.scope1.toFixed(2)}</td>
-                          <td className="px-4 py-3 text-sm text-gray-900">{item.scope2.toFixed(2)}</td>
-                          <td className="px-4 py-3 text-sm text-gray-900">{item.scope3.toFixed(2)}</td>
-                          <td className="px-4 py-3 text-sm text-gray-900">{item.electricity.toFixed(2)} kWh</td>
-                          <td className="px-4 py-3 text-sm text-gray-900">{item.naturalGas.toFixed(2)} m³</td>
-                          <td className="px-4 py-3 text-sm text-gray-600">{item.dataSource || '-'}</td>
-                          <td className="px-4 py-3">
-                            <div className="flex gap-2">
+                          <td className="px-2 sm:px-4 py-3 text-xs sm:text-sm text-gray-900">{item.scope1.toFixed(2)}</td>
+                          <td className="px-2 sm:px-4 py-3 text-xs sm:text-sm text-gray-900">{item.scope2.toFixed(2)}</td>
+                          <td className="px-2 sm:px-4 py-3 text-xs sm:text-sm text-gray-900">{item.scope3.toFixed(2)}</td>
+                          <td className="px-2 sm:px-4 py-3 text-xs sm:text-sm text-gray-900">{item.electricity.toFixed(2)} kWh</td>
+                          <td className="px-2 sm:px-4 py-3 text-xs sm:text-sm text-gray-900">{item.naturalGas.toFixed(2)} m³</td>
+                          <td className="px-2 sm:px-4 py-3 text-xs sm:text-sm text-gray-600">{item.dataSource || '-'}</td>
+                          <td className="px-2 sm:px-4 py-3">
+                            <div className="flex gap-2 flex-col sm:flex-row">
                               <button
                                 onClick={() => handleStartEdit(item)}
-                                className="text-blue-600 hover:text-blue-800"
+                                className="text-blue-600 hover:text-blue-800 p-1 text-xs sm:text-sm"
                                 title="編輯"
                               >
                                 <Edit2 className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => handleDelete(item.id)}
-                                className="text-red-600 hover:text-red-800"
+                                className="text-red-600 hover:text-red-800 p-1 text-xs sm:text-sm"
                                 title="刪除"
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -541,132 +541,132 @@ export default function DataManagementPage() {
 // 新增/編輯表單組件
 function AddEditForm({ data, onChange }: any) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">日期</label>
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">日期</label>
         <input
           type="date"
           value={data.date?.split('T')[0] || ''}
           onChange={(e) => onChange({ ...data, date: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-h-[44px]"
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">總碳排放 (tCO2e)</label>
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">總碳排放 (tCO2e)</label>
         <input
           type="number"
           step="0.01"
           value={data.totalCarbon || 0}
           onChange={(e) => onChange({ ...data, totalCarbon: parseFloat(e.target.value) })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-h-[44px]"
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Scope 1 (tCO2e)</label>
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Scope 1 (tCO2e)</label>
         <input
           type="number"
           step="0.01"
           value={data.scope1 || 0}
           onChange={(e) => onChange({ ...data, scope1: parseFloat(e.target.value) })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-h-[44px]"
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Scope 2 (tCO2e)</label>
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Scope 2 (tCO2e)</label>
         <input
           type="number"
           step="0.01"
           value={data.scope2 || 0}
           onChange={(e) => onChange({ ...data, scope2: parseFloat(e.target.value) })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-h-[44px]"
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Scope 3 (tCO2e)</label>
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Scope 3 (tCO2e)</label>
         <input
           type="number"
           step="0.01"
           value={data.scope3 || 0}
           onChange={(e) => onChange({ ...data, scope3: parseFloat(e.target.value) })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-h-[44px]"
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">電力 (kWh)</label>
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">電力 (kWh)</label>
         <input
           type="number"
           step="0.01"
           value={data.electricity || 0}
           onChange={(e) => onChange({ ...data, electricity: parseFloat(e.target.value) })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-h-[44px]"
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">天然氣 (m³)</label>
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">天然氣 (m³)</label>
         <input
           type="number"
           step="0.01"
           value={data.naturalGas || 0}
           onChange={(e) => onChange({ ...data, naturalGas: parseFloat(e.target.value) })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-h-[44px]"
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">燃料 (L)</label>
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">燃料 (L)</label>
         <input
           type="number"
           step="0.01"
           value={data.fuel || 0}
           onChange={(e) => onChange({ ...data, fuel: parseFloat(e.target.value) })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-h-[44px]"
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">運輸 (km)</label>
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">運輸 (km)</label>
         <input
           type="number"
           step="0.01"
           value={data.transport || 0}
           onChange={(e) => onChange({ ...data, transport: parseFloat(e.target.value) })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-h-[44px]"
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">廢棄物 (kg)</label>
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">廢棄物 (kg)</label>
         <input
           type="number"
           step="0.01"
           value={data.waste || 0}
           onChange={(e) => onChange({ ...data, waste: parseFloat(e.target.value) })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-h-[44px]"
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">用水 (m³)</label>
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">用水 (m³)</label>
         <input
           type="number"
           step="0.01"
           value={data.water || 0}
           onChange={(e) => onChange({ ...data, water: parseFloat(e.target.value) })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-h-[44px]"
         />
       </div>
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">數據來源</label>
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">數據來源</label>
         <input
           type="text"
           value={data.dataSource || ''}
           onChange={(e) => onChange({ ...data, dataSource: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm min-h-[44px]"
         />
       </div>
-      <div className="md:col-span-2">
-        <label className="block text-sm font-medium text-gray-700 mb-2">備註</label>
+      <div className="col-span-1 md:col-span-2">
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">備註</label>
         <textarea
           value={data.notes || ''}
           onChange={(e) => onChange({ ...data, notes: e.target.value })}
           rows={3}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
         />
       </div>
     </div>

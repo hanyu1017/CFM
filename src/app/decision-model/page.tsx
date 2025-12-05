@@ -454,18 +454,18 @@ export default function DecisionModelPage() {
 
       {/* 成功訊息通知 */}
       {successMessage && (
-        <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 animate-bounce">
-          <span className="text-xl">✓</span>
+        <div className="fixed top-2 right-2 sm:top-4 sm:right-4 z-50 bg-green-500 text-white px-3 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-lg shadow-lg flex items-center gap-2 animate-bounce max-w-xs sm:max-w-md">
+          <span className="text-lg sm:text-xl">✓</span>
           <span>{successMessage}</span>
         </div>
       )}
 
       {/* 儲存模型對話框 */}
       {showSaveDialog && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-semibold">儲存模型</h3>
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 max-w-md w-full mx-auto">
+            <div className="flex justify-between items-center mb-4 sm:mb-6">
+              <h3 className="text-lg sm:text-xl font-semibold">儲存模型</h3>
               <button
                 onClick={() => setShowSaveDialog(false)}
                 className="text-gray-400 hover:text-gray-600"
@@ -473,8 +473,8 @@ export default function DecisionModelPage() {
                 <X className="w-6 h-6" />
               </button>
             </div>
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="mb-4 sm:mb-6">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                 模型名稱
               </label>
               <input
@@ -482,7 +482,7 @@ export default function DecisionModelPage() {
                 value={modelName}
                 onChange={(e) => setModelName(e.target.value)}
                 placeholder="輸入模型名稱..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 autoFocus
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
@@ -491,16 +491,16 @@ export default function DecisionModelPage() {
                 }}
               />
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-2 sm:gap-3">
               <button
                 onClick={() => setShowSaveDialog(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base min-h-[44px] flex items-center justify-center border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 取消
               </button>
               <button
                 onClick={saveModel}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base min-h-[44px] flex items-center justify-center bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 儲存
               </button>
@@ -511,10 +511,10 @@ export default function DecisionModelPage() {
 
       {/* 編輯模型對話框 */}
       {showEditDialog && editingModel && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-semibold">編輯模型</h3>
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 max-w-md w-full mx-auto">
+            <div className="flex justify-between items-center mb-4 sm:mb-6">
+              <h3 className="text-lg sm:text-xl font-semibold">編輯模型</h3>
               <button
                 onClick={() => {
                   setShowEditDialog(false);
@@ -525,8 +525,8 @@ export default function DecisionModelPage() {
                 <X className="w-6 h-6" />
               </button>
             </div>
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="mb-4 sm:mb-6">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
                 模型名稱
               </label>
               <input
@@ -534,7 +534,7 @@ export default function DecisionModelPage() {
                 value={modelName}
                 onChange={(e) => setModelName(e.target.value)}
                 placeholder="輸入模型名稱..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 autoFocus
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
@@ -543,22 +543,22 @@ export default function DecisionModelPage() {
                 }}
               />
             </div>
-            <p className="text-sm text-gray-600 mb-6">
+            <p className="text-xs sm:text-sm text-gray-600 mb-4 sm:mb-6">
               注意：當前頁面的參數將保存為此模型的新參數。
             </p>
-            <div className="flex gap-3">
+            <div className="flex gap-2 sm:gap-3">
               <button
                 onClick={() => {
                   setShowEditDialog(false);
                   setEditingModel(null);
                 }}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base min-h-[44px] flex items-center justify-center border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 取消
               </button>
               <button
                 onClick={updateModel}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base min-h-[44px] flex items-center justify-center bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 更新
               </button>
@@ -568,9 +568,9 @@ export default function DecisionModelPage() {
       )}
 
       {loading && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
-            <h3 className="text-xl font-semibold mb-4 text-center">計算最佳化中</h3>
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 max-w-md w-full mx-auto">
+            <h3 className="text-lg sm:text-xl font-semibold mb-4 text-center">計算最佳化中</h3>
             <div className="mb-4">
               <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
                 <div
@@ -578,22 +578,22 @@ export default function DecisionModelPage() {
                   style={{ width: `${progress}%` }}
                 />
               </div>
-              <p className="text-sm text-gray-600 mt-2 text-center">{Math.round(progress)}%</p>
+              <p className="text-xs sm:text-sm text-gray-600 mt-2 text-center">{Math.round(progress)}%</p>
             </div>
             <button
               onClick={cancelCalculation}
-              className="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base min-h-[44px] flex items-center justify-center bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
             >
               取消計算
             </button>
           </div>
         </div>
       )}
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
       {/* 頁面標題 */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">綠色製造決策優化模型</h1>
-        <p className="text-gray-600 mt-2">基於數學模型的供應鏈與碳排放優化決策系統</p>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">綠色製造決策優化模型</h1>
+        <p className="text-sm sm:text-base text-gray-600 mt-2">基於數學模型的供應鏈與碳排放優化決策系統</p>
       </div>
 
       {/* 標籤導航 */}
@@ -621,7 +621,7 @@ export default function DecisionModelPage() {
           />
         </div>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6 lg:p-8">
           {activeTab === 'input' && (
             <InputPanel
               params={params}
@@ -643,8 +643,8 @@ export default function DecisionModelPage() {
       </div>
 
       {/* 已儲存的模型區域 */}
-      <div className="bg-white rounded-lg shadow-md p-6 mt-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">已儲存的模型</h2>
+      <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:p-8 mt-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">已儲存的模型</h2>
         {savedModels.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
             <Save className="w-16 h-16 mx-auto mb-4 opacity-30" />
@@ -652,11 +652,11 @@ export default function DecisionModelPage() {
             <p className="text-sm mt-2">使用「儲存模型」按鈕來保存您的參數配置</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {savedModels.map((model) => (
-              <div key={model.id} className="border border-gray-200 rounded-lg p-5 hover:shadow-lg transition-shadow">
+              <div key={model.id} className="border border-gray-200 rounded-lg p-4 sm:p-5 hover:shadow-lg transition-shadow">
                 <div className="flex justify-between items-start mb-4">
-                  <h3 className="font-semibold text-lg text-gray-900">{model.description}</h3>
+                  <h3 className="font-semibold text-base sm:text-lg text-gray-900">{model.description}</h3>
                   <button
                     onClick={() => setShowDeleteConfirm(model.id)}
                     className="text-red-500 hover:text-red-700 transition-colors"
@@ -666,18 +666,18 @@ export default function DecisionModelPage() {
                   </button>
                 </div>
 
-                <div className="mb-4 text-sm text-gray-600">
+                <div className="mb-4 text-xs sm:text-sm text-gray-600">
                   <p className="mb-2">
                     <span className="font-medium">建立時間：</span>
                     {new Date(model.createdAt).toLocaleString('zh-TW')}
                   </p>
-                  <div className="bg-gray-50 rounded p-3 space-y-1">
+                  <div className="bg-gray-50 rounded p-2 sm:p-3 space-y-1">
                     <p><span className="font-medium">需求參數 (a)：</span>{model.a}</p>
                     <p><span className="font-medium">價格敏感度 (b)：</span>{model.b}</p>
                     <p><span className="font-medium">市場成長率 (M)：</span>{model.M}</p>
                   </div>
                   {model.results && model.results.length > 0 && (
-                    <div className="mt-3 bg-blue-50 rounded p-3">
+                    <div className="mt-3 bg-blue-50 rounded p-2 sm:p-3">
                       <p className="font-medium text-blue-900 mb-1">優化結果：</p>
                       <p className="text-blue-700">最大利潤：{model.results[0].optimalProfit.toFixed(2)} 萬元/月</p>
                     </div>
@@ -687,38 +687,38 @@ export default function DecisionModelPage() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => loadModel(model)}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 px-2 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm min-h-[44px] bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
                     <Upload className="w-4 h-4" />
-                    載入
+                    <span className="hidden sm:inline">載入</span>
                   </button>
                   <button
                     onClick={() => openEditDialog(model)}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 px-2 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm min-h-[44px] bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                   >
                     <Save className="w-4 h-4" />
-                    編輯
+                    <span className="hidden sm:inline">編輯</span>
                   </button>
                 </div>
 
                 {/* 刪除確認對話框 */}
                 {showDeleteConfirm === model.id && (
-                  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-                    <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
-                      <h3 className="text-xl font-semibold mb-4">確認刪除</h3>
-                      <p className="text-gray-600 mb-6">
+                  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl p-4 sm:p-6 lg:p-8 max-w-md w-full mx-auto">
+                      <h3 className="text-lg sm:text-xl font-semibold mb-4">確認刪除</h3>
+                      <p className="text-xs sm:text-sm text-gray-600 mb-4 sm:mb-6">
                         確定要刪除模型「{model.description}」嗎？此操作無法復原。
                       </p>
-                      <div className="flex gap-3">
+                      <div className="flex gap-2 sm:gap-3">
                         <button
                           onClick={() => setShowDeleteConfirm(null)}
-                          className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                          className="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm min-h-[44px] flex items-center justify-center border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                         >
                           取消
                         </button>
                         <button
                           onClick={() => deleteModel(model.id)}
-                          className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                          className="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm min-h-[44px] flex items-center justify-center bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                         >
                           刪除
                         </button>
@@ -742,14 +742,15 @@ function TabButton({ active, onClick, icon, label, disabled = false }: any) {
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`flex items-center gap-2 px-6 py-4 font-medium transition-colors ${
-        active 
-          ? 'text-blue-600 border-b-2 border-blue-600' 
+      className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm min-h-[44px] font-medium transition-colors ${
+        active
+          ? 'text-blue-600 border-b-2 border-blue-600'
           : 'text-gray-600 hover:text-gray-900'
       } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
     >
       {icon}
-      {label}
+      <span className="hidden sm:inline">{label}</span>
+      <span className="sm:hidden">{label.split('')[0]}</span>
     </button>
   );
 }
@@ -786,14 +787,14 @@ function InputPanel({ params, onParamChange, onCalculate, onSaveModel, loading }
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {paramGroups.map((group, idx) => (
-        <div key={idx} className="border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4">{group.title}</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div key={idx} className="border border-gray-200 rounded-lg p-4 sm:p-6">
+          <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">{group.title}</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {group.params.map((param) => (
               <div key={param.key}>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                   {param.label}
                   {param.unit && <span className="text-gray-500 ml-1">({param.unit})</span>}
                 </label>
@@ -802,7 +803,7 @@ function InputPanel({ params, onParamChange, onCalculate, onSaveModel, loading }
                   value={params[param.key]}
                   onChange={(e) => onParamChange(param.key, e.target.value)}
                   step="any"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-2 sm:px-3 py-2 sm:py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 <p className="text-xs text-gray-500 mt-1">{param.description}</p>
               </div>
@@ -812,20 +813,20 @@ function InputPanel({ params, onParamChange, onCalculate, onSaveModel, loading }
       ))}
 
       {/* 操作按鈕 */}
-      <div className="flex gap-4 pt-4 flex-wrap">
+      <div className="flex gap-2 sm:gap-4 pt-2 sm:pt-4 flex-col sm:flex-row">
         <button
           onClick={onCalculate}
           disabled={loading}
-          className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400"
+          className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base min-h-[44px] bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400"
         >
-          <Calculator className="w-5 h-5" />
+          <Calculator className="w-4 sm:w-5 h-4 sm:h-5" />
           {loading ? '計算中...' : '開始優化計算'}
         </button>
         <button
           onClick={onSaveModel}
-          className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base min-h-[44px] bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
         >
-          <Save className="w-5 h-5" />
+          <Save className="w-4 sm:w-5 h-4 sm:h-5" />
           儲存模型
         </button>
       </div>
@@ -836,9 +837,9 @@ function InputPanel({ params, onParamChange, onCalculate, onSaveModel, loading }
 // 結果展示面板
 function ResultPanel({ result }: { result: OptimizationResult }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* 核心結果 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
         <ResultCard
           title="最大利潤"
           value={result.optimalProfit.toFixed(2)}
@@ -884,39 +885,41 @@ function ResultPanel({ result }: { result: OptimizationResult }) {
       </div>
 
       {/* 財務分析 */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold mb-4">財務分析</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
+        <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">財務分析</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
           <div>
-            <p className="text-sm text-gray-600">總收入</p>
-            <p className="text-2xl font-bold text-green-600">{result.totalRevenue.toFixed(0)} 元</p>
+            <p className="text-xs sm:text-sm text-gray-600">總收入</p>
+            <p className="text-lg sm:text-2xl font-bold text-green-600">{result.totalRevenue.toFixed(0)} 元</p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">總成本</p>
-            <p className="text-2xl font-bold text-red-600">{result.totalCost.toFixed(0)} 元</p>
+            <p className="text-xs sm:text-sm text-gray-600">總成本</p>
+            <p className="text-lg sm:text-2xl font-bold text-red-600">{result.totalCost.toFixed(0)} 元</p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">利潤率</p>
-            <p className="text-2xl font-bold text-blue-600">
+            <p className="text-xs sm:text-sm text-gray-600">利潤率</p>
+            <p className="text-lg sm:text-2xl font-bold text-blue-600">
               {((result.optimalProfit / result.totalRevenue) * 100).toFixed(1)}%
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">碳減排量</p>
-            <p className="text-2xl font-bold text-green-600">{result.carbonReduction.toFixed(1)} kg</p>
+            <p className="text-xs sm:text-sm text-gray-600">碳減排量</p>
+            <p className="text-lg sm:text-2xl font-bold text-green-600">{result.carbonReduction.toFixed(1)} kg</p>
           </div>
         </div>
       </div>
 
       {/* 下載按鈕 */}
-      <div className="flex gap-4">
-        <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-          <Download className="w-5 h-5" />
-          下載報告 (PDF)
+      <div className="flex gap-2 sm:gap-4 flex-col sm:flex-row">
+        <button className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-2 text-sm sm:text-base min-h-[44px] bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          <Download className="w-4 sm:w-5 h-4 sm:h-5" />
+          <span className="hidden sm:inline">下載報告 (PDF)</span>
+          <span className="sm:hidden">下載</span>
         </button>
-        <button className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-          <Save className="w-5 h-5" />
-          保存結果
+        <button className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-2 text-sm sm:text-base min-h-[44px] bg-green-600 text-white rounded-lg hover:bg-green-700">
+          <Save className="w-4 sm:w-5 h-4 sm:h-5" />
+          <span className="hidden sm:inline">保存結果</span>
+          <span className="sm:hidden">保存</span>
         </button>
       </div>
     </div>
@@ -942,13 +945,13 @@ function ResultCard({ title, value, unit, color, icon }: ResultCardProps) {
   };
 
   return (
-    <div className={`border-l-4 ${colorClasses[color]} p-4 rounded-lg`}>
+    <div className={`border-l-4 ${colorClasses[color]} p-3 sm:p-4 rounded-lg`}>
       <div className="flex items-center justify-between mb-2">
-        <span className="text-2xl">{icon}</span>
+        <span className="text-xl sm:text-2xl">{icon}</span>
       </div>
-      <p className="text-sm text-gray-600 mb-1">{title}</p>
-      <p className="text-2xl font-bold text-gray-900">
-        {value} <span className="text-sm text-gray-500">{unit}</span>
+      <p className="text-xs sm:text-sm text-gray-600 mb-1">{title}</p>
+      <p className="text-lg sm:text-2xl font-bold text-gray-900">
+        {value} <span className="text-xs sm:text-sm text-gray-500">{unit}</span>
       </p>
     </div>
   );
@@ -964,13 +967,13 @@ function SensitivityPanel({ data }: any) {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold mb-4">參數敏感度分析</h3>
-        <p className="text-sm text-gray-600 mb-6">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
+        <h3 className="text-base sm:text-lg font-semibold mb-2 sm:mb-4">參數敏感度分析</h3>
+        <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-6">
           分析輸入參數變化如何影響優化結果
         </p>
-        <ResponsiveContainer width="100%" height={400}>
+        <ResponsiveContainer width="100%" height={300}>
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="variation" label={{ value: '變化率 (%)', position: 'insideBottom', offset: -5 }} />
@@ -982,23 +985,23 @@ function SensitivityPanel({ data }: any) {
         </ResponsiveContainer>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold mb-4">參數影響摘要</h3>
+      <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
+        <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">參數影響摘要</h3>
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full text-xs sm:text-sm">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">參數</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">敏感度</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">影響</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">說明</th>
+                <th className="text-left py-2 sm:py-3 px-2 sm:px-4 font-semibold text-gray-700">參數</th>
+                <th className="text-left py-2 sm:py-3 px-2 sm:px-4 font-semibold text-gray-700">敏感度</th>
+                <th className="text-left py-2 sm:py-3 px-2 sm:px-4 font-semibold text-gray-700">影響</th>
+                <th className="text-left py-2 sm:py-3 px-2 sm:px-4 font-semibold text-gray-700">說明</th>
               </tr>
             </thead>
             <tbody>
               {extendedData.map((row, idx) => (
                 <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50">
-                  <td className="py-3 px-4 font-medium">{row.param}</td>
-                  <td className="py-3 px-4">
+                  <td className="py-2 sm:py-3 px-2 sm:px-4 font-medium">{row.param}</td>
+                  <td className="py-2 sm:py-3 px-2 sm:px-4">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       row.sensitivity === '高' ? 'bg-red-100 text-red-700' :
                       row.sensitivity === '中' ? 'bg-yellow-100 text-yellow-700' :
@@ -1007,8 +1010,8 @@ function SensitivityPanel({ data }: any) {
                       {row.sensitivity}
                     </span>
                   </td>
-                  <td className="py-3 px-4 font-semibold">{row.impact}</td>
-                  <td className="py-3 px-4 text-sm text-gray-600">{row.description}</td>
+                  <td className="py-2 sm:py-3 px-2 sm:px-4 font-semibold">{row.impact}</td>
+                  <td className="py-2 sm:py-3 px-2 sm:px-4 text-xs sm:text-sm text-gray-600">{row.description}</td>
                 </tr>
               ))}
             </tbody>
@@ -1016,21 +1019,21 @@ function SensitivityPanel({ data }: any) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-6">
-          <h4 className="font-semibold text-blue-900 mb-2">最敏感</h4>
-          <p className="text-2xl font-bold text-blue-600 mb-2">需求 (a)</p>
-          <p className="text-sm text-blue-700">增加10%將帶來8.1%的利潤增長</p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6">
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-4 sm:p-6">
+          <h4 className="font-semibold text-blue-900 mb-2 text-sm sm:text-base">最敏感</h4>
+          <p className="text-lg sm:text-2xl font-bold text-blue-600 mb-2">需求 (a)</p>
+          <p className="text-xs sm:text-sm text-blue-700">增加10%將帶來8.1%的利潤增長</p>
         </div>
-        <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-lg p-6">
-          <h4 className="font-semibold text-green-900 mb-2">機會點</h4>
-          <p className="text-2xl font-bold text-green-600 mb-2">市場成長</p>
-          <p className="text-sm text-green-700">專注於市場擴張策略</p>
+        <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-lg p-4 sm:p-6">
+          <h4 className="font-semibold text-green-900 mb-2 text-sm sm:text-base">機會點</h4>
+          <p className="text-lg sm:text-2xl font-bold text-green-600 mb-2">市場成長</p>
+          <p className="text-xs sm:text-sm text-green-700">專注於市場擴張策略</p>
         </div>
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-lg p-6">
-          <h4 className="font-semibold text-purple-900 mb-2">風險因素</h4>
-          <p className="text-2xl font-bold text-purple-600 mb-2">價格敏感度</p>
-          <p className="text-sm text-purple-700">謹慎監控競爭定價</p>
+        <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-lg p-4 sm:p-6">
+          <h4 className="font-semibold text-purple-900 mb-2 text-sm sm:text-base">風險因素</h4>
+          <p className="text-lg sm:text-2xl font-bold text-purple-600 mb-2">價格敏感度</p>
+          <p className="text-xs sm:text-sm text-purple-700">謹慎監控競爭定價</p>
         </div>
       </div>
     </div>
