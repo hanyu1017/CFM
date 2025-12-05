@@ -56,7 +56,7 @@
   }
 
   .glass-effect {
-    @apply bg-white/80 backdrop-blur-lg border border-white/20 shadow-xl;
+    @apply bg-white/60 backdrop-blur-xl border border-white/30 shadow-xl;
   }
 
   .gradient-primary {
@@ -73,5 +73,34 @@
 
   .card-hover {
     @apply transition-all duration-300 hover:shadow-2xl hover:-translate-y-1;
+  }
+
+  /* 背景圖片樣式 */
+  .bg-pattern {
+    background-image: url('/images/background-horizontal.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+
+  .bg-pattern-vertical {
+    background-image: url('/images/background-vertical.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  /* 背景疊加效果 */
+  .bg-overlay {
+    position: relative;
+  }
+
+  .bg-overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom right, rgba(248, 250, 252, 0.7), rgba(239, 246, 255, 0.7), rgba(240, 253, 244, 0.7));
+    pointer-events: none;
   }
 }

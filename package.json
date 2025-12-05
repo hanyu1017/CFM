@@ -1,7 +1,7 @@
 {
   "name": "carbon-management-system",
   "version": "1.0.0",
-  "description": "專業的永續碳排管理與監控平台",
+  "description": "碳智匯 - 專業的永續碳排管理與監控平台",
   "private": true,
   "scripts": {
     "dev": "next dev",

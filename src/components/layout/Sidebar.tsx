@@ -3,7 +3,8 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { LayoutDashboard, Calculator, FileText, Settings, Leaf, Database, X } from 'lucide-react';
+import Image from 'next/image';
+import { LayoutDashboard, Calculator, FileText, Settings, Database, X } from 'lucide-react';
 
 const navigation = [
   { name: '儀表板', href: '/dashboard', icon: LayoutDashboard },
@@ -40,12 +41,18 @@ export default function Sidebar({ isOpen = true, onClose }: SidebarProps) {
       `}>
         <div className="p-4 sm:p-6 border-b border-gray-200 flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-2 sm:gap-3">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-green-500 to-blue-600 rounded-lg flex items-center justify-center">
-              <Leaf className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden">
+              <Image
+                src="/images/logo.png"
+                alt="碳智匯"
+                width={40}
+                height={40}
+                className="w-full h-full object-cover"
+              />
             </div>
             <div>
-              <h1 className="text-lg sm:text-xl font-bold text-gray-900">CFM System</h1>
-              <p className="text-xs text-gray-500">碳排管理系統</p>
+              <h1 className="text-lg sm:text-xl font-bold text-gray-900">碳智匯</h1>
+              <p className="text-xs text-gray-500">智慧碳管理平台</p>
             </div>
           </Link>
 
