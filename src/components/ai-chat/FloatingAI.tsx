@@ -225,39 +225,39 @@ export default function FloatingAI() {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center z-50"
+          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center z-50"
           aria-label="打開AI助手"
         >
-          <MessageCircle className="w-8 h-8" />
+          <MessageCircle className="w-7 h-7 sm:w-8 sm:h-8" />
         </button>
       )}
 
       {/* 聊天窗口 */}
       {isOpen && (
         <div
-          className={`fixed bottom-6 right-6 bg-white rounded-2xl shadow-2xl transition-all z-50 flex flex-col ${
-            isMinimized
-              ? 'w-80 h-16'
-              : 'w-96 max-h-[90vh]'
-          }`}
+          className={`fixed bg-white rounded-2xl shadow-2xl transition-all z-50 flex flex-col
+            ${isMinimized
+              ? 'bottom-4 right-4 sm:bottom-6 sm:right-6 w-72 sm:w-80 h-16'
+              : 'inset-4 sm:inset-auto sm:bottom-6 sm:right-6 sm:w-96 sm:max-h-[90vh] max-h-[calc(100vh-2rem)]'
+            }`}
         >
           {/* 標題欄 */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-t-2xl flex items-center justify-between flex-shrink-0">
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-              <h3 className="font-semibold">AI永續助手</h3>
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-3 sm:p-4 rounded-t-2xl flex items-center justify-between flex-shrink-0">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-400 rounded-full animate-pulse"></div>
+              <h3 className="font-semibold text-sm sm:text-base">AI永續助手</h3>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
               <button
                 onClick={() => setIsMinimized(!isMinimized)}
-                className="p-1 hover:bg-white/20 rounded-lg transition-colors"
+                className="p-1.5 sm:p-2 hover:bg-white/20 rounded-lg transition-colors min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
                 aria-label={isMinimized ? '展開' : '最小化'}
               >
                 {isMinimized ? <Maximize2 className="w-5 h-5" /> : <Minimize2 className="w-5 h-5" />}
               </button>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1 hover:bg-white/20 rounded-lg transition-colors"
+                className="p-1.5 sm:p-2 hover:bg-white/20 rounded-lg transition-colors min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center"
                 aria-label="關閉"
               >
                 <X className="w-5 h-5" />
@@ -289,9 +289,9 @@ export default function FloatingAI() {
 
               {/* 快速問題（僅在對話開始時顯示） */}
               {messages.length === 1 && (
-                <div className="px-4 pb-2 flex-shrink-0">
+                <div className="px-3 sm:px-4 pb-2 flex-shrink-0">
                   <p className="text-xs text-gray-500 mb-2">快速問題：</p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
                     {quickQuestions.map((question, index) => (
                       <button
                         key={index}
@@ -299,7 +299,7 @@ export default function FloatingAI() {
                           setInput(question);
                           inputRef.current?.focus();
                         }}
-                        className="text-xs px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full transition-colors"
+                        className="text-xs px-2.5 sm:px-3 py-2 sm:py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full transition-colors min-h-[44px] sm:min-h-0 flex items-center"
                       >
                         {question}
                       </button>
@@ -309,7 +309,7 @@ export default function FloatingAI() {
               )}
 
               {/* 輸入區域 */}
-              <div className="border-t border-gray-200 p-4 flex-shrink-0">
+              <div className="border-t border-gray-200 p-3 sm:p-4 flex-shrink-0">
                 <div className="flex items-center gap-2">
                   <input
                     ref={inputRef}
@@ -319,18 +319,18 @@ export default function FloatingAI() {
                     onKeyPress={handleKeyPress}
                     placeholder="輸入訊息..."
                     disabled={loading}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                    className="flex-1 px-3 sm:px-4 py-2.5 sm:py-2 text-sm sm:text-base border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 min-h-[44px]"
                   />
                   <button
                     onClick={handleSendMessage}
                     disabled={!input.trim() || loading}
-                    className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                    className="p-2.5 sm:p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
                     aria-label="發送"
                   >
                     <Send className="w-5 h-5" />
                   </button>
                 </div>
-                <p className="text-xs text-gray-500 mt-2 text-center">
+                <p className="text-xs text-gray-500 mt-2 text-center hidden sm:block">
                   按 Enter 發送 • Shift + Enter 換行
                 </p>
               </div>
@@ -349,17 +349,17 @@ function ChatMessage({ message }: { message: Message }) {
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
       <div
-        className={`max-w-[80%] rounded-2xl px-4 py-2 ${
+        className={`max-w-[85%] sm:max-w-[80%] rounded-2xl px-3 sm:px-4 py-2 ${
           isUser
             ? 'bg-blue-600 text-white rounded-br-none'
             : 'bg-gray-100 text-gray-900 rounded-bl-none'
         }`}
       >
-        <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+        <p className="text-sm sm:text-base whitespace-pre-wrap break-words">{message.content}</p>
         <p className={`text-xs mt-1 ${isUser ? 'text-blue-200' : 'text-gray-500'}`}>
-          {message.timestamp.toLocaleTimeString('zh-TW', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
+          {message.timestamp.toLocaleTimeString('zh-TW', {
+            hour: '2-digit',
+            minute: '2-digit'
           })}
         </p>
       </div>

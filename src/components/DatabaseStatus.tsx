@@ -79,11 +79,11 @@ export default function DatabaseStatus() {
     <div className="relative">
       <button
         onClick={() => setShowDetails(!showDetails)}
-        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all ${getStatusColor()}`}
+        className={`flex items-center gap-2 px-2.5 sm:px-3 py-2 sm:py-1.5 rounded-lg border transition-all min-h-[44px] sm:min-h-0 ${getStatusColor()}`}
         title={dbStatus.message}
       >
         {getStatusIcon()}
-        <span className="text-sm font-medium hidden sm:inline">
+        <span className="text-xs sm:text-sm font-medium hidden sm:inline">
           {dbStatus.status === 'connected' ? '資料庫' : '資料庫'}
         </span>
         {dbStatus.status === 'connected' && (
@@ -98,12 +98,12 @@ export default function DatabaseStatus() {
             className="fixed inset-0 z-40"
             onClick={() => setShowDetails(false)}
           ></div>
-          <div className="absolute right-0 top-12 z-50 w-72 bg-white rounded-lg shadow-xl border border-gray-200 p-4">
+          <div className="fixed sm:absolute left-4 right-4 sm:left-auto sm:right-0 top-20 sm:top-12 z-50 w-auto sm:w-72 bg-white rounded-lg shadow-xl border border-gray-200 p-4">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-gray-900">資料庫連線狀態</h3>
+              <h3 className="font-semibold text-sm sm:text-base text-gray-900">資料庫連線狀態</h3>
               <button
                 onClick={() => setShowDetails(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 min-w-[44px] min-h-[44px] flex items-center justify-center"
               >
                 ✕
               </button>
@@ -112,7 +112,7 @@ export default function DatabaseStatus() {
             <div className="space-y-3">
               <div className={`flex items-center gap-2 p-2 rounded ${getStatusColor()}`}>
                 {getStatusIcon()}
-                <span className="text-sm font-medium">{dbStatus.message}</span>
+                <span className="text-xs sm:text-sm font-medium">{dbStatus.message}</span>
               </div>
 
               {dbStatus.status === 'connected' && dbStatus.stats && (
@@ -120,19 +120,19 @@ export default function DatabaseStatus() {
                   <p className="text-xs text-gray-500 font-medium">資料統計</p>
                   <div className="grid grid-cols-3 gap-2 text-center">
                     <div className="bg-blue-50 rounded p-2">
-                      <p className="text-lg font-bold text-blue-600">
+                      <p className="text-base sm:text-lg font-bold text-blue-600">
                         {dbStatus.stats.companies}
                       </p>
                       <p className="text-xs text-gray-600">公司</p>
                     </div>
                     <div className="bg-green-50 rounded p-2">
-                      <p className="text-lg font-bold text-green-600">
+                      <p className="text-base sm:text-lg font-bold text-green-600">
                         {dbStatus.stats.carbonData}
                       </p>
                       <p className="text-xs text-gray-600">碳排數據</p>
                     </div>
                     <div className="bg-purple-50 rounded p-2">
-                      <p className="text-lg font-bold text-purple-600">
+                      <p className="text-base sm:text-lg font-bold text-purple-600">
                         {dbStatus.stats.targets}
                       </p>
                       <p className="text-xs text-gray-600">目標</p>
@@ -143,7 +143,7 @@ export default function DatabaseStatus() {
 
               <button
                 onClick={checkDatabaseStatus}
-                className="w-full px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="w-full px-3 py-2.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors min-h-[44px]"
               >
                 重新檢查
               </button>

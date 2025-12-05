@@ -125,10 +125,10 @@ export default function SettingsPage() {
         type={toastState.type}
       />
 
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
       {/* 頁面標題 */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">系統設定</h1>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">系統設定</h1>
         <p className="text-gray-600 mt-2">管理公司資料、減排目標與系統配置</p>
       </div>
 
@@ -155,7 +155,7 @@ export default function SettingsPage() {
           />
         </div>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6 lg:p-8">
           {loading ? (
             <LoadingSpinner />
           ) : (
@@ -328,7 +328,7 @@ function TabButton({ active, onClick, icon, label }: any) {
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-2 px-6 py-4 font-medium transition-colors ${
+      className={`flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-4 min-h-[44px] font-medium transition-colors ${
         active
           ? 'text-blue-600 border-b-2 border-blue-600'
           : 'text-gray-600 hover:text-gray-900'
@@ -354,7 +354,7 @@ function CompanyPanel({ data, onChange, onSave }: CompanyPanelProps) {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
         <FormField
           label="公司名稱"
           value={data.name}
@@ -399,7 +399,7 @@ function CompanyPanel({ data, onChange, onSave }: CompanyPanelProps) {
       <div className="flex gap-4 pt-4">
         <button
           onClick={onSave}
-          className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 min-h-[44px] bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
         >
           <Save className="w-5 h-5" />
           儲存設定
@@ -458,7 +458,7 @@ function TargetsPanel({ targets, loading, onAdd, onUpdate, onDelete }: any) {
         <button
           onClick={() => setIsAdding(true)}
           disabled={loading}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-4 py-2 sm:py-3 min-h-[44px] bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed text-sm sm:text-base"
         >
           <Plus className="w-5 h-5" />
           新增減排目標
@@ -467,11 +467,11 @@ function TargetsPanel({ targets, loading, onAdd, onUpdate, onDelete }: any) {
 
       {/* 新增/編輯表單 */}
       {(isAdding || editingId) && (
-        <div className="border border-gray-200 rounded-lg p-6 bg-gray-50">
-          <h3 className="text-lg font-semibold mb-4">
+        <div className="border border-gray-200 rounded-lg p-4 sm:p-6 lg:p-8 bg-gray-50">
+          <h3 className="text-lg sm:text-xl font-semibold mb-4">
             {editingId ? '編輯減排目標' : '新增減排目標'}
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 mb-4">
             <FormField
               label="目標年度"
               type="number"
@@ -479,13 +479,13 @@ function TargetsPanel({ targets, loading, onAdd, onUpdate, onDelete }: any) {
               onChange={(v: string) => setFormData({ ...formData, targetYear: parseInt(v) })}
             />
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                 目標類型
               </label>
               <select
                 value={formData.targetType}
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData({ ...formData, targetType: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="NET_ZERO">淨零排放</option>
                 <option value="REDUCTION">絕對減量</option>
@@ -511,13 +511,13 @@ function TargetsPanel({ targets, loading, onAdd, onUpdate, onDelete }: any) {
               onChange={(v: string) => setFormData({ ...formData, targetValue: parseFloat(v) })}
             />
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                 狀態
               </label>
               <select
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               >
                 <option value="ACTIVE">進行中</option>
                 <option value="ACHIEVED">已達成</option>
@@ -526,22 +526,22 @@ function TargetsPanel({ targets, loading, onAdd, onUpdate, onDelete }: any) {
               </select>
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                 描述
               </label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-4 py-2 sm:py-3 min-h-[44px] bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-sm sm:text-base"
             >
               <Save className="w-5 h-5" />
               {loading ? '儲存中...' : '儲存'}
@@ -553,7 +553,7 @@ function TargetsPanel({ targets, loading, onAdd, onUpdate, onDelete }: any) {
                 resetForm();
               }}
               disabled={loading}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-4 py-2 sm:py-3 min-h-[44px] bg-gray-500 text-white rounded-lg hover:bg-gray-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-sm sm:text-base"
             >
               <X className="w-5 h-5" />
               取消
@@ -565,7 +565,7 @@ function TargetsPanel({ targets, loading, onAdd, onUpdate, onDelete }: any) {
       {/* 目標列表 */}
       <div className="space-y-4">
         {targets.map((target: EmissionTarget) => (
-          <div key={target.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+          <div key={target.id} className="border border-gray-200 rounded-lg p-3 sm:p-4 lg:p-6 hover:shadow-md transition-shadow">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
@@ -574,7 +574,7 @@ function TargetsPanel({ targets, loading, onAdd, onUpdate, onDelete }: any) {
                   </h3>
                   <StatusBadge status={target.status} />
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm">
                   <div>
                     <p className="text-gray-600">基準年度</p>
                     <p className="font-semibold">{target.baselineYear}</p>
@@ -604,14 +604,14 @@ function TargetsPanel({ targets, loading, onAdd, onUpdate, onDelete }: any) {
                     setEditingId(target.id!);
                     setFormData(target);
                   }}
-                  className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                   disabled={loading}
                 >
                   <Edit className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => onDelete(target.id)}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                   disabled={loading}
                 >
                   <Trash2 className="w-5 h-5" />
@@ -656,15 +656,15 @@ function SettingsPanel({ settings, loading, onUpdate }: any) {
         if (categorySettings.length === 0) return null;
 
         return (
-          <div key={category} className="border border-gray-200 rounded-lg p-6">
-            <h3 className="text-lg font-semibold mb-4">{category}</h3>
+          <div key={category} className="border border-gray-200 rounded-lg p-4 sm:p-6 lg:p-8">
+            <h3 className="text-lg sm:text-xl font-semibold mb-4">{category}</h3>
             <div className="space-y-4">
               {categorySettings.map((setting: Setting) => (
                 <div key={setting.id}>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     {setting.label}
                   </label>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <input
                       type="text"
                       value={editingId === setting.id ? editValue : setting.value}
@@ -677,21 +677,21 @@ function SettingsPanel({ settings, loading, onUpdate }: any) {
                         }
                       }}
                       disabled={loading}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                      className="flex-1 px-3 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                     />
                     {editingId === setting.id && (
                       <>
                         <button
                           onClick={() => handleSave(setting)}
                           disabled={loading}
-                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                          className="px-4 py-2 sm:py-3 min-h-[44px] bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-sm sm:text-base"
                         >
                           {loading ? '儲存中...' : '儲存'}
                         </button>
                         <button
                           onClick={handleCancel}
                           disabled={loading}
-                          className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                          className="px-4 py-2 sm:py-3 min-h-[44px] bg-gray-500 text-white rounded-lg hover:bg-gray-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-sm sm:text-base"
                         >
                           取消
                         </button>
@@ -713,7 +713,7 @@ function SettingsPanel({ settings, loading, onUpdate }: any) {
 function FormField({ label, value, onChange, type = 'text', placeholder = '', fullWidth = false }: any) {
   return (
     <div className={fullWidth ? 'md:col-span-2' : ''}>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+      <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
         {label}
       </label>
       <input
@@ -721,7 +721,7 @@ function FormField({ label, value, onChange, type = 'text', placeholder = '', fu
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        className="w-full px-3 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
       />
     </div>
   );

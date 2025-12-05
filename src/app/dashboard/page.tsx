@@ -160,35 +160,35 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout>
-      <div className="min-h-screen bg-gray-50 p-6 relative">
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8 relative">
         {/* 查詢遮罩 */}
         {querying && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-8 shadow-xl">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto"></div>
-              <p className="mt-4 text-gray-700 font-medium">正在查詢數據...</p>
+            <div className="bg-white rounded-lg p-6 sm:p-8 shadow-xl mx-4">
+              <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-b-4 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-700 font-medium text-sm sm:text-base">正在查詢數據...</p>
             </div>
           </div>
         )}
 
         {/* 頁面標題 */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">碳排放監控儀表板</h1>
-          <p className="text-gray-600 mt-2">即時監控企業碳排放數據與趨勢分析</p>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">碳排放監控儀表板</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-2">即時監控企業碳排放數據與趨勢分析</p>
         </div>
 
         {/* 錯誤提示 */}
         {error && (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded">
-            <div className="flex items-center">
-              <AlertCircle className="w-5 h-5 text-red-500 mr-2" />
-              <div>
-                <p className="font-medium text-red-800">查詢失敗</p>
-                <p className="text-red-700 text-sm mt-1">{error}</p>
-                <p className="text-red-600 text-sm mt-2">
+          <div className="bg-red-50 border-l-4 border-red-500 p-3 sm:p-4 mb-4 sm:mb-6 rounded">
+            <div className="flex items-start">
+              <AlertCircle className="w-5 h-5 text-red-500 mr-2 mt-0.5 flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-red-800 text-sm sm:text-base">查詢失敗</p>
+                <p className="text-red-700 text-xs sm:text-sm mt-1 break-words">{error}</p>
+                <p className="text-red-600 text-xs sm:text-sm mt-2">
                   請確認：
                   <br />• 資料庫已正確配置
-                  <br />• 已導入碳排放數據（執行：<code className="bg-red-100 px-1 rounded">npm run seed:import-pg</code>）
+                  <br />• 已導入碳排放數據（執行：<code className="bg-red-100 px-1 rounded text-xs">npm run seed:import-pg</code>）
                   <br />• 所選日期範圍內有數據
                 </p>
               </div>
@@ -198,47 +198,47 @@ export default function DashboardPage() {
 
         {/* 成功訊息 */}
         {message && !error && (
-          <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded">
+          <div className="bg-green-50 border-l-4 border-green-500 p-3 sm:p-4 mb-4 sm:mb-6 rounded">
             <div className="flex items-center">
-              <Database className="w-5 h-5 text-green-500 mr-2" />
-              <p className="text-green-800">{message}</p>
+              <Database className="w-5 h-5 text-green-500 mr-2 flex-shrink-0" />
+              <p className="text-green-800 text-xs sm:text-sm">{message}</p>
             </div>
           </div>
         )}
 
         {/* 日期範圍選擇器 */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-6 sm:mb-8">
           <div className="flex flex-col space-y-4">
             {/* 日期輸入區域 */}
-            <div className="flex flex-col md:flex-row items-start md:items-end gap-4">
-              <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Calendar className="w-4 h-4 inline mr-1" />
+            <div className="flex flex-col md:flex-row items-stretch md:items-end gap-3 sm:gap-4">
+              <div className="flex-1 min-w-0">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
                   開始日期
                 </label>
                 <input
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 sm:px-4 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-              <div className="flex-1">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <Calendar className="w-4 h-4 inline mr-1" />
+              <div className="flex-1 min-w-0">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
+                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
                   結束日期
                 </label>
                 <input
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 sm:px-4 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
               <button
                 onClick={() => fetchDashboardData(startDate, endDate)}
                 disabled={querying}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full md:w-auto px-6 py-2.5 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base min-h-[44px]"
               >
                 {querying ? '查詢中...' : '查詢'}
               </button>
@@ -246,39 +246,39 @@ export default function DashboardPage() {
 
             {/* 快速選擇按鈕 */}
             <div className="flex flex-wrap gap-2">
-              <span className="text-sm font-medium text-gray-700 self-center mr-2">快速選擇：</span>
+              <span className="text-xs sm:text-sm font-medium text-gray-700 self-center mr-1 sm:mr-2 w-full sm:w-auto mb-1 sm:mb-0">快速選擇：</span>
               <button
                 onClick={() => setQuickDateRange(7)}
                 disabled={querying}
-                className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+                className="px-3 py-2 text-xs sm:text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 min-h-[44px] sm:min-h-[36px]"
               >
                 過去7天
               </button>
               <button
                 onClick={() => setQuickDateRange(30)}
                 disabled={querying}
-                className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+                className="px-3 py-2 text-xs sm:text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 min-h-[44px] sm:min-h-[36px]"
               >
                 過去30天
               </button>
               <button
                 onClick={() => setQuickDateRange(90)}
                 disabled={querying}
-                className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+                className="px-3 py-2 text-xs sm:text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 min-h-[44px] sm:min-h-[36px]"
               >
                 過去90天
               </button>
               <button
                 onClick={() => setQuickDateRange(180)}
                 disabled={querying}
-                className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+                className="px-3 py-2 text-xs sm:text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 min-h-[44px] sm:min-h-[36px]"
               >
                 過去180天
               </button>
               <button
                 onClick={() => setQuickDateRange('year')}
                 disabled={querying}
-                className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+                className="px-3 py-2 text-xs sm:text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 min-h-[44px] sm:min-h-[36px]"
               >
                 今年
               </button>
@@ -288,15 +288,15 @@ export default function DashboardPage() {
 
         {/* 空狀態提示 */}
         {!error && carbonData.length === 0 && (
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 mb-8 rounded">
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 sm:p-6 mb-6 sm:mb-8 rounded">
             <div className="flex items-start">
-              <Database className="w-6 h-6 text-yellow-600 mr-3 mt-1" />
-              <div>
-                <h3 className="font-semibold text-yellow-900 mb-2">查詢範圍內無數據</h3>
-                <p className="text-yellow-800 mb-3">
+              <Database className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600 mr-2 sm:mr-3 mt-0.5 sm:mt-1 flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-yellow-900 mb-2 text-sm sm:text-base">查詢範圍內無數據</h3>
+                <p className="text-yellow-800 mb-3 text-xs sm:text-sm break-words">
                   在 <strong>{startDate}</strong> 至 <strong>{endDate}</strong> 期間沒有找到碳排放數據。
                 </p>
-                <div className="text-yellow-800 text-sm space-y-1">
+                <div className="text-yellow-800 text-xs sm:text-sm space-y-1">
                   <p className="font-medium">建議操作：</p>
                   <ul className="list-disc list-inside space-y-1 ml-2">
                     <li>調整查詢日期範圍</li>
@@ -349,22 +349,22 @@ export default function DashboardPage() {
             </div>
 
             {/* 圖表區域 */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
               {/* 趨勢圖 */}
               <ChartCard title="碳排放趨勢圖">
-                <ResponsiveContainer width="100%" height={300}>
+                <ResponsiveContainer width="100%" height={250}>
                   <LineChart data={carbonData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis
                       dataKey="date"
-                      tick={{ fontSize: 12 }}
+                      tick={{ fontSize: 10 }}
                       angle={-45}
                       textAnchor="end"
-                      height={80}
+                      height={70}
                     />
-                    <YAxis tick={{ fontSize: 12 }} />
+                    <YAxis tick={{ fontSize: 10 }} />
                     <Tooltip />
-                    <Legend />
+                    <Legend wrapperStyle={{ fontSize: '12px' }} />
                     <Line type="monotone" dataKey="scope1" stroke="#3b82f6" name="範疇一" strokeWidth={2} />
                     <Line type="monotone" dataKey="scope2" stroke="#10b981" name="範疇二" strokeWidth={2} />
                     <Line type="monotone" dataKey="scope3" stroke="#f59e0b" name="範疇三" strokeWidth={2} />
@@ -374,7 +374,7 @@ export default function DashboardPage() {
 
               {/* 範圍分布圓餅圖 */}
               <ChartCard title="排放範圍分布">
-                <ResponsiveContainer width="100%" height={300}>
+                <ResponsiveContainer width="100%" height={250}>
                   <PieChart>
                     <Pie
                       data={scopeData}
@@ -382,7 +382,7 @@ export default function DashboardPage() {
                       cy="50%"
                       labelLine={false}
                       label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={100}
+                      outerRadius={80}
                       fill="#8884d8"
                       dataKey="value"
                     >
@@ -398,28 +398,28 @@ export default function DashboardPage() {
 
             {/* 總排放量柱狀圖 */}
             <ChartCard title="總排放量對比">
-              <ResponsiveContainer width="100%" height={350}>
+              <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={carbonData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis
                     dataKey="date"
-                    tick={{ fontSize: 12 }}
+                    tick={{ fontSize: 10 }}
                     angle={-45}
                     textAnchor="end"
-                    height={80}
+                    height={70}
                   />
-                  <YAxis tick={{ fontSize: 12 }} />
+                  <YAxis tick={{ fontSize: 10 }} />
                   <Tooltip />
-                  <Legend />
+                  <Legend wrapperStyle={{ fontSize: '12px' }} />
                   <Bar dataKey="total" fill="#8b5cf6" name="總排放量 (tCO2e)" />
                 </BarChart>
               </ResponsiveContainer>
             </ChartCard>
 
             {/* 數據摘要 */}
-            <div className="bg-white rounded-lg shadow-md p-6 mt-6">
-              <h3 className="text-lg font-semibold mb-4">數據摘要</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 mt-4 sm:mt-6">
+              <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">數據摘要</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                 <SummaryItem label="期間總排放" value={monthlyTotal.toFixed(0)} unit="tCO2e" />
                 <SummaryItem label="平均每日" value={avgMonthly.toFixed(0)} unit="tCO2e" />
                 <SummaryItem label="最高單日" value={Math.max(...carbonData.map(d => d.total)).toFixed(0)} unit="tCO2e" />
@@ -452,19 +452,19 @@ function MetricCard({ title, value, unit, trend, icon, color }: MetricCardProps)
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <div className="flex items-center justify-between mb-4">
-        <div className={`${colorClasses[color]} text-white p-3 rounded-lg`}>
+    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <div className={`${colorClasses[color]} text-white p-2 sm:p-3 rounded-lg`}>
           {icon}
         </div>
-        <div className={`flex items-center text-sm ${trend >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-          {trend >= 0 ? <TrendingUp className="w-4 h-4 mr-1" /> : <TrendingDown className="w-4 h-4 mr-1" />}
+        <div className={`flex items-center text-xs sm:text-sm ${trend >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+          {trend >= 0 ? <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> : <TrendingDown className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />}
           {Math.abs(trend)}%
         </div>
       </div>
-      <h3 className="text-gray-600 text-sm mb-2">{title}</h3>
-      <p className="text-2xl font-bold text-gray-900">
-        {value} <span className="text-sm text-gray-500">{unit}</span>
+      <h3 className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-2">{title}</h3>
+      <p className="text-xl sm:text-2xl font-bold text-gray-900">
+        {value} <span className="text-xs sm:text-sm text-gray-500">{unit}</span>
       </p>
     </div>
   );
@@ -473,8 +473,8 @@ function MetricCard({ title, value, unit, trend, icon, color }: MetricCardProps)
 // 圖表卡片組件
 function ChartCard({ title, children }: any) {
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h3 className="text-lg font-semibold mb-4">{title}</h3>
+    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+      <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">{title}</h3>
       {children}
     </div>
   );
@@ -483,10 +483,10 @@ function ChartCard({ title, children }: any) {
 // 摘要項目組件
 function SummaryItem({ label, value, unit }: any) {
   return (
-    <div>
-      <p className="text-sm text-gray-600 mb-1">{label}</p>
-      <p className="text-xl font-bold text-gray-900">
-        {value} <span className="text-sm text-gray-500">{unit}</span>
+    <div className="min-w-0">
+      <p className="text-xs sm:text-sm text-gray-600 mb-1 truncate">{label}</p>
+      <p className="text-base sm:text-xl font-bold text-gray-900">
+        {value} <span className="text-xs sm:text-sm text-gray-500">{unit}</span>
       </p>
     </div>
   );
