@@ -160,7 +160,7 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout>
-      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8 relative">
+      <div className="min-h-screen p-4 sm:p-6 lg:p-8 relative">
         {/* 查詢遮罩 */}
         {querying && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

@@ -589,7 +589,7 @@ export default function DecisionModelPage() {
           </div>
         </div>
       )}
-      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+      <div className="min-h-screen p-4 sm:p-6 lg:p-8">
       {/* 頁面標題 */}
       <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">綠色製造決策優化模型</h1>
