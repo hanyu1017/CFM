@@ -4,7 +4,7 @@ import { LayoutDashboard, Brain, FileText, Settings } from 'lucide-react';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-green-50">
+    <div className="min-h-screen bg-pattern bg-overlay">
       <nav className="glass-effect fixed top-0 left-0 right-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14 sm:h-16">
@@ -34,7 +34,7 @@ export default function Home() {
         </div>
       </nav>
 
-      <section className="pt-24 sm:pt-32 pb-12 sm:pb-20 px-4">
+      <section className="pt-24 sm:pt-32 pb-12 sm:pb-20 px-4 relative z-10">
         <div className="max-w-6xl mx-auto text-center">
           <div className="mb-8 sm:mb-12 flex justify-center">
             <div className="w-32 h-32 sm:w-48 sm:h-48 rounded-full overflow-hidden shadow-2xl">
@@ -62,7 +62,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-12 sm:py-20 px-4">
+      <section className="py-12 sm:py-20 px-4 relative z-10">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <FeatureCard
