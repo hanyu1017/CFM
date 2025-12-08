@@ -1,6 +1,7 @@
 # 🌱 碳智匯
 
 > 專業的企業碳排放監控與永續發展管理平台
+> https://cfm-production.up.railway.app/
 
 [![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-18-blue)](https://reactjs.org/)
