@@ -484,15 +484,15 @@ export default function ReportPage() {
       <div className="min-h-screen p-4 sm:p-6 lg:p-8">
       {/* 頁面標題 */}
       <div className="mb-8">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">永續報告書生成</h1>
-        <p className="text-gray-600 mt-2 text-sm sm:text-base">自動化生成符合國際標準的永續發展報告書</p>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">碳盤查與管理報告生成</h1>
+        <p className="text-gray-600 mt-2 text-sm sm:text-base">自動化生成符合國際標準的碳盤查與管理報告</p>
       </div>
 
       {/* 快速操作卡片 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
         <QuickActionCard
           title="AI一鍵生成"
-          description="使用上個月數據自動生成永續報告書"
+          description="使用上個月數據自動生成碳盤查與管理報告"
           icon={<Sparkles className="w-8 h-8" />}
           color="blue"
           onClick={generateQuickReport}
@@ -609,10 +609,10 @@ function CreateReportPanel({ config, onConfigChange, onGenerate, generating }: a
     { key: 'includeCarbonFootprint', label: '碳足跡分析', description: '完整的碳排放數據分析' },
     { key: 'includeEmissionsSummary', label: '排放總結', description: 'Scope 1/2/3 排放彙整' },
     { key: 'includeReductionTargets', label: '減排目標', description: '短中長期減碳目標與進度' },
-    { key: 'includeInitiatives', label: '永續措施', description: '已實施的永續發展計畫' },
-    { key: 'includeCompliance', label: '法規遵循', description: '相關環境法規符合性說明' },
-    { key: 'includeFinancialImpact', label: '財務影響', description: '永續投資與成本效益分析' },
-    { key: 'includeStakeholders', label: '利害關係人', description: '利害關係人溝通與議合' },
+    { key: 'includeInitiatives', label: '碳管理措施', description: '已實施的碳管理與減排計畫' },
+    { key: 'includeCompliance', label: '碳盤查法規遵循', description: '相關碳盤查與環境法規符合性說明' },
+    { key: 'includeFinancialImpact', label: '碳管理財務影響', description: '碳管理投資與成本效益分析' },
+    { key: 'includeStakeholders', label: '碳管理利害關係人', description: '碳管理相關利害關係人溝通與議合' },
   ];
 
   return (
