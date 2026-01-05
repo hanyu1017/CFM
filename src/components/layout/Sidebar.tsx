@@ -9,7 +9,7 @@ import { LayoutDashboard, Calculator, FileText, Settings, Database, X } from 'lu
 const navigation = [
   { name: '儀表板', href: '/dashboard', icon: LayoutDashboard },
   { name: '決策模型', href: '/decision-model', icon: Calculator },
-  { name: '永續報告書生成', href: '/report', icon: FileText },
+  { name: '碳盤查與管理報告生成', href: '/report', icon: FileText },
   { name: '資料管理', href: '/data-management', icon: Database },
   { name: '設定', href: '/settings', icon: Settings },
 ];

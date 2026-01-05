@@ -190,7 +190,7 @@ model SensitivityAnalysis {
 }
 
 // ========================================
-// 6. 永續報告書
+// 6. 碳盤查與管理報告
 // ========================================
 model SustainabilityReport {
   id              String   @id @default(cuid())

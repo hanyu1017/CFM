@@ -215,7 +215,7 @@ export default function FloatingAI() {
   const quickQuestions = [
     '本月碳排放量是多少？',
     '如何降低能源消耗？',
-    '生成上月永續報告',
+    '生成上月碳盤查與管理報告',
     '查看減排目標進度',
   ];
 
