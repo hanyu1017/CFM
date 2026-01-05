@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     const report = await prisma.sustainabilityReport.create({
       data: {
         companyId: company.id,
-        title: `${year}年${month}月永續報告書`,
+        title: `${year}年${month}月碳盤查與管理報告`,
         reportPeriod: `${year}-${String(month).padStart(2, '0')}`,
         startDate,
         endDate,

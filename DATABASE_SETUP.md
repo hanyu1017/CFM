@@ -61,7 +61,7 @@ npx ts-node prisma/seed.ts
    - 預設參數配置
 
 6. **示範報告**
-   - 2024年度永續發展報告書（草稿）
+   - 2024年度碳盤查與管理報告（草稿）
 
 ## 步驟 4: 驗證數據
 
@@ -140,7 +140,7 @@ npm run prisma:generate
 - `ModelParameter` - 決策模型參數
 - `OptimizationResult` - 優化結果
 - `SensitivityAnalysis` - 敏感性分析
-- `SustainabilityReport` - 永續報告書
+- `SustainabilityReport` - 碳盤查與管理報告
 - `ChatMessage` - AI 對話記錄
 - `AuditLog` - 系統日誌
 
